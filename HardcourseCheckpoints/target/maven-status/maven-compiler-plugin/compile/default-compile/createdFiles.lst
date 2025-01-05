@@ -1,0 +1,7 @@
+com\hardcourse\hardcoursecheckpoints\Commands\MakeCheckpointCommand.class
+com\hardcourse\hardcoursecheckpoints\Commands\DeleteCheckpointCommand.class
+com\hardcourse\hardcoursecheckpoints\Commands\TpCheckpoint.class
+com\hardcourse\hardcoursecheckpoints\Events\PlayerMoveListener.class
+com\hardcourse\hardcoursecheckpoints\HardcourseCheckpoints.class
+com\hardcourse\hardcoursecheckpoints\Events\PlayerDeathListener.class
+com\hardcourse\hardcoursecheckpoints\Utilities\CheckpointManager.class

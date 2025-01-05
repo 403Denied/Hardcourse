@@ -1,0 +1,20 @@
+name: HardcourseCheckpoints
+version: '${project.version}'
+main: com.hardcourse.hardcoursecheckpoints.HardcourseCheckpoints
+api-version: '1.20'
+depend:
+  - HardcourseDiscord
+
+commands:
+  makecheckpoint:
+    description: Make a checkpoint
+    permission: hardcourse.admin
+    aliases: [makecp, makecheckpointcommand]
+  deletecheckpoint:
+    description: Delete a checkpoint
+    permission: hardcourse.admin
+    aliases: [deletecp, deletecheckpointcommand]
+  tpcheckpoint:
+    description: Teleport to a checkpoint
+    permission: hardcourse.staff
+    aliases: [tpcp, tpcheckpointcommand]
