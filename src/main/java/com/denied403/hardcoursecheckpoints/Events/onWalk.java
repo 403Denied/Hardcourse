@@ -54,6 +54,7 @@ public class onWalk implements Listener {
             if (previousCheckpoint < checkpointNumber) {
                 // Notify staff if the player skipped more than 2 checkpoints
                 if (checkpointNumber > previousCheckpoint + 2) {
+                    sendMessage(event.getPlayer(), null, "hacks", previousCheckpoint.toString().replace(".0", ""));
                     if(!p.hasPermission("hardcourse.staff")) {
                         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
                             if (onlinePlayer.hasPermission("hardcourse.staff")) {
@@ -61,7 +62,6 @@ public class onWalk implements Listener {
                                         "&c&lHARDCOURSE &rPlayer &c" + event.getPlayer().getName() +
                                                 "&r might be cheating, they skipped from checkpoint &c" + previousCheckpoint.toString().replace(".0", "") +
                                                 " &rto &c" + checkpointNumber.toString().replace(".0", "") + "&r!"));
-                                sendMessage(event.getPlayer(), null, "hacks", previousCheckpoint.toString().replace(".0", ""));
                             }
                         }
                     }

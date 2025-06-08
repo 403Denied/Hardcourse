@@ -54,7 +54,6 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
         sendMessage(null, null, "starting", null);
         checkpointConfig = YamlConfiguration.loadConfiguration(checkpointFile);
         loadCheckpoints();
-        Bukkit.createWorld(new WorldCreator("Season2"));
         ChatReactions chatReactions = new ChatReactions(this);
         getServer().getPluginManager().registerEvents(chatReactions, this);
         getServer().getPluginManager().registerEvents(new onJoin(), this);
