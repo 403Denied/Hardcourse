@@ -50,18 +50,19 @@ public class onWalk implements Listener {
             Player p = event.getPlayer();
             Double previousCheckpoint = getHighestCheckpoint(playerUUID);
 
-            // Check if the player's highest checkpoint is less than the checkpoint number
+            // Only proceed if the new checkpoint is higher than the current one
             if (previousCheckpoint < checkpointNumber) {
-                // Notify staff if the player skipped more than 2 checkpoints
-                if (checkpointNumber > previousCheckpoint + 2) {
-                    sendMessage(event.getPlayer(), null, "hacks", previousCheckpoint.toString().replace(".0", ""));
-                    if(!p.hasPermission("hardcourse.staff")) {
+                // Notify staff if the player skipped more than 10 checkpoints
+                if (checkpointNumber > previousCheckpoint + 10) {
+                    if (!p.hasPermission("hardcourse.staff")) {
+                        sendMessage(p, null, "hacks", previousCheckpoint.toString().replace(".0", ""), checkpointNumber.toString().replace(".0", ""));
                         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
                             if (onlinePlayer.hasPermission("hardcourse.staff")) {
-                                onlinePlayer.sendMessage(org.bukkit.ChatColor.translateAlternateColorCodes('&',
-                                        "&c&lHARDCOURSE &rPlayer &c" + event.getPlayer().getName() +
-                                                "&r might be cheating, they skipped from checkpoint &c" + previousCheckpoint.toString().replace(".0", "") +
-                                                " &rto &c" + checkpointNumber.toString().replace(".0", "") + "&r!"));
+                                onlinePlayer.sendMessage(ChatColor.translateAlternateColorCodes('&',
+                                        "&c&lHARDCOURSE &rPlayer &c" + p.getName()
+                                                + "&r might be cheating, they skipped from checkpoint &c"
+                                                + previousCheckpoint.toString().replace(".0", "")
+                                                + " &rto &c" + checkpointNumber.toString().replace(".0", "") + "&r!"));
                             }
                         }
                     }
@@ -72,17 +73,11 @@ public class onWalk implements Listener {
 
                 // Notify the player with an action bar
                 String message = "§c§lHARDCOURSE §rCheckpoint reached: §c" + checkpointNumber.toString().replace(".0", "") + "§r!";
-                event.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(message));
-                event.getPlayer().playSound(event.getPlayer().getLocation(), org.bukkit.Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
+                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(message));
+                p.playSound(p.getLocation(), org.bukkit.Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
 
                 // Set the player's bed spawn location to the current location
-                event.getPlayer().setBedSpawnLocation(event.getPlayer().getLocation().add(0, 1, 0), true);
-                //Set tablist to show the player's highest level
-
-                String level = ChatColor.RED + checkpointNumber.toString().replace(".0", "");
-                String formattedTablistName = event.getPlayer().getDisplayName() + net.md_5.bungee.api.ChatColor.translateAlternateColorCodes('&', " &c" + level);
-
-                event.getPlayer().setPlayerListName(formattedTablistName);
+                p.setRespawnLocation(p.getLocation().add(0, 1, 0), true);
             }
         }
     }

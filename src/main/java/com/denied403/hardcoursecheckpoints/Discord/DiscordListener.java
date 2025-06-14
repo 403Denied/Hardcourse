@@ -32,7 +32,6 @@ public final class DiscordListener extends ListenerAdapter {
 
             // Check if the member has roles and access the first role safely
             if (member.getRoles().isEmpty()) {
-                plugin.getLogger().warning("Member " + name + " has no roles.");
                 firstFormattedMessage = "§a§lDC §7" + name + " §f: ";
             } else {
                 Role firstRole = member.getRoles().get(0);
@@ -43,7 +42,7 @@ public final class DiscordListener extends ListenerAdapter {
                 }
                 TextComponent nameComponent = new TextComponent(name);
                 nameComponent.setColor(net.md_5.bungee.api.ChatColor.of(hexColor));
-                firstFormattedMessage = "§a§lDC " + nameComponent.toLegacyText() + " §f: ";
+                firstFormattedMessage = "§a§lDC " + nameComponent.toLegacyText() + "§f: ";
             }
 
             // Check if the member has the "Staff" role

@@ -1,4 +1,4 @@
-name: HardcourseCheckpoints
+name: Hardcourse
 version: '${project.version}'
 main: com.denied403.hardcoursecheckpoints.HardcourseCheckpoints
 api-version: '1.21'
@@ -18,9 +18,6 @@ commands:
   apply:
     description: "Apply for staff."
     usage: "/apply"
-  playtime:
-    description: "Get your playtime on the server."
-    usage: "/playtime [player]"
   clock:
     description: "Lost your clock?"
     usage: "/clock"
@@ -34,5 +31,12 @@ commands:
     usage: "/endchatgame"
     permission: op
     aliases: ecg
+  getlevel:
+    description: "Check the level of another player."
+    usage: "/getlevel [player]"
+  restartforupdate:
+    description: "Restart the server for an update."
+    usage: "/restartforupdate"
+    permission: hardcourse.admin
 
 

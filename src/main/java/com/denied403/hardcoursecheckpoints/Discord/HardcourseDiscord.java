@@ -1,5 +1,6 @@
 package com.denied403.hardcoursecheckpoints.Discord;
 
+import com.denied403.hardcoursecheckpoints.Discord.Commands.CommandManager;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -9,6 +10,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -46,7 +48,10 @@ public class HardcourseDiscord {
                     .setMemberCachePolicy(MemberCachePolicy.ALL)
                     .setChunkingFilter(ChunkingFilter.ALL)
                     .enableCache(CacheFlag.ONLINE_STATUS)
-                    .addEventListeners(new DiscordListener())
+                    .addEventListeners(
+                            new DiscordListener(),
+                            new CommandManager()
+                    )
                     .build().awaitReady();
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -71,7 +76,7 @@ public class HardcourseDiscord {
         }
     }
 
-    public static void sendMessage(Player player, String content, String type, String lastCP) {
+    public static void sendMessage(Player player, String content, String type, String extra1, String extra2) {
         if (chatChannel == null) {
             player.sendMessage("Chat channel not found!");
             return;
@@ -81,25 +86,31 @@ public class HardcourseDiscord {
             return;
         }
         if (type.equals("staffchat")) {
-            staffChatChannel.sendMessage("**" + player.getDisplayName() + "**: " + content).queue();
+            staffChatChannel.sendMessage("**`" + player.getDisplayName() + "`**: " + content).queue();
         }
         if (type.equals("chat")) {
+            chatChannel.sendMessage("[**" + getHighestCheckpoint(player.getUniqueId()).toString().replace(".0", "") + "**] `" + player.getDisplayName() + "`: " + content).queue();
+        }
+        if(type.equals("staffmessage")) {
             chatChannel.sendMessage("[**" + getHighestCheckpoint(player.getUniqueId()).toString().replace(".0", "") + "**] **" + player.getDisplayName() + "**: " + content).queue();
         }
         if (type.equals("join")) {
-            chatChannel.sendMessage("**+** __" + player.getDisplayName() + "__").queue();
+            chatChannel.sendMessage(":inbox_tray: **`" + player.getDisplayName() + "`** joined").queue();
+        }
+        if(type.equals("firstjoin")) {
+            chatChannel.sendMessage(":inbox_tray: **`" + player.getDisplayName() + "`** joined the server for the first time _[#" + Bukkit.getOfflinePlayers().length + "]_").queue();
         }
         if (type.equals("leave")) {
-            chatChannel.sendMessage("**-** __" + player.getDisplayName() + "__").queue();
+            chatChannel.sendMessage(":outbox_tray: **`" + player.getDisplayName() + "`** left the server").queue();
         }
         if (type.equals("hacks")) {
-            hacksChannel.sendMessage("**" + player.getDisplayName() + "** may be hacking. They skipped from " + lastCP + " to " + getHighestCheckpoint(player.getUniqueId())).queue();
+            hacksChannel.sendMessage("**`" + player.getDisplayName() + "`** may be hacking. They skipped from level `" + extra1 + "` to level `" + extra2 + "`!").queue();
         }
         if (type.equals("starting")){
-            chatChannel.sendMessage("**Server is starting.**").queue();
+            chatChannel.sendMessage(":white_check_mark: **The server has started up!**").queue();
         }
         if (type.equals("stopping")){
-            chatChannel.sendMessage("**Server is shutting down.**").queue();
+            chatChannel.sendMessage(":octagonal_sign: **The server has shut down!**").queue();
         }
     }
 }

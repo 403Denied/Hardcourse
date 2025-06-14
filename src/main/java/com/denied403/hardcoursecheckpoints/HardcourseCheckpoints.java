@@ -4,6 +4,7 @@ import com.denied403.hardcoursecheckpoints.Commands.*;
 import com.denied403.hardcoursecheckpoints.Discord.HardcourseDiscord;
 import com.denied403.hardcoursecheckpoints.Events.*;
 import com.denied403.hardcoursecheckpoints.Chat.ChatReactions;
+import com.denied403.hardcoursecheckpoints.Utils.WordSyncListener;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.WorldCreator;
@@ -51,9 +52,10 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
         if(!checkpointFile.exists()) {
             saveResource("checkpoints.yml", false);
         }
-        sendMessage(null, null, "starting", null);
+        sendMessage(null, null, "starting", null, null);
         checkpointConfig = YamlConfiguration.loadConfiguration(checkpointFile);
         loadCheckpoints();
+        WordSyncListener wordSyncListener = new WordSyncListener(this);
         ChatReactions chatReactions = new ChatReactions(this);
         getServer().getPluginManager().registerEvents(chatReactions, this);
         getServer().getPluginManager().registerEvents(new onJoin(), this);
@@ -61,15 +63,19 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
         getServer().getPluginManager().registerEvents(new onClick(), this);
         getServer().getPluginManager().registerEvents(new onWalk(this), this);
         getServer().getPluginManager().registerEvents(new onChat(), this);
+        getServer().getPluginManager().registerEvents(new onHunger(), this);
         getServer().getPluginManager().registerEvents(this, this);
+        getServer().getPluginManager().registerEvents(wordSyncListener, this);
+        WordSyncListener.updateFilterWords();
         getCommand("resetcheckpoint").setExecutor(new CheckpointCommands(this));
         getCommand("resetallcheckpoints").setExecutor(new CheckpointCommands(this));
         getCommand("discord").setExecutor(new Discord());
         getCommand("apply").setExecutor(new Apply());
-        getCommand("playtime").setExecutor(new Playtime());
         getCommand("clock").setExecutor(new Clock());
         getCommand("runchatgame").setExecutor(new runChatGame());
         getCommand("endchatgame").setExecutor(new endChatGame());
+        getCommand("getlevel").setExecutor(new getLevel());
+        getCommand("restartforupdate").setExecutor(new restartForUpdate(this));
 
         Bukkit.getScheduler().runTaskTimer(this, () -> {
             String message = messages.get(random.nextInt(messages.size()));
@@ -89,7 +95,7 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
 
     @Override
     public void onDisable() {
-        sendMessage(null, null, "stopping", null);
+        sendMessage(null, null, "stopping", null, null);
         saveCheckpoints();
         if(jda != null){
             jda.shutdownNow();
@@ -118,19 +124,20 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
 
 
     private List<String> messages = Arrays.asList(
-            "See someone hacking? Don't call them out in chat, instead use &c/report <player> <reason>",
+            "See someone hacking? Don't call them out in chat, instead use &c/report",
             "Join our discord server at &c/discord",
             "See an issue? Please notify a staff member to have it fixed!",
             "Need help? Feel free to ask, or make a ticket in our discord!",
             "All jumps have been tested and &c&lAre Possible&r.",
             "While all of our levels have undergone testing, that was many years ago in another version. If something doesn't work, please alert a staff member and it will be fixed promptly.",
-            "Lost your kill item? Do &c/clock&r for a new one."
+            "Lost your kill item? Do &c/clock&r for a new one.",
+            "&cFAQ: &fThere are &c543&f levels in total, with no plans of expansion."
 
     );
     private Random random = new Random();
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e){
-        sendMessage(e.getPlayer(), null, "leave", null);
+        sendMessage(e.getPlayer(), null, "leave", null, null);
     }
 }
 
