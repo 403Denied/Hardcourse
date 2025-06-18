@@ -1,11 +1,13 @@
 package com.denied403.hardcoursecheckpoints.Discord;
 
 import com.denied403.hardcoursecheckpoints.Discord.Commands.CommandManager;
+import com.denied403.hardcoursecheckpoints.HardcourseCheckpoints;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
@@ -17,6 +19,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import javax.security.auth.login.LoginException;
 
 import static com.denied403.hardcoursecheckpoints.HardcourseCheckpoints.getHighestCheckpoint;
+import static com.denied403.hardcoursecheckpoints.Utils.Playtime.getPlaytime;
 
 public class HardcourseDiscord {
 
@@ -50,7 +53,8 @@ public class HardcourseDiscord {
                     .enableCache(CacheFlag.ONLINE_STATUS)
                     .addEventListeners(
                             new DiscordListener(),
-                            new CommandManager()
+                            new CommandManager(),
+                            new DiscordButtonListener((HardcourseCheckpoints) plugin)
                     )
                     .build().awaitReady();
         } catch (InterruptedException e) {
@@ -92,7 +96,7 @@ public class HardcourseDiscord {
             chatChannel.sendMessage("[**" + getHighestCheckpoint(player.getUniqueId()).toString().replace(".0", "") + "**] `" + player.getDisplayName() + "`: " + content).queue();
         }
         if(type.equals("staffmessage")) {
-            chatChannel.sendMessage("[**" + getHighestCheckpoint(player.getUniqueId()).toString().replace(".0", "") + "**] **" + player.getDisplayName() + "**: " + content).queue();
+            chatChannel.sendMessage("[**" + getHighestCheckpoint(player.getUniqueId()).toString().replace(".0", "") + "**] **`" + player.getDisplayName() + "`**: " + content).queue();
         }
         if (type.equals("join")) {
             chatChannel.sendMessage(":inbox_tray: **`" + player.getDisplayName() + "`** joined").queue();
@@ -104,13 +108,20 @@ public class HardcourseDiscord {
             chatChannel.sendMessage(":outbox_tray: **`" + player.getDisplayName() + "`** left the server").queue();
         }
         if (type.equals("hacks")) {
-            hacksChannel.sendMessage("**`" + player.getDisplayName() + "`** may be hacking. They skipped from level `" + extra1 + "` to level `" + extra2 + "`!").queue();
+            String playerName = player.getDisplayName();
+            String message = "**`" + playerName + "`** may be hacking. They skipped from level `" + extra1 + "` to level `" + extra2 + "`!";
+            hacksChannel.sendMessage(message)
+                    .setActionRow(Button.danger("ban:" + playerName, "Ban"))
+                    .queue();
         }
         if (type.equals("starting")){
             chatChannel.sendMessage(":white_check_mark: **The server has started up!**").queue();
         }
         if (type.equals("stopping")){
             chatChannel.sendMessage(":octagonal_sign: **The server has shut down!**").queue();
+        }
+        if (type.equals("winning")){
+            chatChannel.sendMessage(":trophy: **`" + player.getDisplayName() + "`** has completed the course! Their playtime was " + getPlaytime(player)).queue();
         }
     }
 }

@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 
 import static com.denied403.hardcoursecheckpoints.Chat.ChatReactions.*;
 import static com.denied403.hardcoursecheckpoints.Discord.HardcourseDiscord.sendMessage;
+import static com.denied403.hardcoursecheckpoints.Utils.WordSyncListener.isPlayerMuted;
 
 public class onChat implements Listener {
 
@@ -59,6 +60,7 @@ public class onChat implements Listener {
         return false;
     }
 
+
     @EventHandler(priority = EventPriority.MONITOR)
     public void onChatEvent(AsyncPlayerChatEvent event) {
         String content = event.getMessage()
@@ -68,6 +70,9 @@ public class onChat implements Listener {
                 .replaceAll("https://", "`https://`")
                 .replaceAll("http://", "`http://`");
 
+        if(isPlayerMuted(event.getPlayer().getUniqueId())){
+            return;
+        }
         if (isBlocked(content)) {
             return;
         }

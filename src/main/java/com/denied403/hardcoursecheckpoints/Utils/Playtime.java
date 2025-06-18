@@ -2,10 +2,8 @@ package com.denied403.hardcoursecheckpoints.Utils;
 
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Statistic;
-import org.bukkit.entity.Player;
 
-public class PlaytimeUtil {
-
+public class Playtime {
     public static String getPlaytime(OfflinePlayer player) {
         long ticks = player.getStatistic(Statistic.PLAY_ONE_MINUTE);
 

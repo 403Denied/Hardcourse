@@ -56,6 +56,7 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
         checkpointConfig = YamlConfiguration.loadConfiguration(checkpointFile);
         loadCheckpoints();
         WordSyncListener wordSyncListener = new WordSyncListener(this);
+        WordSyncListener.reloadMuteCache();
         ChatReactions chatReactions = new ChatReactions(this);
         getServer().getPluginManager().registerEvents(chatReactions, this);
         getServer().getPluginManager().registerEvents(new onJoin(), this);

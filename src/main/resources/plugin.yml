@@ -2,6 +2,10 @@ name: Hardcourse
 version: '${project.version}'
 main: com.denied403.hardcoursecheckpoints.HardcourseCheckpoints
 api-version: '1.21'
+depend: [Core403, Vault]
+author: "403Denied"
+description: "Hardcourse Checkpoints plugin for managing player checkpoints and commands."
+prefix: "HARDCOURSE"
 
 commands:
   resetcheckpoint:

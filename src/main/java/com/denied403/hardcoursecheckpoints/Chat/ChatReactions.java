@@ -38,7 +38,7 @@ public class ChatReactions implements Listener {
         if (!wordFile.exists()) {
             try {
                 wordFile.createNewFile();
-                wordConfig.set("words", List.of("Apple", "Banana", "Cherry", "Date", "Elderberry", "Grape", "Strawberry", "Hardcourse", "Pneumonoultramicroscopicsilicovolcanoconiosis", "Word", "Parkour", "Supercalifragilisticexpialidocious", "Scrambled", "Jump", "Leap", "Antidisestablishmentarianism", "Hippopotomonstrosesquipedaliophobia", "Floccinaucinihilipilification", "Sesquipedalian", "Uncharacteristically", "Incomprehensibilities"));
+                wordConfig.set("words", List.of("Apple", "Banana", "Cherry", "Date", "Elderberry", "Grape", "Strawberry", "Hardcourse", "Pneumonoultramicroscopicsilicovolcanoconiosis", "Word", "Parkour", "Supercalifragilisticexpialidocious", "Scrambled", "Jump", "Leap", "Antidisestablishmentarianism", "Hippopotomonstrosesquipedaliophobia", "Floccinaucinihilipilification", "Sesquipedalian", "Uncharacteristically", "Incomprehensibilities", "Touch Grass"));
                 wordConfig.save(wordFile);
             } catch (IOException e) {
                 e.printStackTrace();
