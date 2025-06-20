@@ -4,6 +4,7 @@ import com.denied403.hardcoursecheckpoints.Commands.*;
 import com.denied403.hardcoursecheckpoints.Discord.HardcourseDiscord;
 import com.denied403.hardcoursecheckpoints.Events.*;
 import com.denied403.hardcoursecheckpoints.Chat.ChatReactions;
+import com.denied403.hardcoursecheckpoints.Utils.PermissionChecker;
 import com.denied403.hardcoursecheckpoints.Utils.WordSyncListener;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -35,6 +36,9 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
             highestCheckpoint.put(player, 0.0);
             return 1.0;
         }
+    }
+    public static void setHighestCheckpoint(UUID player, Double checkpoint) {
+        highestCheckpoint.put(player, checkpoint);
     }
     public static HardcourseCheckpoints plugin;
     private HardcourseDiscord discordBot;
@@ -77,6 +81,7 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
         getCommand("endchatgame").setExecutor(new endChatGame());
         getCommand("getlevel").setExecutor(new getLevel());
         getCommand("restartforupdate").setExecutor(new restartForUpdate(this));
+        getCommand("setlevel").setExecutor(new setLevel());
 
         Bukkit.getScheduler().runTaskTimer(this, () -> {
             String message = messages.get(random.nextInt(messages.size()));
@@ -91,6 +96,7 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
                 ChatReactions.runGame(ChatReactions.getRandomWord());
             }
         }.runTaskTimer(this, 0L, 4800L);
+        new PermissionChecker(this);
 
     }
 

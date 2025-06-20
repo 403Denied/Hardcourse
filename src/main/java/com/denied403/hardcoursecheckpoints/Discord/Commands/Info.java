@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.UUID;
 
+import static com.denied403.hardcoursecheckpoints.Utils.PermissionChecker.playerHasPermission;
+
 public class Info {
     static OptionMapping typeOption;
     public static OptionData infoType = new OptionData(OptionType.STRING, "info_type", "Type of information").addChoices(
@@ -88,6 +90,18 @@ public class Info {
         EmbedBuilder playerEmbed = new EmbedBuilder();
         playerEmbed.setThumbnail(Objects.requireNonNull(event.getGuild().getIconUrl()));
         String level = String.valueOf(HardcourseCheckpoints.getHighestCheckpoint(uuid)).replace(".0", "");
+        if(playerHasPermission(offlinePlayer.getName(), "hardcourse.season1")){
+            level = "1-" + level;
+        }
+        if(playerHasPermission(offlinePlayer.getName(), "hardcourse.season2")){
+            level = "2-" + level;
+        }
+        if(playerHasPermission(offlinePlayer.getName(), "hardcourse.season3")){
+            level = "3-" + level;
+        }
+        else {
+            level = "1-" + level;
+        }
         try {
             playerEmbed.setTitle(offlinePlayer.getName());
             playerEmbed.setFooter("Requested by " + event.getUser().getName(), event.getUser().getEffectiveAvatarUrl());
