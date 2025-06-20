@@ -93,10 +93,10 @@ public class HardcourseDiscord {
             staffChatChannel.sendMessage("**`" + player.getDisplayName() + "`**: " + content).queue();
         }
         if (type.equals("chat")) {
-            chatChannel.sendMessage("[**" + getHighestCheckpoint(player.getUniqueId()).toString().replace(".0", "") + "**] `" + player.getDisplayName() + "`: " + content).queue();
+            chatChannel.sendMessage("[**" + extra1 + getHighestCheckpoint(player.getUniqueId()).toString().replace(".0", "") + "**] `" + player.getDisplayName() + "`: " + content).queue();
         }
         if(type.equals("staffmessage")) {
-            chatChannel.sendMessage("[**" + getHighestCheckpoint(player.getUniqueId()).toString().replace(".0", "") + "**] **`" + player.getDisplayName() + "`**: " + content).queue();
+            chatChannel.sendMessage("[**" + extra1 + getHighestCheckpoint(player.getUniqueId()).toString().replace(".0", "") + "**] **`" + player.getDisplayName() + "`**: " + content).queue();
         }
         if (type.equals("join")) {
             chatChannel.sendMessage(":inbox_tray: **`" + player.getDisplayName() + "`** joined").queue();

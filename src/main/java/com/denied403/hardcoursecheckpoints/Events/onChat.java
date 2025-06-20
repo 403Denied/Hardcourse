@@ -3,6 +3,7 @@ package com.denied403.hardcoursecheckpoints.Events;
 import com.denied403.hardcoursecheckpoints.Utils.WordSyncListener;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -13,6 +14,7 @@ import java.util.regex.Pattern;
 
 import static com.denied403.hardcoursecheckpoints.Chat.ChatReactions.*;
 import static com.denied403.hardcoursecheckpoints.Discord.HardcourseDiscord.sendMessage;
+import static com.denied403.hardcoursecheckpoints.Utils.PermissionChecker.playerHasPermission;
 import static com.denied403.hardcoursecheckpoints.Utils.WordSyncListener.isPlayerMuted;
 
 public class onChat implements Listener {
@@ -87,10 +89,25 @@ public class onChat implements Listener {
                 sendMessage(event.getPlayer(), content, "chat", null, null);
             }
         } else {
+            Player p = event.getPlayer();
+            String playerName = p.getName();
+            String level;
+            if(playerHasPermission(playerName,"hardcourse.season1")){
+                level = "1-";
+            }
+            if(playerHasPermission(playerName, "hardcourse.season2")) {
+                level = "2-";
+            }
+            if(playerHasPermission(playerName,"hardcourse.season3")) {
+                level = "3-";
+            }
+            else {
+                level = "1-";
+            }
             if (event.getPlayer().hasPermission("hardcourse.jrmod")) {
-                sendMessage(event.getPlayer(), content, "staffmessage", null, null);
+                sendMessage(event.getPlayer(), content, "staffmessage", level, null);
             } else {
-                sendMessage(event.getPlayer(), content, "chat", null, null);
+                sendMessage(event.getPlayer(), content, "chat", level, null);
             }
         }
     }

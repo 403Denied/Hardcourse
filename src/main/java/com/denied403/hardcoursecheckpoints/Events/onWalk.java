@@ -80,7 +80,7 @@ public class onWalk implements Listener {
                 // Set the player's bed spawn location to the current location
                 p.setRespawnLocation(p.getLocation().add(0, 1, 0), true);
                 if(checkpointNumber == 543.0) {
-                    if (previousCheckpoint >= 540 && p.getWorld().getName().equals("Season1")) {
+                    if (previousCheckpoint >= 542.0 && p.getWorld().getName().equals("Season1")) {
                         sendMessage(p, null, "winning", null, null);
                         p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c&lHARDCOURSE &rCongratulations! You have completed &cSeason 1&f!"));
                         p.teleport(Bukkit.getWorld("Season2").getSpawnLocation());
@@ -88,6 +88,7 @@ public class onWalk implements Listener {
                         p.setRespawnLocation(p.getLocation().add(0, 1, 0), true);
                         highestCheckpoint.put(playerUUID, 1.0);
                         p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c&lHARDCOURSE &fYou have been teleported to the next season. You can now continue your journey!"));
+                        Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "lp user " + p.getName() + " parent set 2");
                     }
                     else {
                         p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c&lHARDCOURSE &fYou have reached the end. However, we have reason to believe you are &4cheating&f. If you are not, please contact a staff member to verify your progress."));
