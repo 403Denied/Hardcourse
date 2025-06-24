@@ -1,6 +1,8 @@
 package com.denied403.hardcoursecheckpoints.Chat;
 
 import com.denied403.hardcoursecheckpoints.Chat.Shuffler;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
@@ -60,17 +62,19 @@ public class ChatReactions implements Listener {
     public static void runGame(String word) {
         currentWord = word;  // Store the passed word in the instance variable
         scrambledWord = Shuffler.shuffleWord(currentWord);
+        MiniMessage mm = MiniMessage.miniMessage();
         for (Player p : Bukkit.getServer().getOnlinePlayers()) {
-            TextComponent shuffled = new TextComponent(ChatColor.translateAlternateColorCodes('&', "&c&lHARDCOURSE &rHover here for a word to unscramble."));
-            shuffled.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(scrambledWord)));
-            p.spigot().sendMessage(shuffled);
+            Component message = mm.deserialize(
+                    "<red><bold>HARDCOURSE<reset> <hover:show_text:'" + scrambledWord + "'>Hover here for a word to unscramble.</hover>"
+            );
         }
         gameActive = true;
 
         new BukkitRunnable() {
                 @Override
                 public void run() {if (gameActive) {
-                    Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', "&c&lHARDCOURSE &rTime's Up! The correct word was &c" + currentWord));
+                    Component endMsg = mm.deserialize("<red><bold>HARDCOURSE</bold></red> <reset>Time's Up! The correct word was <red>" + currentWord + "</red>");
+                    Bukkit.broadcast(endMsg);
                     gameActive = false;
                 }
             }

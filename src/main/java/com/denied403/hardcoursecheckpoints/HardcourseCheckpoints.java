@@ -94,6 +94,7 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
         getCommand("restartforupdate").setExecutor(new restartForUpdate(this));
         getCommand("setlevel").setExecutor(new setLevel());
         getCommand("reloadhardcourseconfig").setExecutor(new reloadHardcourseConfig(this));
+        getCommand("stuck").setExecutor(new stuck());
         setupWordsConfig();
         setupCheckpointsConfig();
         if(BroadcastEnabled) {

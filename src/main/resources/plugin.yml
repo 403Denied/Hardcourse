@@ -51,5 +51,8 @@ commands:
     usage: "/reloadhardcourseconfig"
     permission: hardcourse.admin
     aliases: [reloadhardcourse, rconfig, reloadconfig]
+  stuck:
+    description: "Get unstuck."
+    usage: "/stuck"
 
 

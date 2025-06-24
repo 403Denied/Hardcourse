@@ -1,22 +1,20 @@
 package com.denied403.hardcoursecheckpoints.Commands;
 
-import com.denied403.hardcoursecheckpoints.HardcourseCheckpoints;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class Discord implements CommandExecutor {
+    private static final MiniMessage miniMessage = MiniMessage.miniMessage();
+
     @Override
-    public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
-        if(commandSender instanceof Player){
-            Player p = (Player) commandSender;
-            TextComponent discord = new TextComponent(ChatColor.translateAlternateColorCodes('&', "&c&lHARDCOURSE &rClick here to join our discord."));
-            discord.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://discord.gg/mh9EBtwnzs"));
-            p.spigot().sendMessage(discord);
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (sender instanceof Player player) {
+            Component message = miniMessage.deserialize("<red><bold>HARDCOURSE</bold></red> <reset><click:open_url:'https://discord.gg/mh9EBtwnzs'>Click here to join our discord.</click>");
+            player.sendMessage(message);
             return true;
         }
         return false;
