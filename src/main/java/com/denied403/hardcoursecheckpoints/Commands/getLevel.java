@@ -4,12 +4,12 @@ import com.denied403.hardcoursecheckpoints.HardcourseCheckpoints;
 import com.denied403.hardcoursecheckpoints.Utils.PermissionChecker;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import net.milkbowl.vault.permission.Permission;
 
 import java.util.UUID;
 
@@ -21,8 +21,13 @@ public class getLevel implements CommandExecutor {
             return true;
         }
         String playerName = strings[0];
-        Player p = Bukkit.getPlayer(playerName);
-        UUID uuid = p != null ? p.getUniqueId() : Bukkit.getOfflinePlayer(playerName).getUniqueId();
+        Player onlineTarget = Bukkit.getPlayerExact(playerName);
+        OfflinePlayer p = (onlineTarget != null) ? onlineTarget : Bukkit.getOfflinePlayer(playerName);
+        if(p.getName() == null) {
+            commandSender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c&lHARDCOURSE &rPlayer not found or has never played before!"));
+            return true;
+        }
+        UUID uuid = p.getUniqueId();
         Double level = HardcourseCheckpoints.getHighestCheckpoint(uuid);
         if (level == null) {
             commandSender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c&lHARDCOURSE &rPlayer not found or has no checkpoints!"));
@@ -30,16 +35,14 @@ public class getLevel implements CommandExecutor {
         }
 
         String levelString = level.toString().replace(".0", "");
-        if (PermissionChecker.playerHasPermission(p.getDisplayName(), "hardcourse.season2")) {
+        if (PermissionChecker.playerHasPermission(p.getName(), "hardcourse.season2")) {
             levelString = "2-" + levelString;
         }
-        if (PermissionChecker.playerHasPermission(p.getDisplayName(), "hardcourse.season1")) {
+        if (PermissionChecker.playerHasPermission(p.getName(), "hardcourse.season1")) {
             levelString = "1-" + levelString;
         }
-        if (PermissionChecker.playerHasPermission(p.getDisplayName(), "hardcourse.season3")) {
+        if (PermissionChecker.playerHasPermission(p.getName(), "hardcourse.season3")) {
             levelString = "3-" + levelString;
-        } else {
-            levelString = "1-" + levelString;
         }
         commandSender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c&lHARDCOURSE &c" + playerName + "&f's level is: &c" + levelString));
         return true;

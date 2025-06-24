@@ -16,8 +16,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import java.util.UUID;
 
 import static com.denied403.hardcoursecheckpoints.Discord.HardcourseDiscord.sendMessage;
-import static com.denied403.hardcoursecheckpoints.HardcourseCheckpoints.getHighestCheckpoint;
-import static com.denied403.hardcoursecheckpoints.HardcourseCheckpoints.highestCheckpoint;
+import static com.denied403.hardcoursecheckpoints.HardcourseCheckpoints.*;
 
 public class onWalk implements Listener {
     private final HardcourseCheckpoints plugin;
@@ -56,7 +55,9 @@ public class onWalk implements Listener {
                 // Notify staff if the player skipped more than 10 checkpoints
                 if (checkpointNumber > previousCheckpoint + 10) {
                     if (!p.hasPermission("hardcourse.staff")) {
-                        sendMessage(p, null, "hacks", previousCheckpoint.toString().replace(".0", ""), checkpointNumber.toString().replace(".0", ""));
+                        if(isDiscordEnabled()) {
+                            sendMessage(p, null, "hacks", previousCheckpoint.toString().replace(".0", ""), checkpointNumber.toString().replace(".0", ""));
+                        }
                         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
                             if (onlinePlayer.hasPermission("hardcourse.staff")) {
                                 onlinePlayer.sendMessage(ChatColor.translateAlternateColorCodes('&',
@@ -80,22 +81,56 @@ public class onWalk implements Listener {
                 // Set the player's bed spawn location to the current location
                 p.setRespawnLocation(p.getLocation().add(0, 1, 0), true);
                 if(checkpointNumber == 543.0) {
-                    if (previousCheckpoint >= 542.0 && p.getWorld().getName().equals("Season1")) {
-                        sendMessage(p, null, "winning", null, null);
-                        p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c&lHARDCOURSE &rCongratulations! You have completed &cSeason 1&f!"));
-                        p.teleport(Bukkit.getWorld("Season2").getSpawnLocation());
-                        p.setGameMode(GameMode.ADVENTURE);
-                        p.setRespawnLocation(p.getLocation().add(0, 1, 0), true);
-                        highestCheckpoint.put(playerUUID, 1.0);
-                        p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c&lHARDCOURSE &fYou have been teleported to the next season. You can now continue your journey!"));
-                        Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "lp user " + p.getName() + " parent set 2");
-                    }
-                    else {
-                        p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c&lHARDCOURSE &fYou have reached the end. However, we have reason to believe you are &4cheating&f. If you are not, please contact a staff member to verify your progress."));
+                    if(p.getWorld().getName().equals("Season1")) {
+                        if (previousCheckpoint >= 542.0) {
+                            if(isDiscordEnabled()) {
+                                sendMessage(p, null, "winning", "1", null);
+                            }
+                            p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c&lHARDCOURSE &rCongratulations! You have completed &cSeason 1&f!"));
+                            p.teleport(Bukkit.getWorld("Season2").getSpawnLocation());
+                            p.setGameMode(GameMode.ADVENTURE);
+                            p.setRespawnLocation(p.getLocation().add(0, 1, 0), true);
+                            highestCheckpoint.put(playerUUID, 1.0);
+                            p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c&lHARDCOURSE &fYou have been teleported to the next season. You can now continue your journey!"));
+                            Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "lp user " + p.getName() + " parent add 2");
+                        }
+                        else {
+                            p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c&lHARDCOURSE &fYou have reached the end. However, we have reason to believe you are &4cheating&f. If you are not, please contact a staff member to verify your progress."));
+                        }
                     }
                 }
-                if(checkpointNumber == 350.0) {
-                    p.getInventory().getChestplate().setType(Material.AIR);
+                if(checkpointNumber == 365.0){
+                    if(p.getWorld().getName().equals("Season2")) {
+                        if (previousCheckpoint >= 363.0) {
+                            if(isDiscordEnabled()) {
+                                sendMessage(p, null, "winning", "2", null);
+                            }
+                            p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c&lHARDCOURSE &rCongratulations! You have completed &cSeason 2&f!"));
+                            p.teleport(Bukkit.getWorld("Season3").getSpawnLocation());
+                            p.setGameMode(GameMode.ADVENTURE);
+                            p.setRespawnLocation(p.getLocation().add(0, 1, 0), true);
+                            highestCheckpoint.put(playerUUID, 1.0);
+                            p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c&lHARDCOURSE &fYou have been teleported to the next season. You can now continue your journey!"));
+                            Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "lp user " + p.getName() + " parent add 3");
+                        }
+                        else {
+                            p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c&lHARDCOURSE &fYou have reached the end. However, we have reason to believe you are &4cheating&f. If you are not, please contact a staff member to verify your progress."));
+                        }
+                    }
+
+                }
+                if(checkpointNumber == 240.0) {
+                    if(p.getWorld().getName().equals("Season3")) {
+                        if (previousCheckpoint >= 238.0) {
+                            if(isDiscordEnabled()) {
+                                sendMessage(p, null, "winning", "3", null);
+                            }
+                            p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c&lHARDCOURSE &rCongratulations! You have completed &cSeason 3&f! There is currently no Season 4, so you have reached the end of the Hardcourse for now."));
+                        }
+                        else {
+                            p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c&lHARDCOURSE &fYou have reached the end. However, we have reason to believe you are &4cheating&f. If you are not, please contact a staff member to verify your progress."));
+                        }
+                    }
                 }
             }
         }

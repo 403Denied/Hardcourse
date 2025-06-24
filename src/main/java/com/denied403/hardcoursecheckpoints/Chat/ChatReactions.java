@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Random;
 
+import static com.denied403.hardcoursecheckpoints.HardcourseCheckpoints.isUnscrambleEnabled;
+
 public class ChatReactions implements Listener {
 
     private static File wordFile;
@@ -34,14 +36,15 @@ public class ChatReactions implements Listener {
         wordFile = new File(plugin.getDataFolder(), "words.yml");
         wordConfig = YamlConfiguration.loadConfiguration(wordFile);
         random = new Random();
-
-        if (!wordFile.exists()) {
-            try {
-                wordFile.createNewFile();
-                wordConfig.set("words", List.of("Apple", "Banana", "Cherry", "Date", "Elderberry", "Grape", "Strawberry", "Hardcourse", "Pneumonoultramicroscopicsilicovolcanoconiosis", "Word", "Parkour", "Supercalifragilisticexpialidocious", "Scrambled", "Jump", "Leap", "Antidisestablishmentarianism", "Hippopotomonstrosesquipedaliophobia", "Floccinaucinihilipilification", "Sesquipedalian", "Uncharacteristically", "Incomprehensibilities", "Touch Grass"));
-                wordConfig.save(wordFile);
-            } catch (IOException e) {
-                e.printStackTrace();
+        if(isUnscrambleEnabled()) {
+            if (!wordFile.exists()) {
+                try {
+                    wordFile.createNewFile();
+                    wordConfig.set("words", List.of("Word 1", "Word 2"));
+                    wordConfig.save(wordFile);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -57,7 +60,6 @@ public class ChatReactions implements Listener {
     public static void runGame(String word) {
         currentWord = word;  // Store the passed word in the instance variable
         scrambledWord = Shuffler.shuffleWord(currentWord);
-
         for (Player p : Bukkit.getServer().getOnlinePlayers()) {
             TextComponent shuffled = new TextComponent(ChatColor.translateAlternateColorCodes('&', "&c&lHARDCOURSE &rHover here for a word to unscramble."));
             shuffled.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(scrambledWord)));
@@ -66,14 +68,13 @@ public class ChatReactions implements Listener {
         gameActive = true;
 
         new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (gameActive) {
+                @Override
+                public void run() {if (gameActive) {
                     Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', "&c&lHARDCOURSE &rTime's Up! The correct word was &c" + currentWord));
                     gameActive = false;
                 }
             }
-        }.runTaskLater(plugin, 600L); // Run after 30 seconds (600 ticks)
+        }.runTaskLater(plugin, 600L);// Run after 30 seconds (600 ticks)
     }
 
     @EventHandler

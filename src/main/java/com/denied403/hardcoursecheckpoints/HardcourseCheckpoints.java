@@ -8,7 +8,6 @@ import com.denied403.hardcoursecheckpoints.Utils.PermissionChecker;
 import com.denied403.hardcoursecheckpoints.Utils.WordSyncListener;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.WorldCreator;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.EventHandler;
@@ -28,6 +27,8 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
     public static HashMap<UUID, Double> highestCheckpoint = new HashMap<>();
     private File checkpointFile;
     private FileConfiguration checkpointConfig;
+    private File wordsFile;
+    private FileConfiguration wordsConfig;
     public static Double getHighestCheckpoint(UUID player) {
         if(highestCheckpoint.containsKey(player)) {
             return highestCheckpoint.get(player);
@@ -46,19 +47,28 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
     public void onEnable() {
         // Plugin startup logic
         plugin = this;
-        discordBot = new HardcourseDiscord(this);
-        try{
-            discordBot.InitJDA();
-        } catch (Exception e){
-            getLogger().severe("Failed to initialize Discord bot: " + e.getMessage());
+        if(DiscordEnabled) {
+            discordBot = new HardcourseDiscord(this);
+            try {
+                discordBot.InitJDA();
+            } catch (Exception e) {
+                getLogger().severe("Failed to initialize Discord bot: " + e.getMessage());
+            }
         }
         checkpointFile = new File(getDataFolder(), "checkpoints.yml");
         if(!checkpointFile.exists()) {
             saveResource("checkpoints.yml", false);
         }
-        sendMessage(null, null, "starting", null, null);
+        if(DiscordEnabled) {
+            sendMessage(null, null, "starting", null, null);
+        }
         checkpointConfig = YamlConfiguration.loadConfiguration(checkpointFile);
         loadCheckpoints();
+        saveDefaultConfig();
+        messages = getConfig().getStringList("broadcast-messages");
+        DiscordEnabled = getConfig().getBoolean("discord-enabled");
+        BroadcastEnabled = getConfig().getBoolean("broadcast-enabled");
+        UnscrambleEnabled = getConfig().getBoolean("unscramble-enabled");
         WordSyncListener wordSyncListener = new WordSyncListener(this);
         WordSyncListener.reloadMuteCache();
         ChatReactions chatReactions = new ChatReactions(this);
@@ -71,6 +81,7 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
         getServer().getPluginManager().registerEvents(new onHunger(), this);
         getServer().getPluginManager().registerEvents(this, this);
         getServer().getPluginManager().registerEvents(wordSyncListener, this);
+        getServer().getPluginManager().registerEvents(new BanListener(this), this);
         WordSyncListener.updateFilterWords();
         getCommand("resetcheckpoint").setExecutor(new CheckpointCommands(this));
         getCommand("resetallcheckpoints").setExecutor(new CheckpointCommands(this));
@@ -82,31 +93,39 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
         getCommand("getlevel").setExecutor(new getLevel());
         getCommand("restartforupdate").setExecutor(new restartForUpdate(this));
         getCommand("setlevel").setExecutor(new setLevel());
-
-        Bukkit.getScheduler().runTaskTimer(this, () -> {
-            String message = messages.get(random.nextInt(messages.size()));
-            Bukkit.broadcastMessage(" ");
-            Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', "&c&lHARDCOURSE &r" + message));
-            Bukkit.broadcastMessage(" ");
-        }, 0L, 20 * 60 * 5); //Runs every 5 mins
-
-        new BukkitRunnable(){
-            @Override
-            public void run(){
-                ChatReactions.runGame(ChatReactions.getRandomWord());
-            }
-        }.runTaskTimer(this, 0L, 4800L);
+        getCommand("reloadhardcourseconfig").setExecutor(new reloadHardcourseConfig(this));
+        setupWordsConfig();
+        setupCheckpointsConfig();
+        if(BroadcastEnabled) {
+            Bukkit.getScheduler().runTaskTimer(this, () -> {
+                String message = messages.get(random.nextInt(messages.size()));
+                Bukkit.broadcastMessage(" ");
+                Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', "&c&lHARDCOURSE &r" + message));
+                Bukkit.broadcastMessage(" ");
+            }, 0L, 20 * 60 * 5);
+        }//Runs every 5 mins
+        if(UnscrambleEnabled) {
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    ChatReactions.runGame(ChatReactions.getRandomWord());
+                }
+            }.runTaskTimer(this, 0L, 4800L);
+        }
         new PermissionChecker(this);
 
     }
 
+
     @Override
     public void onDisable() {
-        sendMessage(null, null, "stopping", null, null);
-        saveCheckpoints();
-        if(jda != null){
-            jda.shutdownNow();
+        if(DiscordEnabled) {
+            sendMessage(null, null, "stopping", null, null);
+            if(jda != null){
+                jda.shutdownNow();
+            }
         }
+        saveCheckpoints();
     }
 
     public void loadCheckpoints(){
@@ -116,7 +135,13 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
             highestCheckpoint.put(uuid, checkpoint);
         }
     }
-
+    public void setupCheckpointsConfig() {
+        checkpointFile = new File(getDataFolder(), "checkpoints.yml");
+        if (!checkpointFile.exists()) {
+            saveResource("checkpoints.yml", false);
+        }
+        checkpointConfig = YamlConfiguration.loadConfiguration(checkpointFile);
+    }
     public void saveCheckpoints(){
         try {
             checkpointConfig.getKeys(false).forEach(key -> checkpointConfig.set(key, null));
@@ -128,23 +153,52 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
             e.printStackTrace();
         }
     }
+    public void setupWordsConfig() {
+        wordsFile = new File(getDataFolder(), "words.yml");
+        if (!wordsFile.exists()) {
+            saveResource("words.yml", false);
+        }
+        wordsConfig = YamlConfiguration.loadConfiguration(wordsFile);
+    }
+    public static boolean isDiscordEnabled(){
+        return DiscordEnabled;
+    }
+    public static boolean isBroadcastEnabled(){
+        return BroadcastEnabled;
+    }
+    public static boolean isUnscrambleEnabled(){
+        return UnscrambleEnabled;
+    }
+    public FileConfiguration getCheckpointsConfig() {
+        return checkpointConfig;
+    }
+
+    public FileConfiguration getWordsConfig() {
+        return wordsConfig;
+    }
+    public void reloadCheckpointsConfig() {
+        checkpointConfig = YamlConfiguration.loadConfiguration(checkpointFile);
+    }
+
+    public void reloadWordsConfig() {
+        wordsConfig = YamlConfiguration.loadConfiguration(wordsFile);
+    }
+    public void loadBroadcastMessages() {
+        messages = getConfig().getStringList("broadcast-messages");
+    }
 
 
-    private List<String> messages = Arrays.asList(
-            "See someone hacking? Don't call them out in chat, instead use &c/report",
-            "Join our discord server at &c/discord",
-            "See an issue? Please notify a staff member to have it fixed!",
-            "Need help? Feel free to ask, or make a ticket in our discord!",
-            "All jumps have been tested and &c&lAre Possible&r.",
-            "While all of our levels have undergone testing, that was many years ago in another version. If something doesn't work, please alert a staff member and it will be fixed promptly.",
-            "Lost your kill item? Do &c/clock&r for a new one.",
-            "&cFAQ: &fThere are &c543&f levels in total, with no plans of expansion."
 
-    );
-    private Random random = new Random();
+    private List<String> messages = new ArrayList<>();
+    private static boolean DiscordEnabled;
+    private static boolean BroadcastEnabled;
+    private static boolean UnscrambleEnabled;
+    private final Random random = new Random();
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e){
-        sendMessage(e.getPlayer(), null, "leave", null, null);
+        if(DiscordEnabled) {
+            sendMessage(e.getPlayer(), null, "leave", null, null);
+        }
     }
 }
 

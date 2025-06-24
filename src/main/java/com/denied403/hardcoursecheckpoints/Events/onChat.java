@@ -14,11 +14,10 @@ import java.util.regex.Pattern;
 
 import static com.denied403.hardcoursecheckpoints.Chat.ChatReactions.*;
 import static com.denied403.hardcoursecheckpoints.Discord.HardcourseDiscord.sendMessage;
-import static com.denied403.hardcoursecheckpoints.Utils.PermissionChecker.playerHasPermission;
+import static com.denied403.hardcoursecheckpoints.HardcourseCheckpoints.isDiscordEnabled;
 import static com.denied403.hardcoursecheckpoints.Utils.WordSyncListener.isPlayerMuted;
 
 public class onChat implements Listener {
-
     private static final Map<Character, String> replacements = Map.of(
             'a', "[a4@]",
             'e', "[e3]",
@@ -65,49 +64,48 @@ public class onChat implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onChatEvent(AsyncPlayerChatEvent event) {
-        String content = event.getMessage()
-                .replaceAll("@everyone", "`@everyone`")
-                .replaceAll("@here", "`@here`")
-                .replaceAll("<@", "`<@`")
-                .replaceAll("https://", "`https://`")
-                .replaceAll("http://", "`http://`");
+        if (isDiscordEnabled()) {
+            String content = event.getMessage()
+                    .replaceAll("@everyone", "`@everyone`")
+                    .replaceAll("@here", "`@here`")
+                    .replaceAll("<@", "`<@`")
+                    .replaceAll("https://", "`https://`")
+                    .replaceAll("http://", "`http://`");
 
-        if(isPlayerMuted(event.getPlayer().getUniqueId())){
-            return;
-        }
-        if (isBlocked(content)) {
-            return;
-        }
-        if (gameActive && event.getMessage().equalsIgnoreCase(getCurrentWord())) {
-            return;
-        }
+            if (isPlayerMuted(event.getPlayer().getUniqueId())) {
+                return;
+            }
+            if (isBlocked(content)) {
+                return;
+            }
+            if (gameActive && event.getMessage().equalsIgnoreCase(getCurrentWord())) {
+                return;
+            }
 
-        if (content.startsWith("#")) {
-            if (event.getPlayer().hasPermission("hardcourse.jrmod")) {
-                sendMessage(event.getPlayer(), content.substring(1), "staffchat", null, null);
+            if (content.startsWith("#")) {
+                if (event.getPlayer().hasPermission("hardcourse.jrmod")) {
+                    sendMessage(event.getPlayer(), content.substring(1), "staffchat", null, null);
+                } else {
+                    sendMessage(event.getPlayer(), content, "chat", null, null);
+                }
             } else {
-                sendMessage(event.getPlayer(), content, "chat", null, null);
-            }
-        } else {
-            Player p = event.getPlayer();
-            String playerName = p.getName();
-            String level;
-            if(playerHasPermission(playerName,"hardcourse.season1")){
-                level = "1-";
-            }
-            if(playerHasPermission(playerName, "hardcourse.season2")) {
-                level = "2-";
-            }
-            if(playerHasPermission(playerName,"hardcourse.season3")) {
-                level = "3-";
-            }
-            else {
-                level = "1-";
-            }
-            if (event.getPlayer().hasPermission("hardcourse.jrmod")) {
-                sendMessage(event.getPlayer(), content, "staffmessage", level, null);
-            } else {
-                sendMessage(event.getPlayer(), content, "chat", level, null);
+                Player p = event.getPlayer();
+                String playerName = p.getName();
+                String level;
+                if (p.hasPermission("hardcourse.season1")) {
+                    level = "1-";
+                }
+                if (p.hasPermission("hardcourse.season2")) {
+                    level = "2-";
+                }
+                if (p.hasPermission("hardcourse.season3")) {
+                    level = "3-";
+                } else level = "";
+                if (event.getPlayer().hasPermission("hardcourse.jrmod")) {
+                    sendMessage(event.getPlayer(), content, "staffmessage", level, null);
+                } else {
+                    sendMessage(event.getPlayer(), content, "chat", level, null);
+                }
             }
         }
     }

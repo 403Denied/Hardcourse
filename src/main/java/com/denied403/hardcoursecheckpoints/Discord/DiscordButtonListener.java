@@ -5,6 +5,9 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.bukkit.Bukkit;
 
+import static com.denied403.hardcoursecheckpoints.Events.BanListener.runBanCleanup;
+import static com.denied403.hardcoursecheckpoints.HardcourseCheckpoints.isDiscordEnabled;
+
 public class DiscordButtonListener extends ListenerAdapter {
     private final HardcourseCheckpoints plugin;
 
@@ -14,18 +17,21 @@ public class DiscordButtonListener extends ListenerAdapter {
 
     @Override
     public void onButtonInteraction(ButtonInteractionEvent event) {
-        String id = event.getComponentId();
+        if(isDiscordEnabled()) {
+            String id = event.getComponentId();
 
-        if (id.startsWith("ban:")) {
-            String playerName = id.substring("ban:".length());
+            if (id.startsWith("ban:")) {
+                String playerName = id.substring("ban:".length());
 
-            // Optionally acknowledge the button press
-            event.reply("Issued ban command for **" + playerName + "**.").setEphemeral(true).queue();
+                // Optionally acknowledge the button press
+                event.reply("Issued ban command for **" + playerName + "**.").setEphemeral(true).queue();
 
-            // Dispatch ban command to server
-            Bukkit.getScheduler().runTask(plugin, () -> {
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "ban " + playerName + " Hacking");
-            });
+                // Dispatch ban command to server
+                Bukkit.getScheduler().runTask(plugin, () -> {
+                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "ban " + playerName + " Hacking");
+                });
+                runBanCleanup(playerName);
+            }
         }
     }
 }

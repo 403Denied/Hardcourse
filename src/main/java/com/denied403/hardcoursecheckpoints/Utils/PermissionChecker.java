@@ -3,7 +3,7 @@ package com.denied403.hardcoursecheckpoints.Utils;
 import com.denied403.hardcoursecheckpoints.HardcourseCheckpoints;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import net.milkbowl.vault.permission.Permission; // Or your permission plugin's API
+import net.milkbowl.vault.permission.Permission;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
 public class PermissionChecker {
@@ -19,9 +19,10 @@ public class PermissionChecker {
 
     public static boolean playerHasPermission(String playerName, String permissionNode) {
         if (permission == null) {
-            return false; // Or handle the error appropriately
+            return false;
         }
         OfflinePlayer player = Bukkit.getServer().getOfflinePlayer(playerName);
-        return permission.playerHas(player.getName(), permissionNode, null); // Use appropriate method from your permission plugin's API
+        return permission.playerHas(null, player, permissionNode);
+
     }
 }

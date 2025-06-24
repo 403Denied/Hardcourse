@@ -46,5 +46,10 @@ commands:
     description: "Set the level of a player."
     usage: "/setlevel <player> <level>"
     permission: hardcourse.admin
+  reloadhardcourseconfig:
+    description: "Reload the Hardcourse plugin configuration."
+    usage: "/reloadhardcourseconfig"
+    permission: hardcourse.admin
+    aliases: [reloadhardcourse, rconfig, reloadconfig]
 
 

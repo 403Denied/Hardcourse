@@ -17,11 +17,12 @@ public class onJoin implements Listener {
     @EventHandler
     public void onJoin(org.bukkit.event.player.PlayerJoinEvent event) {
         org.bukkit.entity.Player player = event.getPlayer();
-        if(player.hasPlayedBefore()) {
-            sendMessage(player, null, "join", null, null);
-        }
-        else {
-            sendMessage(player, null, "firstjoin", null, null);
+        if(isDiscordEnabled()) {
+            if (player.hasPlayedBefore()) {
+                sendMessage(player, null, "join", null, null);
+            } else {
+                sendMessage(player, null, "firstjoin", null, null);
+            }
         }
         player.getInventory().clear();
         Material killItem = Material.CLOCK;

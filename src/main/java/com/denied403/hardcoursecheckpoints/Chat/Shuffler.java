@@ -16,6 +16,9 @@ public class Shuffler {
             builder.append(c);
         }
         String shuffledWord = builder.toString();
+        if (shuffledWord.equalsIgnoreCase(word)) {
+            return shuffleWord(word);
+        }
         return shuffledWord;
     }
 }

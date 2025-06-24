@@ -81,9 +81,10 @@ public class Info {
             return;
         }
         String name = nameOption.getAsString();
-        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(name);
+        Player onlineTarget = Bukkit.getPlayerExact(name);
+        OfflinePlayer offlinePlayer = (onlineTarget != null) ? onlineTarget : Bukkit.getOfflinePlayer(name);
         UUID uuid = offlinePlayer.getUniqueId();
-        if(!offlinePlayer.hasPlayedBefore()) {
+        if(offlinePlayer.getName() == null) {
             event.reply("This player has never played on the server!").setEphemeral(true).queue();
             return;
         }
@@ -98,9 +99,6 @@ public class Info {
         }
         if(playerHasPermission(offlinePlayer.getName(), "hardcourse.season3")){
             level = "3-" + level;
-        }
-        else {
-            level = "1-" + level;
         }
         try {
             playerEmbed.setTitle(offlinePlayer.getName());
