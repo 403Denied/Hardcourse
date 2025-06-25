@@ -54,5 +54,13 @@ commands:
   stuck:
     description: "Get unstuck."
     usage: "/stuck"
-
-
+  points:
+    description: "Manage player points."
+    usage: "/points <player> set|give|remove <amount>"
+    permission: hardcourse.points.manage
+    aliases: pts
+  purgeinactive:
+    description: "Remove checkpoints that are 1 or 0 from the config"
+    usage: "/purgeinactive confirm"
+    permission: hardcourse.admin
+    aliases: [purgecheckpoints, purgeinactivecheckpoints]

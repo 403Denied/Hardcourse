@@ -14,7 +14,6 @@ import org.jetbrains.annotations.NotNull;
 import static com.denied403.hardcoursecheckpoints.Discord.HardcourseDiscord.chatChannel;
 import static com.denied403.hardcoursecheckpoints.Discord.HardcourseDiscord.staffChatChannel;
 import static com.denied403.hardcoursecheckpoints.HardcourseCheckpoints.isDiscordEnabled;
-import static com.denied403.hardcoursecheckpoints.HardcourseCheckpoints.plugin;
 
 public final class DiscordListener extends ListenerAdapter {
     @Override

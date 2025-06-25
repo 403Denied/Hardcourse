@@ -35,14 +35,27 @@ public class getLevel implements CommandExecutor {
         }
 
         String levelString = level.toString().replace(".0", "");
-        if (PermissionChecker.playerHasPermission(p.getName(), "hardcourse.season2")) {
-            levelString = "2-" + levelString;
+        if(!p.isOnline()) {
+            if (PermissionChecker.playerHasPermission(p.getName(), "hardcourse.season2")) {
+                levelString = "2-" + levelString;
+            }
+            if (PermissionChecker.playerHasPermission(p.getName(), "hardcourse.season1")) {
+                levelString = "1-" + levelString;
+            }
+            if (PermissionChecker.playerHasPermission(p.getName(), "hardcourse.season3")) {
+                levelString = "3-" + levelString;
+            }
         }
-        if (PermissionChecker.playerHasPermission(p.getName(), "hardcourse.season1")) {
-            levelString = "1-" + levelString;
-        }
-        if (PermissionChecker.playerHasPermission(p.getName(), "hardcourse.season3")) {
-            levelString = "3-" + levelString;
+        else {
+            if (onlineTarget.hasPermission("hardcourse.season1")) {
+                levelString = "1-" + levelString;
+            }
+            if (onlineTarget.hasPermission("hardcourse.season2")) {
+                levelString = "2-" + levelString;
+            }
+            if (onlineTarget.hasPermission("hardcourse.season3")) {
+                levelString = "3-" + levelString;
+            }
         }
         commandSender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c&lHARDCOURSE &c" + playerName + "&f's level is: &c" + levelString));
         return true;

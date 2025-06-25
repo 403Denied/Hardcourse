@@ -91,14 +91,28 @@ public class Info {
         EmbedBuilder playerEmbed = new EmbedBuilder();
         playerEmbed.setThumbnail(Objects.requireNonNull(event.getGuild().getIconUrl()));
         String level = String.valueOf(HardcourseCheckpoints.getHighestCheckpoint(uuid)).replace(".0", "");
-        if(playerHasPermission(offlinePlayer.getName(), "hardcourse.season1")){
-            level = "1-" + level;
+        if(!offlinePlayer.isOnline()) {
+            if (playerHasPermission(offlinePlayer.getName(), "hardcourse.season1")) {
+                level = "1-" + level;
+            }
+            if (playerHasPermission(offlinePlayer.getName(), "hardcourse.season2")) {
+                level = "2-" + level;
+            }
+            if (playerHasPermission(offlinePlayer.getName(), "hardcourse.season3")) {
+                level = "3-" + level;
+            }
         }
-        if(playerHasPermission(offlinePlayer.getName(), "hardcourse.season2")){
-            level = "2-" + level;
-        }
-        if(playerHasPermission(offlinePlayer.getName(), "hardcourse.season3")){
-            level = "3-" + level;
+        if(offlinePlayer.isOnline()) {
+            Player onlinePlayer = (Player) offlinePlayer;
+            if(onlinePlayer.hasPermission("hardcourse.season1")) {
+                level = "1-" + level;
+            }
+            if(onlinePlayer.hasPermission("hardcourse.season2")) {
+                level = "2-" + level;
+            }
+            if(onlinePlayer.hasPermission("hardcourse.season3")) {
+                level = "3-" + level;
+            }
         }
         try {
             playerEmbed.setTitle(offlinePlayer.getName());
