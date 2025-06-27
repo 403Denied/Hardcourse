@@ -71,15 +71,15 @@ public class PointsShop implements Listener {
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         if (!(event.getWhoClicked() instanceof Player)) return;
-
-        Player player = (Player) event.getWhoClicked();
-        Inventory inventory = event.getInventory();
-
+        if (event.getClickedInventory() == null) return;
         if (!event.getView().getTitle().equals("Points Shop")) return;
 
-        event.setCancelled(true); // Prevent item movement
+        // Only process clicks in the top inventory
+        if (event.getClickedInventory().equals(event.getWhoClicked().getInventory())) return;
 
-        // Only allow basic left click (no shift, no right-clicks)
+        event.setCancelled(true);
+
+        // Only allow basic left clicks
         if (event.getClick().isShiftClick() || !event.getClick().isLeftClick()) return;
 
         ItemStack clicked = event.getCurrentItem();
@@ -89,6 +89,7 @@ public class PointsShop implements Listener {
         if (!name.equalsIgnoreCase("Jump Boost")) return;
 
         int cost = 1500;
+        Player player = (Player) event.getWhoClicked();
         PointsManager pointsManager = plugin.getPointsManager();
         int currentPoints = pointsManager.getPoints(player.getUniqueId());
 
@@ -97,6 +98,7 @@ public class PointsShop implements Listener {
             player.getInventory().addItem(getJumpBootsItem());
             player.sendMessage(ChatColor.GREEN + "You purchased Jump Boost boots!");
             pointsManager.sendPointsActionBar(player);
+            player.closeInventory(); // Close after successful purchase
         } else {
             player.sendMessage(ChatColor.RED + "You don't have enough points!");
             pointsManager.sendTemporaryPointsMessage(player,
