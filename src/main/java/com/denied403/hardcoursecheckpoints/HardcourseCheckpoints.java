@@ -4,13 +4,25 @@ import com.denied403.hardcoursecheckpoints.Commands.*;
 import com.denied403.hardcoursecheckpoints.Discord.HardcourseDiscord;
 import com.denied403.hardcoursecheckpoints.Events.*;
 import com.denied403.hardcoursecheckpoints.Chat.ChatReactions;
+
 import com.denied403.hardcoursecheckpoints.Points.*;
 import com.denied403.hardcoursecheckpoints.Utils.PermissionChecker;
 import com.denied403.hardcoursecheckpoints.Utils.WordSyncListener;
+
+import com.denied403.hardcoursecheckpoints.Points.PointsCommand;
+import com.denied403.hardcoursecheckpoints.Points.PointsManager;
+import com.denied403.hardcoursecheckpoints.Points.PointsTabCompleter;
+import com.denied403.hardcoursecheckpoints.Utils.PermissionChecker;
+import com.denied403.hardcoursecheckpoints.Utils.WordSyncListener;
+import com.denied403.hardcoursecheckpoints.Points.PointsShop;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+
+import com.denied403.hardcoursecheckpoints.Points.ShopItem;
+
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -26,7 +38,9 @@ import static com.denied403.hardcoursecheckpoints.Discord.HardcourseDiscord.send
 
 public final class HardcourseCheckpoints extends JavaPlugin implements Listener {
     public static HashMap<UUID, Double> highestCheckpoint = new HashMap<>();
+
     // --- New: Store player points ---
+
     public static HashMap<UUID, Integer> playerPoints = new HashMap<>();
 
     private File checkpointFile;
@@ -35,7 +49,9 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
     private File wordsFile;
     private FileConfiguration wordsConfig;
 
+
     // --- New: Points file and config ---
+
     private File pointsFile;
     private FileConfiguration pointsConfig;
 
@@ -64,10 +80,15 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
 
     @Override
     public void onEnable() {
+
         // Plugin startup logic
         plugin = this;
 
         // Load config flags early so Discord messages and broadcasts behave correctly
+
+        plugin = this;
+
+
         DiscordEnabled = getConfig().getBoolean("discord-enabled");
         BroadcastEnabled = getConfig().getBoolean("broadcast-enabled");
         UnscrambleEnabled = getConfig().getBoolean("unscramble-enabled");
@@ -77,7 +98,9 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
         getServer().getPluginManager().registerEvents(pointsShop, this);
 
         this.pointsManager = new PointsManager(this);
+
         getServer().getPluginManager().registerEvents(new PointsShop(this), this);
+
 
         shopItem = new ShopItem();
         getServer().getPluginManager().registerEvents(shopItem, this);
@@ -132,7 +155,9 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
         getServer().getPluginManager().registerEvents(this, this);
         getServer().getPluginManager().registerEvents(wordSyncListener, this);
         getServer().getPluginManager().registerEvents(new BanListener(this), this);
+
         getServer().getPluginManager().registerEvents(new JumpListener(pointsShop, this), this);
+
 
         WordSyncListener.updateFilterWords();
 
@@ -190,7 +215,9 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
         }
         saveCheckpoints();
 
+
         // --- New: Save points on disable ---
+
         savePoints();
     }
 
