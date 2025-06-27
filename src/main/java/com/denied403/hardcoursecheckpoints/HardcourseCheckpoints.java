@@ -99,9 +99,6 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
 
         this.pointsManager = new PointsManager(this);
 
-        getServer().getPluginManager().registerEvents(new PointsShop(this), this);
-
-
         shopItem = new ShopItem();
         getServer().getPluginManager().registerEvents(shopItem, this);
 
