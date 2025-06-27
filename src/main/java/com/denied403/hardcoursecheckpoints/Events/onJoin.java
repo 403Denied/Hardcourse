@@ -13,34 +13,48 @@ import org.bukkit.Location;
 import static com.denied403.hardcoursecheckpoints.Discord.HardcourseDiscord.sendMessage;
 import static com.denied403.hardcoursecheckpoints.HardcourseCheckpoints.*;
 
+import com.denied403.hardcoursecheckpoints.Points.ShopItem;
+
 public class onJoin implements Listener {
+
+    private final ShopItem shopItem = new ShopItem();
+
     @EventHandler
     public void onJoin(org.bukkit.event.player.PlayerJoinEvent event) {
         org.bukkit.entity.Player player = event.getPlayer();
-        if(isDiscordEnabled()) {
+
+        if (isDiscordEnabled()) {
             if (player.hasPlayedBefore()) {
                 sendMessage(player, null, "join", null, null);
             } else {
                 sendMessage(player, null, "firstjoin", null, null);
             }
         }
+
         player.getInventory().clear();
+
+        // Give points shop item using existing method
+        shopItem.givePointsShopChest(player);
+
+        // Create stuck clock item in slot 8
         Material killItem = Material.CLOCK;
         ItemStack killItemStack = new ItemStack(killItem);
         org.bukkit.inventory.meta.ItemMeta killItemMeta = killItemStack.getItemMeta();
         killItemMeta.addEnchant(Enchantment.INFINITY, 1, true);
         killItemMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS);
-        killItemMeta.setDisplayName(org.bukkit.ChatColor.RED + "" + org.bukkit.ChatColor.BOLD + "Stuck");
-        java.util.ArrayList<String> lore = new java.util.ArrayList<>();
-        lore.add(" ");
-        lore.add(org.bukkit.ChatColor.GRAY + "Click if you're stuck to go back to your level");
-        killItemMeta.setLore(lore);
+        killItemMeta.setDisplayName(ChatColor.RED + "" + ChatColor.BOLD + "Stuck");
+        java.util.ArrayList<String> stuckLore = new java.util.ArrayList<>();
+        stuckLore.add(" ");
+        stuckLore.add(ChatColor.GRAY + "Click if you're stuck to go back to your level");
+        killItemMeta.setLore(stuckLore);
         killItemStack.setItemMeta(killItemMeta);
         player.getInventory().setItem(8, killItemStack);
-        if(!highestCheckpoint.containsKey(player.getUniqueId())) {
+
+        if (!highestCheckpoint.containsKey(player.getUniqueId())) {
             highestCheckpoint.put(player.getUniqueId(), 1.0);
         }
-        if(!player.hasPlayedBefore()) {
+
+        if (!player.hasPlayedBefore()) {
             World targetWorld = Bukkit.getServer().getWorld("Season1");
             Location spawnLocation = targetWorld.getSpawnLocation();
             player.teleport(spawnLocation);

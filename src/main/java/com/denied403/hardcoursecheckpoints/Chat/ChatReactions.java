@@ -1,10 +1,7 @@
 package com.denied403.hardcoursecheckpoints.Chat;
 
-import com.denied403.hardcoursecheckpoints.Chat.Shuffler;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;

@@ -9,10 +9,12 @@ import com.denied403.hardcoursecheckpoints.Points.PointsManager;
 import com.denied403.hardcoursecheckpoints.Points.PointsTabCompleter;
 import com.denied403.hardcoursecheckpoints.Utils.PermissionChecker;
 import com.denied403.hardcoursecheckpoints.Utils.WordSyncListener;
+import com.denied403.hardcoursecheckpoints.Points.PointsShop;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import com.denied403.hardcoursecheckpoints.Points.ShopItem;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -28,7 +30,6 @@ import static com.denied403.hardcoursecheckpoints.Discord.HardcourseDiscord.send
 
 public final class HardcourseCheckpoints extends JavaPlugin implements Listener {
     public static HashMap<UUID, Double> highestCheckpoint = new HashMap<>();
-    // --- New: Store player points ---
     public static HashMap<UUID, Integer> playerPoints = new HashMap<>();
 
     private File checkpointFile;
@@ -37,9 +38,12 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
     private File wordsFile;
     private FileConfiguration wordsConfig;
 
-    // --- New: Points file and config ---
     private File pointsFile;
     private FileConfiguration pointsConfig;
+
+    private PointsShop pointsShop;
+
+    private ShopItem shopItem;  // Add ShopItem instance
 
     private PointsManager pointsManager;
 
@@ -62,14 +66,24 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
 
     @Override
     public void onEnable() {
-        // Plugin startup logic
         plugin = this;
 
-        // Load config flags early so Discord messages and broadcasts behave correctly
         DiscordEnabled = getConfig().getBoolean("discord-enabled");
         BroadcastEnabled = getConfig().getBoolean("broadcast-enabled");
         UnscrambleEnabled = getConfig().getBoolean("unscramble-enabled");
         messages = getConfig().getStringList("broadcast-messages");
+
+        pointsShop = new PointsShop(this);
+        getServer().getPluginManager().registerEvents(pointsShop, this);
+
+        this.pointsManager = new PointsManager(this);
+
+        shopItem = new ShopItem();
+        getServer().getPluginManager().registerEvents(shopItem, this);
+
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            shopItem.givePointsShopChest(player);
+        }
 
         if(DiscordEnabled) {
             discordBot = new HardcourseDiscord(this);
@@ -107,7 +121,7 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
         WordSyncListener wordSyncListener = new WordSyncListener(this);
         WordSyncListener.reloadMuteCache();
         ChatReactions chatReactions = new ChatReactions(this);
-        getServer().getPluginManager().registerEvents(chatReactions, this);
+        getServer().getPluginManager().registerEvents(new ChatReactions(this), this);
         getServer().getPluginManager().registerEvents(new onJoin(), this);
         getServer().getPluginManager().registerEvents(new onDrop(), this);
         getServer().getPluginManager().registerEvents(new onClick(), this);
@@ -159,6 +173,10 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
         new PermissionChecker(this);
     }
 
+    public PointsManager getPointsManager() {
+        return this.pointsManager;
+    }
+
     @Override
     public void onDisable() {
         if(DiscordEnabled) {
@@ -169,7 +187,6 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
         }
         saveCheckpoints();
 
-        // --- New: Save points on disable ---
         savePoints();
     }
 

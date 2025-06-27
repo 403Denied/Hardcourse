@@ -2,8 +2,8 @@ package com.denied403.hardcoursecheckpoints.Points;
 
 import com.denied403.hardcoursecheckpoints.HardcourseCheckpoints;
 import org.bukkit.ChatColor;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.UUID;
 
@@ -39,5 +39,18 @@ public class PointsManager {
         int points = getPoints(player.getUniqueId());
         String message = ChatColor.RED + "Points: " + ChatColor.WHITE + points;
         player.sendActionBar(message);
+    }
+
+    public void sendTemporaryPointsMessage(Player player, String tempMessage, long durationTicks) {
+        // Show temporary message immediately
+        player.sendActionBar(tempMessage);
+
+        // Schedule task to send the normal points message after the specified delay
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                sendPointsActionBar(player);
+            }
+        }.runTaskLater(plugin, durationTicks);
     }
 }
