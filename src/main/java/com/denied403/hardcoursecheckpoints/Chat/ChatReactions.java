@@ -1,10 +1,9 @@
 package com.denied403.hardcoursecheckpoints.Chat;
 
-import com.denied403.hardcoursecheckpoints.Chat.Shuffler;
+import com.denied403.hardcoursecheckpoints.Points.PointsManager;
+import com.denied403.hardcoursecheckpoints.HardcourseCheckpoints;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -27,7 +26,7 @@ public class ChatReactions implements Listener {
 
     private static File wordFile;
     private static FileConfiguration wordConfig;
-    private static Random random;
+    private static final Random random = new Random();
     private static String currentWord;
     private static String scrambledWord;
     public static boolean gameActive = false;
@@ -37,16 +36,14 @@ public class ChatReactions implements Listener {
         ChatReactions.plugin = plugin;
         wordFile = new File(plugin.getDataFolder(), "words.yml");
         wordConfig = YamlConfiguration.loadConfiguration(wordFile);
-        random = new Random();
-        if(isUnscrambleEnabled()) {
-            if (!wordFile.exists()) {
-                try {
-                    wordFile.createNewFile();
-                    wordConfig.set("words", List.of("Word 1", "Word 2"));
-                    wordConfig.save(wordFile);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+
+        if (isUnscrambleEnabled() && !wordFile.exists()) {
+            try {
+                wordFile.createNewFile();
+                wordConfig.set("words", List.of("Word 1", "Word 2"));
+                wordConfig.save(wordFile);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
@@ -60,32 +57,44 @@ public class ChatReactions implements Listener {
     }
 
     public static void runGame(String word) {
-        currentWord = word;  // Store the passed word in the instance variable
+        currentWord = word;
         scrambledWord = Shuffler.shuffleWord(currentWord);
         MiniMessage mm = MiniMessage.miniMessage();
+
         for (Player p : Bukkit.getServer().getOnlinePlayers()) {
-            Component message = mm.deserialize(
-                    "<red><bold>HARDCOURSE<reset> <hover:show_text:'" + scrambledWord + "'>Hover here for a word to unscramble.</hover>"
-            );
+            Component message = mm.deserialize("<red><bold>HARDCOURSE<reset> <hover:show_text:'" + scrambledWord + "'>Hover here for a word to unscramble.</hover>");
+            p.sendMessage(message);
         }
+
         gameActive = true;
 
         new BukkitRunnable() {
-                @Override
-                public void run() {if (gameActive) {
+            @Override
+            public void run() {
+                if (gameActive) {
                     Component endMsg = mm.deserialize("<red><bold>HARDCOURSE</bold></red> <reset>Time's Up! The correct word was <red>" + currentWord + "</red>");
                     Bukkit.broadcast(endMsg);
                     gameActive = false;
                 }
             }
-        }.runTaskLater(plugin, 600L);// Run after 30 seconds (600 ticks)
+        }.runTaskLater(plugin, 600L); // Run after 30 seconds (600 ticks)
     }
 
     @EventHandler
     public void onPlayerChat(AsyncPlayerChatEvent event) {
         if (gameActive && event.getMessage().equalsIgnoreCase(currentWord)) {
             Player p = event.getPlayer();
-            Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', "&c&lHARDCOURSE &r&c" + p.getDisplayName() + "&r successfully unscrambled the word! It was &c" + currentWord));
+            int points = 50 + random.nextInt(51); // Random between 50 and 100 inclusive
+
+            PointsManager pointsManager = ((HardcourseCheckpoints) plugin).getPointsManager();
+            pointsManager.addPoints(p.getUniqueId(), points);
+            pointsManager.sendPointsActionBar(p);
+
+            Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&',
+                    "&c&lHARDCOURSE &r&c" + p.getDisplayName() +
+                            "&r successfully unscrambled the word! It was &c" + currentWord +
+                            "&r and earned &a" + points + " points&r!"));
+
             event.setCancelled(true);
             gameActive = false;
         }

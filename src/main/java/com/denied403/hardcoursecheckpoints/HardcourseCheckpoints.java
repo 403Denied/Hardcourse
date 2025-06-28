@@ -152,8 +152,8 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
         getServer().getPluginManager().registerEvents(this, this);
         getServer().getPluginManager().registerEvents(wordSyncListener, this);
         getServer().getPluginManager().registerEvents(new BanListener(this), this);
-
-        getServer().getPluginManager().registerEvents(new JumpListener(pointsShop, this), this);
+        getServer().getPluginManager().registerEvents(new JumpBoost(), this);
+        getServer().getPluginManager().registerEvents(new DoubleJump(), this);
 
 
         WordSyncListener.updateFilterWords();
