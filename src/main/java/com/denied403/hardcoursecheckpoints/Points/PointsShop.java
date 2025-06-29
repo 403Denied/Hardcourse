@@ -13,6 +13,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 
 import java.util.ArrayList;
@@ -40,17 +41,32 @@ public class PointsShop implements Listener {
             meta.setColor(Color.LIME);
 
             List<String> lore = new ArrayList<>();
-            lore.add(ChatColor.GRAY + "Gives you jump boost.");
+            lore.add(ChatColor.GRAY + "Gives you 10 seconds of Jump Boost");
             lore.add(ChatColor.YELLOW + "Cost: " + ChatColor.GOLD + "1500 Points");
             meta.setLore(lore);
 
             meta.setUnbreakable(true);
-            meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
-            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-
+            meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
             jumpBoots.setItemMeta(meta);
         }
         return jumpBoots;
+    }
+
+    private ItemStack getDoubleJumpItem() {
+        ItemStack feather = new ItemStack(Material.FEATHER);
+        ItemMeta meta = feather.getItemMeta();
+        if (meta != null) {
+            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&c&lDouble Jump"));
+
+            List<String> lore = new ArrayList<>();
+            lore.add(ChatColor.GRAY + "Acts like a second jump");
+            lore.add(ChatColor.YELLOW + "Cost: " + ChatColor.GOLD + "2000 Points");
+            meta.setLore(lore);
+
+            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+            feather.setItemMeta(meta);
+        }
+        return feather;
     }
 
     @EventHandler
@@ -62,8 +78,9 @@ public class PointsShop implements Listener {
             Player player = event.getPlayer();
             event.setCancelled(true);
 
-            Inventory pointsShopInventory = Bukkit.createInventory(null, 27, "Points Shop");
+            Inventory pointsShopInventory = Bukkit.createInventory(null, 27, ChatColor.DARK_GREEN + "Points Shop");
             pointsShopInventory.setItem(10, getJumpBootsItem());
+            pointsShopInventory.setItem(12, getDoubleJumpItem());
             player.openInventory(pointsShopInventory);
         }
     }
@@ -71,51 +88,59 @@ public class PointsShop implements Listener {
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         if (!(event.getWhoClicked() instanceof Player)) return;
+        if (event.getClickedInventory() == null) return;
 
-        Player player = (Player) event.getWhoClicked();
-        Inventory inventory = event.getInventory();
+        String title = ChatColor.stripColor(event.getView().getTitle());
+        if (!title.equalsIgnoreCase("Points Shop")) return;
 
-        if (!event.getView().getTitle().equals("Points Shop")) return;
+        // Prevent taking items from the GUI
+        if (event.getClickedInventory().equals(event.getWhoClicked().getInventory())) return;
 
-        event.setCancelled(true); // Prevent item movement
+        event.setCancelled(true);
 
-        // Only allow basic left click (no shift, no right-clicks)
         if (event.getClick().isShiftClick() || !event.getClick().isLeftClick()) return;
 
         ItemStack clicked = event.getCurrentItem();
         if (clicked == null || !clicked.hasItemMeta()) return;
 
         String name = ChatColor.stripColor(clicked.getItemMeta().getDisplayName());
-        if (!name.equalsIgnoreCase("Jump Boost")) return;
-
-        int cost = 1500;
+        Player player = (Player) event.getWhoClicked();
         PointsManager pointsManager = plugin.getPointsManager();
-        int currentPoints = pointsManager.getPoints(player.getUniqueId());
 
-        // Check if player already has the jump boots equipped
-        boolean hasBoots = false;
-        for (ItemStack armor : player.getInventory().getArmorContents()) {
-            if (armor != null && armor.isSimilar(getJumpBootsItem())) {
-                hasBoots = true;
-                break;
+        if (name.equalsIgnoreCase("Jump Boost")) {
+            int cost = 1500;
+            int currentPoints = pointsManager.getPoints(player.getUniqueId());
+
+            if (currentPoints >= cost) {
+                pointsManager.removePoints(player.getUniqueId(), cost);
+                player.getInventory().addItem(getJumpBootsItem());
+                player.sendMessage(ChatColor.GREEN + "You purchased Jump Boost boots!");
+                pointsManager.sendPointsActionBar(player);
+                player.closeInventory();
+            } else {
+                player.sendMessage(ChatColor.RED + "You don't have enough points!");
+                pointsManager.sendTemporaryPointsMessage(player,
+                        ChatColor.RED + "Not enough points! Need 1500.",
+                        40L);
             }
         }
 
-        if (hasBoots) {
-            player.sendMessage(ChatColor.RED + "You already own the Jump Boost boots.");
-            return;
-        }
+        if (name.equalsIgnoreCase("Double Jump")) {
+            int cost = 2000;
+            int currentPoints = pointsManager.getPoints(player.getUniqueId());
 
-        if (currentPoints >= cost) {
-            pointsManager.removePoints(player.getUniqueId(), cost);
-            player.getInventory().addItem(getJumpBootsItem());
-            player.sendMessage(ChatColor.GREEN + "You purchased Jump Boost boots!");
-            pointsManager.sendPointsActionBar(player);
-        } else {
-            player.sendMessage(ChatColor.RED + "You don't have enough points!");
-            pointsManager.sendTemporaryPointsMessage(player,
-                    ChatColor.RED + "Not enough points! Need 1500.",
-                    40L);
+            if (currentPoints >= cost) {
+                pointsManager.removePoints(player.getUniqueId(), cost);
+                player.getInventory().addItem(getDoubleJumpItem());
+                player.sendMessage(ChatColor.GREEN + "You purchased Double Jump!");
+                pointsManager.sendPointsActionBar(player);
+                player.closeInventory();
+            } else {
+                player.sendMessage(ChatColor.RED + "You don't have enough points!");
+                pointsManager.sendTemporaryPointsMessage(player,
+                        ChatColor.RED + "Not enough points! Need 2000.",
+                        40L);
+            }
         }
     }
 }
