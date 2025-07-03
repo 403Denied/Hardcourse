@@ -142,8 +142,6 @@ public class onWalk implements Listener {
 
     // New method: sends the subtitle with empty title, showing the points message for ~3 seconds
     private void sendPointsSubtitle(Player player, String pointsMessage) {
-        player.sendTitle("", pointsMessage, 5, 60, 5);  // fadeIn=5, stay=60 (3 sec), fadeOut=5 ticks
+        player.sendTitle("", pointsMessage, 5, 40, 5);  // fadeIn=5, stay=60 (3 sec), fadeOut=5 ticks
     }
-
-    // Removed sendTemporaryPointsMessageRepeated usage since no longer needed
 }

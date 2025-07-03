@@ -28,7 +28,7 @@ public class DiscordButtonListener extends ListenerAdapter {
 
                 // Dispatch ban command to server
                 Bukkit.getScheduler().runTask(plugin, () -> {
-                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "ban " + playerName + " Hacking");
+                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "consolepunish " + playerName + " unfair_advantage Discord ban issued by " + event.getUser().getName());
                 });
                 runBanCleanup(playerName);
             }

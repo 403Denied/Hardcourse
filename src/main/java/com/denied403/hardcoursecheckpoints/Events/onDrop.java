@@ -14,5 +14,8 @@ public class onDrop implements Listener {
         if(event.getItemDrop().getItemStack().getType() == Material.ELYTRA){
             event.setCancelled(true);
         }
+        if(event.getItemDrop().getItemStack().getType() == Material.PAPER){
+            event.setCancelled(true);
+        }
     }
 }

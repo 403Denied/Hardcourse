@@ -1,6 +1,5 @@
 package com.denied403.hardcoursecheckpoints.Discord;
 
-import com.vdurmont.emoji.EmojiParser;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -54,7 +53,7 @@ public final class DiscordListener extends ListenerAdapter {
                 }
 
                 String finalFormattedMessage = formattedMessage;
-                Bukkit.getOnlinePlayers().forEach(player -> player.sendMessage(EmojiParser.parseToAliases(finalFormattedMessage.replaceAll("%message", ChatColor.stripColor(message)))));
+                Bukkit.getOnlinePlayers().forEach(player -> player.sendMessage(finalFormattedMessage.replaceAll("%message", ChatColor.stripColor(message))));
             }
 
             // Staff chat handling remains the same
@@ -67,7 +66,7 @@ public final class DiscordListener extends ListenerAdapter {
                 String finalFormattedMessage = formattedMessage;
                 for (Player player : Bukkit.getServer().getOnlinePlayers()) {
                     if (player.hasPermission("hardcourse.jrmod")) {
-                        player.sendMessage(EmojiParser.parseToAliases(finalFormattedMessage.replaceAll("%message", ChatColor.stripColor(message))));
+                        player.sendMessage(finalFormattedMessage.replaceAll("%message", ChatColor.stripColor(message)));
                     }
                 }
             }

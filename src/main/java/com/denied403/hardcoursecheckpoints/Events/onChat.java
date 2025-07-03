@@ -19,9 +19,9 @@ import static com.denied403.hardcoursecheckpoints.Utils.WordSyncListener.isPlaye
 
 public class onChat implements Listener {
     private static final Map<Character, String> replacements = Map.of(
-            'a', "[a4@]",
+            'a', "[a4@9]",
             'e', "[e3]",
-            'i', "[i1!\\|]",  // escape the pipe symbol
+            'i', "[i1!\\|]",
             'o', "[o0]",
             's', "[s$5]",
             't', "[t7+]",
@@ -45,7 +45,7 @@ public class onChat implements Listener {
 
         if (whitelist == null || blacklist == null) {
             Bukkit.getLogger().warning("[Hardcourse] Word filters not initialized, allowing message.");
-            return false; // Fallback: allow message if filters are not ready
+            return false;
         }
 
         for (String allow : whitelist) {
@@ -90,7 +90,6 @@ public class onChat implements Listener {
                 }
             } else {
                 Player p = event.getPlayer();
-                String playerName = p.getName();
                 String level;
                 if (p.hasPermission("hardcourse.season1")) {
                     level = "1-";
@@ -100,7 +99,9 @@ public class onChat implements Listener {
                 }
                 if (p.hasPermission("hardcourse.season3")) {
                     level = "3-";
-                } else level = "";
+                } else {
+                    level = "";
+                }
                 if (event.getPlayer().hasPermission("hardcourse.jrmod")) {
                     sendMessage(event.getPlayer(), content, "staffmessage", level, null);
                 } else {

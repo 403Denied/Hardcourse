@@ -9,6 +9,8 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import static com.denied403.hardcoursecheckpoints.Points.PointsShop.givePointsShopChest;
+
 public class Clock implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
@@ -37,6 +39,7 @@ public class Clock implements CommandExecutor {
         killItemStack.setItemMeta(killItemMeta);
         // Set the inventory slot to the last hotbar slot
         player.getInventory().setItem(8, killItemStack);
+        givePointsShopChest(player);
         return true;
     }
 }

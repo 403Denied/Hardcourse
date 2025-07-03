@@ -65,6 +65,7 @@ public class ChatReactions implements Listener {
             Component message = mm.deserialize("<red><bold>HARDCOURSE<reset> <hover:show_text:'" + scrambledWord + "'>Hover here for a word to unscramble.</hover>");
             p.sendMessage(message);
         }
+        Bukkit.getServer().getLogger().info("&c&lHARDCOURSE &fHover here for a word to unscramble: &c" + scrambledWord + "&f(" + currentWord + ")");
 
         gameActive = true;
 

@@ -18,6 +18,9 @@ public class reloadHardcourseConfig implements CommandExecutor {
         plugin.saveCheckpoints();
         plugin.loadBroadcastMessages();
         plugin.reloadConfig();
+        plugin.reloadCheckpointsConfig();
+        plugin.reloadPointsConfig();
+        plugin.reloadWordsConfig();
         commandSender.sendMessage("§c§lHARDCOURSE §fHardcourse Config Reloaded.");
         return true;
     }

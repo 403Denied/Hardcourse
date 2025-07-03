@@ -143,4 +143,14 @@ public class PointsShop implements Listener {
             }
         }
     }
+    public static void givePointsShopChest(Player player) {
+        ItemStack paper = new ItemStack(Material.PAPER);
+        ItemMeta meta = paper.getItemMeta();
+        if (meta != null) {
+            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&c&lPoints Shop"));
+            paper.setItemMeta(meta);
+        }
+
+        player.getInventory().setItem(4, paper);
+    }
 }

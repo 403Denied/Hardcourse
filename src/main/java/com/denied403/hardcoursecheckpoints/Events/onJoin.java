@@ -12,12 +12,9 @@ import org.bukkit.Location;
 
 import static com.denied403.hardcoursecheckpoints.Discord.HardcourseDiscord.sendMessage;
 import static com.denied403.hardcoursecheckpoints.HardcourseCheckpoints.*;
-
-import com.denied403.hardcoursecheckpoints.Points.ShopItem;
+import static com.denied403.hardcoursecheckpoints.Points.PointsShop.givePointsShopChest;
 
 public class onJoin implements Listener {
-
-    private final ShopItem shopItem = new ShopItem();
 
     @EventHandler
     public void onJoin(org.bukkit.event.player.PlayerJoinEvent event) {
@@ -33,10 +30,8 @@ public class onJoin implements Listener {
 
         player.getInventory().clear();
 
-        // Give points shop item using existing method
-        shopItem.givePointsShopChest(player);
+        givePointsShopChest(player);
 
-        // Create stuck clock item in slot 8
         Material killItem = Material.CLOCK;
         ItemStack killItemStack = new ItemStack(killItem);
         org.bukkit.inventory.meta.ItemMeta killItemMeta = killItemStack.getItemMeta();
@@ -58,7 +53,7 @@ public class onJoin implements Listener {
             World targetWorld = Bukkit.getServer().getWorld("Season1");
             Location spawnLocation = targetWorld.getSpawnLocation();
             player.teleport(spawnLocation);
-            player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c&lHARDCOURSE &rWelcome to hardcourse. This server contains over 500 levels that will test your patience (and your will to live). Think it's worth it? &cYou may begin&r."));
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c&lHARDCOURSE &rWelcome to hardcourse. This server contains over 1000 levels that will test your patience (and your will to live). Think it's worth it? &cYou may begin&r."));
             Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', "&c&lHARDCOURSE &r&c" + player.getDisplayName() + " &rhas joined for the first time. Welcome! &c[#" + Bukkit.getOfflinePlayers().length + "]"));
         }
     }

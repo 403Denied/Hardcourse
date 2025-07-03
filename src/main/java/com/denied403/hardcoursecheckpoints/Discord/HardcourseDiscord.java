@@ -55,7 +55,7 @@ public class HardcourseDiscord {
                         .enableCache(CacheFlag.ONLINE_STATUS)
                         .addEventListeners(
                                 new DiscordListener(),
-                                new CommandManager(),
+                                new CommandManager((HardcourseCheckpoints) plugin),
                                 new DiscordButtonListener((HardcourseCheckpoints) plugin)
                         )
                         .build().awaitReady();

@@ -62,7 +62,8 @@ public class BanListener implements Listener {
                 List<Button> updated = new ArrayList<>();
                 for (Button b : buttons) {
                     if (b.getId() != null && b.getId().equalsIgnoreCase("ban:" + playerName)) {
-                        // gray out by changing to disabled
+                        // Change the button text to indicate the player is banned
+                        updated.add(Button.danger(b.getId(), "Banned").asDisabled());
                         updated.add(b.asDisabled());
                         changed = true;
                     } else {

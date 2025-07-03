@@ -37,14 +37,14 @@ public class WordSyncListener implements Listener {
             Bukkit.getScheduler().runTaskLater(plugin, WordSyncListener::updateFilterWords, 10L);
 
         }
-        if(msg.startsWith("/mute") || msg.startsWith("/tempmute") || msg.startsWith("/unmute")){
+        if(msg.startsWith("/mute") || msg.startsWith("/tempmute") || msg.startsWith("/unmute") && !msg.equals("/mutechat")){
             Bukkit.getScheduler().runTaskLater(plugin, WordSyncListener::reloadMuteCache, 10L);
         }
     }
     @EventHandler
     public void onConsoleCommand(ServerCommandEvent event) {
         String msg = event.getCommand().toLowerCase();
-        if(msg.startsWith("mute") || msg.startsWith("tempmute") || msg.startsWith("unmute")){
+        if(msg.startsWith("mute") || msg.startsWith("tempmute") || msg.startsWith("unmute") && !msg.equals("mutechat")) {
             Bukkit.getScheduler().runTaskLater(plugin, WordSyncListener::reloadMuteCache, 10L);
         }
     }
