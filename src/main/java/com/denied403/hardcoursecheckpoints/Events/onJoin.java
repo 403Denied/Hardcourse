@@ -5,6 +5,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
@@ -13,6 +14,7 @@ import org.bukkit.Location;
 import static com.denied403.hardcoursecheckpoints.Discord.HardcourseDiscord.sendMessage;
 import static com.denied403.hardcoursecheckpoints.HardcourseCheckpoints.*;
 import static com.denied403.hardcoursecheckpoints.Points.PointsShop.givePointsShopChest;
+import static com.denied403.hardcoursecheckpoints.Scoreboard.ScoreboardMain.setScoreboard;
 
 public class onJoin implements Listener {
 
@@ -55,6 +57,9 @@ public class onJoin implements Listener {
             player.teleport(spawnLocation);
             player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c&lHARDCOURSE &rWelcome to hardcourse. This server contains over 1000 levels that will test your patience (and your will to live). Think it's worth it? &cYou may begin&r."));
             Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', "&c&lHARDCOURSE &r&c" + player.getDisplayName() + " &rhas joined for the first time. Welcome! &c[#" + Bukkit.getOfflinePlayers().length + "]"));
+        }
+        for(Player p : Bukkit.getOnlinePlayers()) {
+            setScoreboard(p);
         }
     }
 }

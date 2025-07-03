@@ -22,7 +22,7 @@ public class WordSyncListener implements Listener {
     public static List<String> whitelistedWords;
     private static final Map<UUID, Long> muteCache = new HashMap<>();
 
-    private final HardcourseCheckpoints plugin; // Replace with your actual main plugin class
+    private final HardcourseCheckpoints plugin;
 
     public WordSyncListener(HardcourseCheckpoints plugin) {
         this.plugin = plugin;

@@ -130,6 +130,8 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
         getServer().getPluginManager().registerEvents(new BanListener(this), this);
         getServer().getPluginManager().registerEvents(new JumpBoost(), this);
         getServer().getPluginManager().registerEvents(new DoubleJump(), this);
+        getServer().getPluginManager().registerEvents(new onWorldChange(), this);
+        getServer().getPluginManager().registerEvents(new onQuit(), this);
         WordSyncListener.updateFilterWords();
         getCommand("resetcheckpoint").setExecutor(new CheckpointCommands(this));
         getCommand("resetallcheckpoints").setExecutor(new CheckpointCommands(this));

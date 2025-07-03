@@ -15,7 +15,7 @@ public class PointsManager {
         this.plugin = plugin;
     }
 
-    public int getPoints(UUID playerUUID) {
+    public static int getPoints(UUID playerUUID) {
         return HardcourseCheckpoints.playerPoints.getOrDefault(playerUUID, 0);
     }
 
