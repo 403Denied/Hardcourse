@@ -66,7 +66,7 @@ public class ChatReactions implements Listener {
                 Component message = mm.deserialize("<red><bold>HARDCOURSE<reset> <hover:show_text:'" + scrambledWord + "'>Hover here for a word to unscramble.</hover>");
                 p.sendMessage(message);
             }
-            Bukkit.getServer().getLogger().info("&c&lHARDCOURSE &fHover here for a word to unscramble: &c" + scrambledWord + "&f(" + currentWord + ")");
+            Bukkit.getServer().getLogger().info(ChatColor.translateAlternateColorCodes('&', "&c&lHARDCOURSE &fHover here for a word to unscramble: &c" + scrambledWord + "&f(" + currentWord + ")"));
 
             gameActive = true;
 
@@ -87,7 +87,7 @@ public class ChatReactions implements Listener {
     public void onPlayerChat(AsyncPlayerChatEvent event) {
         if (gameActive && event.getMessage().equalsIgnoreCase(currentWord)) {
             Player p = event.getPlayer();
-            int points = 50 + random.nextInt(51); // Random between 50 and 100 inclusive
+            int points = 50 + random.nextInt(51);
 
             PointsManager pointsManager = ((HardcourseCheckpoints) plugin).getPointsManager();
             pointsManager.addPoints(p.getUniqueId(), points);

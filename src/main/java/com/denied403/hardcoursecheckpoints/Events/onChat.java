@@ -81,6 +81,9 @@ public class onChat implements Listener {
             if (gameActive && event.getMessage().equalsIgnoreCase(getCurrentWord())) {
                 return;
             }
+            if(event.isCancelled()){
+                return;
+            }
 
             if (content.startsWith("#")) {
                 if (event.getPlayer().hasPermission("hardcourse.jrmod")) {

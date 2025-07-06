@@ -13,14 +13,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Random;
 import java.util.UUID;
 
 import static com.denied403.hardcoursecheckpoints.Discord.HardcourseDiscord.sendMessage;
 import static com.denied403.hardcoursecheckpoints.HardcourseCheckpoints.*;
-import static com.denied403.hardcoursecheckpoints.Scoreboard.ScoreboardMain.setScoreboard;
 
 public class onWalk implements Listener {
     private final HardcourseCheckpoints plugin;
@@ -97,7 +95,6 @@ public class onWalk implements Listener {
 
                 // Set respawn location
                 p.setRespawnLocation(p.getLocation().add(0, 1, 0), true);
-                setScoreboard(p);
 
                 if (checkpointNumber == 543.0 && p.getWorld().getName().equals("Season1")) {
                     if (previousCheckpoint >= 542.0) {

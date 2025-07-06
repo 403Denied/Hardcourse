@@ -31,6 +31,7 @@ import java.util.*;
 
 import static com.denied403.hardcoursecheckpoints.Discord.HardcourseDiscord.jda;
 import static com.denied403.hardcoursecheckpoints.Discord.HardcourseDiscord.sendMessage;
+import static com.denied403.hardcoursecheckpoints.Scoreboard.ScoreboardMain.setScoreboard;
 
 public final class HardcourseCheckpoints extends JavaPlugin implements Listener {
     public static HashMap<UUID, Double> highestCheckpoint = new HashMap<>();
@@ -130,8 +131,6 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
         getServer().getPluginManager().registerEvents(new BanListener(this), this);
         getServer().getPluginManager().registerEvents(new JumpBoost(), this);
         getServer().getPluginManager().registerEvents(new DoubleJump(), this);
-        getServer().getPluginManager().registerEvents(new onWorldChange(), this);
-        getServer().getPluginManager().registerEvents(new onQuit(), this);
         WordSyncListener.updateFilterWords();
         getCommand("resetcheckpoint").setExecutor(new CheckpointCommands(this));
         getCommand("resetallcheckpoints").setExecutor(new CheckpointCommands(this));
@@ -172,6 +171,16 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
         }
 
         new PermissionChecker(this);
+
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    setScoreboard(player);
+                }
+            }
+        }.runTaskTimer(this, 0L, 20L);
     }
 
     public PointsManager getPointsManager() {

@@ -4,8 +4,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.*;
 
-import java.util.Arrays;
-
 import static com.denied403.hardcoursecheckpoints.HardcourseCheckpoints.getHighestCheckpoint;
 import static com.denied403.hardcoursecheckpoints.Points.PointsManager.getPoints;
 import static com.denied403.hardcoursecheckpoints.Utils.Playtime.getPlaytimeShort;
@@ -20,7 +18,9 @@ public class ScoreboardMain {
                 return "2";
             case "season3":
                 return "3";
-            case "plotworld":
+            case "season4":
+                return "4";
+            case "creativeplots":
                 return "Plots";
             default:
                 return rawWorldName;
@@ -34,7 +34,7 @@ public class ScoreboardMain {
         String world = formatWorldName(player.getWorld().getName());
         String level = getHighestCheckpoint(player.getUniqueId()).toString().replace(".0", "");
         String deaths = String.valueOf(player.getStatistic(org.bukkit.Statistic.DEATHS));
-        obj.getScore(ChatColor.translateAlternateColorCodes('&', " ")).setScore(line--);
+        obj.getScore(" ").setScore(line--);
         obj.getScore(ChatColor.translateAlternateColorCodes('&', "&fSeason: &c" + world)).setScore(line--);
         obj.getScore(ChatColor.translateAlternateColorCodes('&', "&fLevel: &c" + level)).setScore(line--);
         obj.getScore(ChatColor.translateAlternateColorCodes('&', "&fPlaytime: &c" + getPlaytimeShort(player))).setScore(line--);
@@ -42,8 +42,7 @@ public class ScoreboardMain {
         obj.getScore(ChatColor.translateAlternateColorCodes('&', "&fPoints: &c" + getPoints(player.getUniqueId()))).setScore(line--);
         obj.getScore(ChatColor.translateAlternateColorCodes('&', " ")).setScore(line--);
         obj.getScore(ChatColor.translateAlternateColorCodes('&', "&fPlayers: &c" + Bukkit.getServer().getOnlinePlayers().size() + "&f/&c" + Bukkit.getServer().getMaxPlayers())).setScore(line--);
-        obj.getScore(ChatColor.translateAlternateColorCodes('&',"&fJoins: &c" + Bukkit.getServer().getOfflinePlayers().length + "&f")).setScore(line--);
-        obj.getScore(ChatColor.translateAlternateColorCodes('&', "&fTPS: &c" + String.format("%.2f", Bukkit.getTPS()[0]))).setScore(line--);
+        obj.getScore(ChatColor.translateAlternateColorCodes('&', "&fTPS: &c" + Math.round(Bukkit.getTPS()[0]))).setScore(line--);
         obj.getScore(ChatColor.translateAlternateColorCodes('&', "&fIP: &chardcourse.dev.falixsrv.me")).setScore(line);
         player.setScoreboard(board);
     }
