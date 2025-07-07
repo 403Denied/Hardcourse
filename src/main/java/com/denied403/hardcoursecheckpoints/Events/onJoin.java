@@ -9,6 +9,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.Location;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import static com.denied403.hardcoursecheckpoints.Discord.HardcourseDiscord.sendMessage;
 import static com.denied403.hardcoursecheckpoints.HardcourseCheckpoints.*;
@@ -29,9 +30,22 @@ public class onJoin implements Listener {
             }
         }
 
-        player.getInventory().clear();
+        boolean hasPointsShop = false;
 
-        givePointsShopChest(player);
+        for (ItemStack item : player.getInventory().getContents()) {
+            if (item == null || item.getType() != Material.PAPER) continue;
+
+            ItemMeta meta = item.getItemMeta();
+            if (meta != null && meta.hasDisplayName() &&
+                    ChatColor.stripColor(meta.getDisplayName()).equalsIgnoreCase("Points Shop")) {
+                hasPointsShop = true;
+                break;
+            }
+        }
+        if (!hasPointsShop) {
+            givePointsShopChest(player, true);
+        }
+
         initScoreboard(player);
 
         Material killItem = Material.CLOCK;
@@ -45,7 +59,11 @@ public class onJoin implements Listener {
         stuckLore.add(ChatColor.GRAY + "Click if you're stuck to go back to your level");
         killItemMeta.setLore(stuckLore);
         killItemStack.setItemMeta(killItemMeta);
-        player.getInventory().setItem(8, killItemStack);
+        if (player.getInventory().contains(killItemStack)) {
+            return;
+        } else {
+            player.getInventory().setItem(8, killItemStack);
+        }
 
         if (!highestCheckpoint.containsKey(player.getUniqueId())) {
             highestCheckpoint.put(player.getUniqueId(), 1.0);

@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -17,6 +18,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import javax.security.auth.login.LoginException;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.denied403.hardcoursecheckpoints.HardcourseCheckpoints.getHighestCheckpoint;
 import static com.denied403.hardcoursecheckpoints.HardcourseCheckpoints.isDiscordEnabled;
@@ -33,6 +37,8 @@ public class HardcourseDiscord {
     public HardcourseDiscord(JavaPlugin plugin) {
         this.plugin = plugin;
     }
+    private static final Map<String, Message> lastHackAlert = new HashMap<>();
+
 
     public void InitJDA() throws LoginException {
         if(isDiscordEnabled()) {
@@ -112,11 +118,19 @@ public class HardcourseDiscord {
         }
         if (type.equals("hacks")) {
             String playerName = player.getDisplayName();
-            String message = "**`" + playerName + "`** may be hacking. They skipped from level `" + extra1 + "` to level `" + extra2 + "`!";
-            hacksChannel.sendMessage(message)
+            String messageContent = "**`" + playerName + "`** may be hacking. They skipped from level `" + extra1 + "` to level `" + extra2 + "`!";
+
+            if (lastHackAlert.containsKey(playerName)) {
+                Message oldMessage = lastHackAlert.get(playerName);
+                oldMessage.editMessage(oldMessage.getContentRaw())
+                        .setComponents()
+                        .queue();
+            }
+            hacksChannel.sendMessage(messageContent)
                     .setActionRow(Button.danger("ban:" + playerName, "Ban"))
-                    .queue();
+                    .queue(sentMessage -> lastHackAlert.put(playerName, sentMessage));
         }
+
         if (type.equals("starting")){
             chatChannel.sendMessage(":white_check_mark: **The server has started up!**").queue();
         }

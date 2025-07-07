@@ -15,7 +15,6 @@ public class DoubleJump implements Listener {
 
     @EventHandler
     public void onPlayerRightClick(PlayerInteractEvent event) {
-        // Only process main hand interactions
         if (event.getHand() != EquipmentSlot.HAND) return;
         if (!event.hasItem()) return;
 
@@ -36,11 +35,9 @@ public class DoubleJump implements Listener {
                 0.01 // speed
         );
 
-        // Simulate a jump boost using upward velocity
         Vector currentVelocity = player.getVelocity();
-        player.setVelocity(currentVelocity.setY(0.5)); // adjust jump height as needed
+        player.setVelocity(currentVelocity.setY(0.5));
 
-        // Remove ONE feather from the player's hand
         ItemStack handItem = player.getInventory().getItemInMainHand();
         if (handItem.getAmount() > 1) {
             handItem.setAmount(handItem.getAmount() - 1);

@@ -99,11 +99,10 @@ public class ChatReactions implements Listener {
         String message = LegacyComponentSerializer.legacySection().serialize(event.message());
         if (gameActive && message.equalsIgnoreCase(currentWord)) {
             Player p = event.getPlayer();
-            int points = 50 + random.nextInt(51);
+            int points = 5 + random.nextInt(11);
 
             PointsManager pointsManager = ((HardcourseCheckpoints) plugin).getPointsManager();
             pointsManager.addPoints(p.getUniqueId(), points);
-            pointsManager.sendPointsActionBar(p);
 
             Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&',
                     "&c&lHARDCOURSE &r&c" + p.getDisplayName() +

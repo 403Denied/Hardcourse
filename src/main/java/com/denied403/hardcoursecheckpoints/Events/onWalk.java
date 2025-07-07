@@ -34,7 +34,6 @@ public class onWalk implements Listener {
     public void onWalk(PlayerMoveEvent event) {
         Player p = event.getPlayer();
 
-        // Check if the block below the player is a jukebox and the block at player's feet is a sign
         if (p.getLocation().subtract(0, 1, 0).getBlock().getType() == Material.JUKEBOX &&
                 p.getLocation().getBlock().getType() == Material.OAK_SIGN) {
 
@@ -43,21 +42,20 @@ public class onWalk implements Listener {
                 Sign sign = (Sign) p.getLocation().getBlock().getState();
                 String line = sign.getLine(0);
 
-                // Remove all non-numeric characters except "."
                 String numericLine = line.replaceAll("[^\\d.]", "");
 
-                // Parse the cleaned string to a Double
+
                 checkpointNumber = Double.valueOf(numericLine);
             } catch (NumberFormatException e) {
-                return;  // Exit if not a valid number
+                return;
             }
 
             UUID playerUUID = p.getUniqueId();
             Double previousCheckpoint = getHighestCheckpoint(playerUUID);
 
-            // Proceed only if new checkpoint is higher
+
             if (previousCheckpoint < checkpointNumber) {
-                // Notify staff if skipping more than 10 checkpoints
+
                 if (checkpointNumber > previousCheckpoint + 10 && !p.hasPermission("hardcourse.staff")) {
                     if (isDiscordEnabled()) {
                         sendMessage(p, null, "hacks",
@@ -75,25 +73,19 @@ public class onWalk implements Listener {
                     }
                 }
 
-                // Update highest checkpoint
                 highestCheckpoint.put(playerUUID, checkpointNumber);
 
-                // Send checkpoint reached action bar message
                 String checkpointMessage = ChatColor.RED + "Checkpoint reached: " + ChatColor.DARK_RED
                         + checkpointNumber.toString().replace(".0", "") + ChatColor.RESET + "!";
                 p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(checkpointMessage));
                 p.playSound(p.getLocation(), org.bukkit.Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
 
-                // Add random points between 10 and 20
                 int pointsToAdd = 10 + random.nextInt(11);
                 pointsManager.addPoints(playerUUID, pointsToAdd);
 
-                // Notify player of points gained as a subtitle in the middle of the screen (empty title)
-                String pointsMessage = ChatColor.GREEN + "+" + pointsToAdd + " points for completing level "
-                        + checkpointNumber.toString().replace(".0", "");
+                String pointsMessage = ChatColor.GREEN + "+" + pointsToAdd + " points";
                 sendPointsSubtitle(p, pointsMessage);
 
-                // Set respawn location
                 p.setRespawnLocation(p.getLocation().add(0, 1, 0), true);
 
                 if (checkpointNumber == 543.0 && p.getWorld().getName().equals("Season1")) {
@@ -140,6 +132,6 @@ public class onWalk implements Listener {
 
     // New method: sends the subtitle with empty title, showing the points message for ~3 seconds
     private void sendPointsSubtitle(Player player, String pointsMessage) {
-        player.sendTitle("", pointsMessage, 5, 40, 5);  // fadeIn=5, stay=60 (3 sec), fadeOut=5 ticks
+        player.sendTitle("", pointsMessage, 5, 40, 5);
     }
 }

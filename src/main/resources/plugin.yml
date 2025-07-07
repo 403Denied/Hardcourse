@@ -23,7 +23,8 @@ commands:
     description: "Apply for staff."
     usage: "/apply"
   clock:
-    description: "Lost your clock?"
+    description: "Lost your items?"
+    aliases: shop
     usage: "/clock"
   runchatgame:
     description: "Run a chat game."

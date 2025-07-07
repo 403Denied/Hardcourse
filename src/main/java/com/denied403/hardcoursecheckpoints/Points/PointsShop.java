@@ -68,6 +68,73 @@ public class PointsShop implements Listener {
         }
         return feather;
     }
+    private ItemStack getJumpBoostAllItem() {
+        int costPerPlayer = 1500;
+        int onlinePlayers = Bukkit.getOnlinePlayers().size();
+        int totalCost = costPerPlayer * onlinePlayers;
+
+        ItemStack boots = new ItemStack(Material.DIAMOND_BOOTS);
+        ItemMeta meta = boots.getItemMeta();
+        if (meta != null) {
+            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&b&lBuy everyone jump boost"));
+
+            List<String> lore = new ArrayList<>();
+            lore.add(ChatColor.GRAY + "Gives all online players jump boost boots");
+            lore.add(ChatColor.YELLOW + "Cost: " + ChatColor.GOLD + totalCost + " Points");
+            meta.setLore(lore);
+
+            meta.setUnbreakable(true);
+            meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
+            boots.setItemMeta(meta);
+        }
+        return boots;
+    }
+
+    private ItemStack getTempCheckpointItem() {
+        ItemStack book = new ItemStack(Material.BOOK);
+        ItemMeta meta = book.getItemMeta();
+        if (meta != null) {
+            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&d&lTemporary Checkpoint"));
+
+            List<String> lore = new ArrayList<>();
+            lore.add(ChatColor.GRAY + "Gives you a temporary checkpoint book");
+            lore.add(ChatColor.YELLOW + "Cost: " + ChatColor.GOLD + "7500 Points");
+            meta.setLore(lore);
+
+            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+            book.setItemMeta(meta);
+        }
+        return book;
+    }
+
+    private ItemStack getCheckpointBook() {
+        ItemStack book = new ItemStack(Material.BOOK);
+        ItemMeta meta = book.getItemMeta();
+        if (meta != null) {
+            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&d&lTemporary Checkpoint"));
+            List<String> lore = new ArrayList<>();
+            lore.add(ChatColor.GRAY + "Use this book to set a temporary checkpoint.");
+            meta.setLore(lore);
+            book.setItemMeta(meta);
+        }
+        return book;
+    }
+
+    private ItemStack getCosmeticsItem() {
+        ItemStack chest = new ItemStack(Material.CHEST);
+        ItemMeta meta = chest.getItemMeta();
+        if (meta != null) {
+            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&c&lCosmetics"));
+
+            List<String> lore = new ArrayList<>();
+            lore.add(ChatColor.GRAY + "Not yet configured");
+            meta.setLore(lore);
+
+            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+            chest.setItemMeta(meta);
+        }
+        return chest;
+    }
 
     @EventHandler
     public void onPlayerRightClick(PlayerInteractEvent event) {
@@ -78,13 +145,28 @@ public class PointsShop implements Listener {
             Player player = event.getPlayer();
             event.setCancelled(true);
 
-            Inventory pointsShopInventory = Bukkit.createInventory(null, 27, ChatColor.DARK_GREEN + "Points Shop");
+            Inventory pointsShopInventory = Bukkit.createInventory(null, 36, "Points Shop");
             pointsShopInventory.setItem(10, getJumpBootsItem());
             pointsShopInventory.setItem(12, getDoubleJumpItem());
-            player.openInventory(pointsShopInventory);
+            pointsShopInventory.setItem(14, getJumpBoostAllItem());
+            pointsShopInventory.setItem(16, getTempCheckpointItem());
+            pointsShopInventory.setItem(31, getCosmeticsItem());
+
+            ItemStack filler = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
+            ItemMeta fillerMeta = filler.getItemMeta();
+            if (fillerMeta != null) {
+                fillerMeta.setHideTooltip(true);
+                filler.setItemMeta(fillerMeta);
+            }
+            for (int slot = 0; slot < pointsShopInventory.getSize(); slot++) {
+                if (pointsShopInventory.getItem(slot) == null) {
+                    pointsShopInventory.setItem(slot, filler);
+                }
+
+                player.openInventory(pointsShopInventory);
+            }
         }
     }
-
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         if (!(event.getWhoClicked() instanceof Player)) return;
@@ -115,17 +197,11 @@ public class PointsShop implements Listener {
                 pointsManager.removePoints(player.getUniqueId(), cost);
                 player.getInventory().addItem(getJumpBootsItem());
                 player.sendMessage(ChatColor.GREEN + "You purchased Jump Boost boots!");
-                pointsManager.sendPointsActionBar(player);
                 player.closeInventory();
             } else {
                 player.sendMessage(ChatColor.RED + "You don't have enough points!");
-                pointsManager.sendTemporaryPointsMessage(player,
-                        ChatColor.RED + "Not enough points! Need 1500.",
-                        40L);
             }
-        }
-
-        if (name.equalsIgnoreCase("Double Jump")) {
+        } else if (name.equalsIgnoreCase("Double Jump")) {
             int cost = 2000;
             int currentPoints = pointsManager.getPoints(player.getUniqueId());
 
@@ -133,24 +209,65 @@ public class PointsShop implements Listener {
                 pointsManager.removePoints(player.getUniqueId(), cost);
                 player.getInventory().addItem(getDoubleJumpItem());
                 player.sendMessage(ChatColor.GREEN + "You purchased Double Jump!");
-                pointsManager.sendPointsActionBar(player);
                 player.closeInventory();
             } else {
                 player.sendMessage(ChatColor.RED + "You don't have enough points!");
-                pointsManager.sendTemporaryPointsMessage(player,
-                        ChatColor.RED + "Not enough points! Need 2000.",
-                        40L);
             }
+        } else if (name.equalsIgnoreCase("Buy everyone jump boost")) {
+            int costPerPlayer = 1500;
+            int onlinePlayers = Bukkit.getOnlinePlayers().size();
+            int totalCost = costPerPlayer * onlinePlayers;
+            int currentPoints = pointsManager.getPoints(player.getUniqueId());
+
+            if (currentPoints >= totalCost) {
+                pointsManager.removePoints(player.getUniqueId(), totalCost);
+                ItemStack jumpBoots = getJumpBootsItem();
+
+                for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                    onlinePlayer.getInventory().addItem(jumpBoots.clone());
+                    onlinePlayer.sendMessage(ChatColor.AQUA + "You received Jump Boost boots from " + player.getName() + "!");
+                }
+
+                String broadcastMsg = ChatColor.RED + "" + ChatColor.BOLD + "HARDCOURSE "
+                        + ChatColor.RESET + ChatColor.RED + player.getName()
+                        + ChatColor.RESET + " bought "
+                        + ChatColor.RESET + "everyone "
+                        + ChatColor.RED + "Jump Boost";
+
+                Bukkit.broadcastMessage(broadcastMsg);
+
+                player.closeInventory();
+            } else {
+                player.sendMessage(ChatColor.RED + "You don't have enough points!");
+            }
+        } else if (name.equalsIgnoreCase("Temporary Checkpoint")) {
+            int cost = 7500;
+            int currentPoints = pointsManager.getPoints(player.getUniqueId());
+
+            if (currentPoints >= cost) {
+                pointsManager.removePoints(player.getUniqueId(), cost);
+                player.getInventory().addItem(getCheckpointBook());
+                player.sendMessage(ChatColor.GREEN + "You purchased a Temporary Checkpoint book!");
+                player.closeInventory();
+            } else {
+                player.sendMessage(ChatColor.RED + "You don't have enough points!");
+            }
+        } else if (name.equalsIgnoreCase("Cosmetics")) {
+            player.sendMessage(ChatColor.YELLOW + "Cosmetics are not yet configured.");
+            player.closeInventory();
         }
     }
-    public static void givePointsShopChest(Player player) {
+    public static void givePointsShopChest(Player player, Boolean inSpot) {
         ItemStack paper = new ItemStack(Material.PAPER);
         ItemMeta meta = paper.getItemMeta();
         if (meta != null) {
             meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&c&lPoints Shop"));
             paper.setItemMeta(meta);
         }
-
-        player.getInventory().setItem(4, paper);
+        if(inSpot) {
+            player.getInventory().setItem(4, paper);
+        } else {
+            player.getInventory().addItem(paper);
+        }
     }
 }

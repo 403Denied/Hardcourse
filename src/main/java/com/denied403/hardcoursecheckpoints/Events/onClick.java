@@ -8,8 +8,7 @@ public class onClick implements Listener {
     public void onClick(org.bukkit.event.player.PlayerInteractEvent event) {
         if(event.getItem() == null) {
             return;
-        }
-        if(event.getItem().getItemMeta().getDisplayName().equals(org.bukkit.ChatColor.RED + "" + org.bukkit.ChatColor.BOLD + "Stuck")){
+        } if(event.getItem().getItemMeta().getDisplayName().equals(org.bukkit.ChatColor.RED + "" + org.bukkit.ChatColor.BOLD + "Stuck")){
             event.getPlayer().setHealth(0);
         }
     }
