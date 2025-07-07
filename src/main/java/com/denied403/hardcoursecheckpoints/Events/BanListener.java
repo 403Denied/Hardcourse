@@ -24,32 +24,6 @@ public class BanListener implements Listener {
         this.plugin = plugin;
     }
 
-    @EventHandler
-    public void onPlayerBan(PlayerCommandPreprocessEvent e) {
-        if(isDiscordEnabled()) {
-            if (!e.getMessage().toLowerCase().startsWith("/ban ")) return;
-            Player p = e.getPlayer();
-            String[] args = e.getMessage().split(" ");
-            if (args.length < 2) return;
-
-            if (!p.hasPermission("core403.punish")) return;
-
-            String target = args[1];
-            runBanCleanup(target);
-        }
-    }
-
-    @EventHandler
-    public void onConsoleBan(ServerCommandEvent e) {
-        if(isDiscordEnabled()) {
-            String cmd = e.getCommand().toLowerCase();
-            if (!cmd.startsWith("ban ")) return;
-            String[] args = cmd.split(" ");
-            if (args.length < 2) return;
-
-            runBanCleanup(args[1]);
-        }
-    }
     public static void runBanCleanup(String playerName) {
         MessageChannel channel = jda.getTextChannelById(plugin.getConfig().getString("Report-Channel-Id"));
         if (channel == null) return;
@@ -62,21 +36,16 @@ public class BanListener implements Listener {
                 List<Button> updated = new ArrayList<>();
                 for (Button b : buttons) {
                     if (b.getId() != null && b.getId().equalsIgnoreCase("ban:" + playerName)) {
-                        // Change the button text to indicate the player is banned
-                        updated.add(Button.danger(b.getId(), "Banned").asDisabled());
-                        updated.add(b.asDisabled());
+                        updated.add(Button.success(b.getId(), "✅ Banned").asDisabled());
                         changed = true;
                     } else {
                         updated.add(b);
                     }
                 }
-
                 if (changed) {
                     channel.editMessageComponentsById(msg.getId(), ActionRow.of(updated)).queue();
                 }
             }
         });
     }
-
-
 }

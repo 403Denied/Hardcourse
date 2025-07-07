@@ -130,7 +130,6 @@ public class HardcourseDiscord {
                     .setActionRow(Button.danger("ban:" + playerName, "Ban"))
                     .queue(sentMessage -> lastHackAlert.put(playerName, sentMessage));
         }
-
         if (type.equals("starting")){
             chatChannel.sendMessage(":white_check_mark: **The server has started up!**").queue();
         }

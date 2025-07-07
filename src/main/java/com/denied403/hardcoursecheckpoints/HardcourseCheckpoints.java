@@ -1,17 +1,11 @@
 package com.denied403.hardcoursecheckpoints;
 
 import com.denied403.hardcoursecheckpoints.Commands.*;
-import com.denied403.hardcoursecheckpoints.Discord.HardcourseDiscord;
+import com.denied403.hardcoursecheckpoints.Discord.*;
 import com.denied403.hardcoursecheckpoints.Events.*;
-import com.denied403.hardcoursecheckpoints.Chat.ChatReactions;
-
+import com.denied403.hardcoursecheckpoints.Chat.*;
 import com.denied403.hardcoursecheckpoints.Points.*;
-import com.denied403.hardcoursecheckpoints.Utils.PermissionChecker;
-
-import com.denied403.hardcoursecheckpoints.Points.PointsCommand;
-import com.denied403.hardcoursecheckpoints.Points.PointsManager;
-import com.denied403.hardcoursecheckpoints.Points.PointsTabCompleter;
-import com.denied403.hardcoursecheckpoints.Points.PointsShop;
+import com.denied403.hardcoursecheckpoints.Utils.*;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -28,8 +22,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.io.File;
 import java.util.*;
 
-import static com.denied403.hardcoursecheckpoints.Discord.HardcourseDiscord.jda;
-import static com.denied403.hardcoursecheckpoints.Discord.HardcourseDiscord.sendMessage;
+import static com.denied403.hardcoursecheckpoints.Discord.HardcourseDiscord.*;
 import static com.denied403.hardcoursecheckpoints.Scoreboard.ScoreboardMain.updateScoreboard;
 
 public final class HardcourseCheckpoints extends JavaPlugin implements Listener {
@@ -118,8 +111,6 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
         getCommand("resetcheckpoint").setExecutor(new CheckpointCommands(this));
         getCommand("resetallcheckpoints").setExecutor(new CheckpointCommands(this));
         getCommand("purgeinactive").setExecutor(new CheckpointCommands(this));
-        getCommand("discord").setExecutor(new Discord());
-        getCommand("apply").setExecutor(new Apply());
         getCommand("clock").setExecutor(new Clock());
         getCommand("runchatgame").setExecutor(new runChatGame());
         getCommand("endchatgame").setExecutor(new endChatGame());
@@ -227,7 +218,6 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
         pointsConfig = YamlConfiguration.loadConfiguration(pointsFile);
     }
 
-    // --- New: Load points from points.yml ---
     public void loadPoints() {
         if(pointsConfig == null) return;
         for (String key : pointsConfig.getKeys(false)) {
@@ -237,7 +227,6 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
         }
     }
 
-    // --- New: Save points to points.yml ---
     public void savePoints() {
         try {
             pointsConfig.getKeys(false).forEach(key -> pointsConfig.set(key, null));

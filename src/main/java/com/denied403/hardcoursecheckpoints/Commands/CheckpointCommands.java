@@ -26,7 +26,6 @@ public class CheckpointCommands implements CommandExecutor {
             sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
             return true;
         }
-
         if (command.getName().equalsIgnoreCase("resetcheckpoint")) {
             return handleResetCheckpoint(sender, args);
         } else if (command.getName().equalsIgnoreCase("resetallcheckpoints")) {
@@ -34,10 +33,8 @@ public class CheckpointCommands implements CommandExecutor {
         } else if( command.getName().equalsIgnoreCase("purgeinactive")) {
             return handlePurgeInactiveCheckpoints(sender, args);
         }
-
         return false;
     }
-
     private boolean handleResetCheckpoint(CommandSender sender, String[] args) {
         if (args.length < 2) {
             sender.sendMessage(ChatColor.YELLOW + "Usage: /resetcheckpoint <player> confirm");
@@ -76,7 +73,7 @@ public class CheckpointCommands implements CommandExecutor {
         }
 
         highestCheckpoint.clear();
-        plugin.saveCheckpoints();  // Save changes immediately
+        plugin.saveCheckpoints();
         sender.sendMessage(ChatColor.GREEN + "All player checkpoints have been reset.");
         return true;
     }
@@ -85,7 +82,6 @@ public class CheckpointCommands implements CommandExecutor {
             sender.sendMessage(ChatColor.RED + "Please confirm the purge by typing: /purgeinactive confirm");
             return true;
         }
-        //remove checkpoints equal to 1.0
         highestCheckpoint.entrySet().removeIf(entry -> entry.getValue().equals(1.0));
         highestCheckpoint.entrySet().removeIf(entry -> entry.getKey().equals(0.0));
         plugin.saveCheckpoints();
