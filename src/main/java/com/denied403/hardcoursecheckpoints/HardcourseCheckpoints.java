@@ -7,7 +7,6 @@ import com.denied403.hardcoursecheckpoints.Chat.ChatReactions;
 
 import com.denied403.hardcoursecheckpoints.Points.*;
 import com.denied403.hardcoursecheckpoints.Utils.PermissionChecker;
-import com.denied403.hardcoursecheckpoints.Utils.WordSyncListener;
 
 import com.denied403.hardcoursecheckpoints.Points.PointsCommand;
 import com.denied403.hardcoursecheckpoints.Points.PointsManager;
@@ -31,12 +30,10 @@ import java.util.*;
 
 import static com.denied403.hardcoursecheckpoints.Discord.HardcourseDiscord.jda;
 import static com.denied403.hardcoursecheckpoints.Discord.HardcourseDiscord.sendMessage;
-import static com.denied403.hardcoursecheckpoints.Scoreboard.ScoreboardMain.setScoreboard;
+import static com.denied403.hardcoursecheckpoints.Scoreboard.ScoreboardMain.updateScoreboard;
 
 public final class HardcourseCheckpoints extends JavaPlugin implements Listener {
     public static HashMap<UUID, Double> highestCheckpoint = new HashMap<>();
-
-    // --- New: Store player points ---
 
     public static HashMap<UUID, Integer> playerPoints = new HashMap<>();
 
@@ -45,9 +42,6 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
 
     private File wordsFile;
     private FileConfiguration wordsConfig;
-
-
-    // --- New: Points file and config ---
 
     private File pointsFile;
     private FileConfiguration pointsConfig;
@@ -108,17 +102,6 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
 
         pointsManager = new PointsManager(this);
 
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    pointsManager.sendPointsActionBar(player);
-                }
-            }
-        }.runTaskTimer(this, 0L, 20L);
-
-        WordSyncListener wordSyncListener = new WordSyncListener(this);
-        WordSyncListener.reloadMuteCache();
         getServer().getPluginManager().registerEvents(new ChatReactions(this), this);
         getServer().getPluginManager().registerEvents(new onJoin(), this);
         getServer().getPluginManager().registerEvents(new onDrop(), this);
@@ -127,11 +110,9 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
         getServer().getPluginManager().registerEvents(new onChat(), this);
         getServer().getPluginManager().registerEvents(new onHunger(), this);
         getServer().getPluginManager().registerEvents(this, this);
-        getServer().getPluginManager().registerEvents(wordSyncListener, this);
         getServer().getPluginManager().registerEvents(new BanListener(this), this);
         getServer().getPluginManager().registerEvents(new JumpBoost(), this);
         getServer().getPluginManager().registerEvents(new DoubleJump(), this);
-        WordSyncListener.updateFilterWords();
         getCommand("resetcheckpoint").setExecutor(new CheckpointCommands(this));
         getCommand("resetallcheckpoints").setExecutor(new CheckpointCommands(this));
         getCommand("purgeinactive").setExecutor(new CheckpointCommands(this));
@@ -147,7 +128,6 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
         getCommand("points").setExecutor(new PointsCommand(new PointsManager(this)));
         getCommand("points").setTabCompleter(new PointsTabCompleter());
         getCommand("stuck").setExecutor(new Stuck());
-
 
         setupWordsConfig();
         setupCheckpointsConfig();
@@ -177,7 +157,7 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
             @Override
             public void run() {
                 for (Player player : Bukkit.getOnlinePlayers()) {
-                    setScoreboard(player);
+                    updateScoreboard(player);
                 }
             }
         }.runTaskTimer(this, 0L, 20L);
@@ -268,7 +248,6 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
         }
     }
 
-    // --- New: Reload points config if needed ---
     public void reloadPointsConfig() {
         pointsConfig = YamlConfiguration.loadConfiguration(pointsFile);
     }
@@ -293,7 +272,6 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
         return wordsConfig;
     }
 
-    // --- New: Get points config if needed ---
     public FileConfiguration getPointsConfig() {
         return pointsConfig;
     }

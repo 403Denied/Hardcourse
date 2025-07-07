@@ -13,6 +13,7 @@ import org.bukkit.Location;
 import static com.denied403.hardcoursecheckpoints.Discord.HardcourseDiscord.sendMessage;
 import static com.denied403.hardcoursecheckpoints.HardcourseCheckpoints.*;
 import static com.denied403.hardcoursecheckpoints.Points.PointsShop.givePointsShopChest;
+import static com.denied403.hardcoursecheckpoints.Scoreboard.ScoreboardMain.initScoreboard;
 
 public class onJoin implements Listener {
 
@@ -31,6 +32,7 @@ public class onJoin implements Listener {
         player.getInventory().clear();
 
         givePointsShopChest(player);
+        initScoreboard(player);
 
         Material killItem = Material.CLOCK;
         ItemStack killItemStack = new ItemStack(killItem);

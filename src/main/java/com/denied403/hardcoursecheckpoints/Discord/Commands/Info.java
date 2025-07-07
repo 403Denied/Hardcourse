@@ -92,27 +92,24 @@ public class Info {
         playerEmbed.setThumbnail(Objects.requireNonNull(event.getGuild().getIconUrl()));
         String level = String.valueOf(HardcourseCheckpoints.getHighestCheckpoint(uuid)).replace(".0", "");
         if(!offlinePlayer.isOnline()) {
-            if (playerHasPermission(offlinePlayer.getName(), "hardcourse.season1")) {
-                level = "1-" + level;
-            }
-            if (playerHasPermission(offlinePlayer.getName(), "hardcourse.season2")) {
-                level = "2-" + level;
-            }
             if (playerHasPermission(offlinePlayer.getName(), "hardcourse.season3")) {
                 level = "3-" + level;
-            }
+            } else if (playerHasPermission(offlinePlayer.getName(), "hardcourse.season2")) {
+                level = "2-" + level;
+            } else if (playerHasPermission(offlinePlayer.getName(), "hardcourse.season1")) {
+                level = "1-" + level;
+            } else { level = ""; }
         }
         if(offlinePlayer.isOnline()) {
             Player onlinePlayer = (Player) offlinePlayer;
-            if(onlinePlayer.hasPermission("hardcourse.season1")) {
-                level = "1-" + level;
+            switch (onlinePlayer.getWorld().getName().toLowerCase()) {
+                case "season1" -> level = "1-";
+                case "season2" -> level = "2-";
+                case "season3" -> level = "3-";
+                case "season4" -> level = "4-";
+                default -> level = "";
             }
-            if(onlinePlayer.hasPermission("hardcourse.season2")) {
-                level = "2-" + level;
-            }
-            if(onlinePlayer.hasPermission("hardcourse.season3")) {
-                level = "3-" + level;
-            }
+
         }
         try {
             playerEmbed.setTitle(offlinePlayer.getName());

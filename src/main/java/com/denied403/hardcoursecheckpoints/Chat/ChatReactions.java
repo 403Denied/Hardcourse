@@ -2,8 +2,13 @@ package com.denied403.hardcoursecheckpoints.Chat;
 
 import com.denied403.hardcoursecheckpoints.Points.PointsManager;
 import com.denied403.hardcoursecheckpoints.HardcourseCheckpoints;
+import io.papermc.paper.event.player.AsyncChatEvent;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -66,7 +71,13 @@ public class ChatReactions implements Listener {
                 Component message = mm.deserialize("<red><bold>HARDCOURSE<reset> <hover:show_text:'" + scrambledWord + "'>Hover here for a word to unscramble.</hover>");
                 p.sendMessage(message);
             }
-            Bukkit.getServer().getLogger().info(ChatColor.translateAlternateColorCodes('&', "&c&lHARDCOURSE &fHover here for a word to unscramble: &c" + scrambledWord + "&f(" + currentWord + ")"));
+            Audience audience = Bukkit.getConsoleSender();
+            audience.sendMessage(Component.text()
+                    .append(Component.text("HARDCOURSE ", NamedTextColor.RED, TextDecoration.BOLD))
+                    .append(Component.text("Unscramble: ", NamedTextColor.WHITE))
+                    .append(Component.text(scrambledWord + " ", NamedTextColor.RED))
+                    .append(Component.text("(" + currentWord + ")", NamedTextColor.WHITE)));
+
 
             gameActive = true;
 
@@ -79,13 +90,14 @@ public class ChatReactions implements Listener {
                         gameActive = false;
                     }
                 }
-            }.runTaskLater(plugin, 600L); // Run after 30 seconds (600 ticks)
+            }.runTaskLater(plugin, 600L);
         }
     }
 
     @EventHandler
-    public void onPlayerChat(AsyncPlayerChatEvent event) {
-        if (gameActive && event.getMessage().equalsIgnoreCase(currentWord)) {
+    public void onPlayerChat(AsyncChatEvent event) {
+        String message = LegacyComponentSerializer.legacySection().serialize(event.message());
+        if (gameActive && message.equalsIgnoreCase(currentWord)) {
             Player p = event.getPlayer();
             int points = 50 + random.nextInt(51);
 

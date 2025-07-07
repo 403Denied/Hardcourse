@@ -8,13 +8,10 @@ import org.bukkit.event.Listener;
 public class onDrop implements Listener {
     @EventHandler
     public void onDrop(org.bukkit.event.player.PlayerDropItemEvent event) {
-        if(event.getItemDrop().getItemStack().getItemMeta().getDisplayName().equals(org.bukkit.ChatColor.RED + "" + org.bukkit.ChatColor.BOLD + "Stuck")){
+        if(event.getItemDrop().getItemStack().getType() == Material.CLOCK && event.getItemDrop().getItemStack().getItemMeta().getDisplayName().equals(org.bukkit.ChatColor.RED + "" + org.bukkit.ChatColor.BOLD + "Stuck")){
             event.setCancelled(true);
         }
-        if(event.getItemDrop().getItemStack().getType() == Material.ELYTRA){
-            event.setCancelled(true);
-        }
-        if(event.getItemDrop().getItemStack().getType() == Material.PAPER){
+        if(event.getItemDrop().getItemStack().getType() == Material.PAPER && event.getItemDrop().getItemStack().getItemMeta().getDisplayName().equals(ChatColor.translateAlternateColorCodes('&', "&c&lPoints Shop"))){
             event.setCancelled(true);
         }
     }
