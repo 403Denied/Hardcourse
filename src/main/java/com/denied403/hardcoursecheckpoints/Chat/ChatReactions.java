@@ -104,10 +104,7 @@ public class ChatReactions implements Listener {
             PointsManager pointsManager = ((HardcourseCheckpoints) plugin).getPointsManager();
             pointsManager.addPoints(p.getUniqueId(), points);
 
-            Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&',
-                    "&c&lHARDCOURSE &r&c" + p.getDisplayName() +
-                            "&r successfully unscrambled the word! It was &c" + currentWord +
-                            "&r and earned &a" + points + " points&r!"));
+            Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', "&c&lHARDCOURSE &r&c" + p.getDisplayName() + "&r successfully unscrambled the word and earned &c" + points + "&f points! It was &c" + currentWord));
 
             event.setCancelled(true);
             gameActive = false;

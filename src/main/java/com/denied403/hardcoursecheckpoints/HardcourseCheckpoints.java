@@ -108,6 +108,7 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
         getServer().getPluginManager().registerEvents(new DoubleJump(), this);
         getServer().getPluginManager().registerEvents(new TempCheckpoint(), this);
         Bukkit.getPluginManager().registerEvents(new JumpBoost(), this);
+        Bukkit.getPluginManager().registerEvents(new Portal(), this);
         getCommand("resetcheckpoint").setExecutor(new CheckpointCommands(this));
         getCommand("resetallcheckpoints").setExecutor(new CheckpointCommands(this));
         getCommand("purgeinactive").setExecutor(new CheckpointCommands(this));
@@ -121,6 +122,7 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
         getCommand("points").setExecutor(new PointsCommand(new PointsManager(this)));
         getCommand("points").setTabCompleter(new PointsTabCompleter());
         getCommand("stuck").setExecutor(new Stuck());
+        getCommand("winnertp").setExecutor(new WinnerTP());
 
         setupWordsConfig();
         setupCheckpointsConfig();
@@ -278,6 +280,7 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
     public void loadBroadcastMessages() {
         messages = getConfig().getStringList("broadcast-messages");
     }
+    public List<String> getApplicationQuestions(){return getConfig().getStringList("application-questions");}
 
     private List<String> messages = new ArrayList<>();
     private static boolean DiscordEnabled;

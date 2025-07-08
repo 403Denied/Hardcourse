@@ -1,6 +1,10 @@
 package com.denied403.hardcoursecheckpoints.Discord;
 
 import com.denied403.hardcoursecheckpoints.Discord.Commands.CommandManager;
+import com.denied403.hardcoursecheckpoints.Discord.Tickets.ApplicationButtonListener;
+import com.denied403.hardcoursecheckpoints.Discord.Tickets.ApplicationMessageListener;
+import com.denied403.hardcoursecheckpoints.Discord.Tickets.ModalListener;
+import com.denied403.hardcoursecheckpoints.Discord.Tickets.TicketButtonListener;
 import com.denied403.hardcoursecheckpoints.HardcourseCheckpoints;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -62,7 +66,11 @@ public class HardcourseDiscord {
                         .addEventListeners(
                                 new DiscordListener(),
                                 new CommandManager((HardcourseCheckpoints) plugin),
-                                new DiscordButtonListener((HardcourseCheckpoints) plugin)
+                                new DiscordButtonListener((HardcourseCheckpoints) plugin),
+                                new TicketButtonListener((HardcourseCheckpoints) plugin),
+                                new ApplicationMessageListener((HardcourseCheckpoints) plugin),
+                                new ApplicationButtonListener((HardcourseCheckpoints) plugin),
+                                new ModalListener()
                         )
                         .build().awaitReady();
             } catch (InterruptedException e) {

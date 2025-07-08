@@ -65,8 +65,8 @@ public class onWalk implements Listener {
                     for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
                         if (onlinePlayer.hasPermission("hardcourse.staff")) {
                             onlinePlayer.sendMessage(ChatColor.translateAlternateColorCodes('&',
-                                    "&c[Hardcourse] &rPlayer &c" + p.getName()
-                                            + "&r might be cheating, they skipped from checkpoint &c"
+                                    "&c&lHARDCOURSE &rPlayer &c" + p.getName()
+                                            + "&r might be hacking, they skipped from level &c"
                                             + previousCheckpoint.toString().replace(".0", "")
                                             + " &rto &c" + checkpointNumber.toString().replace(".0", "") + "&r!"));
                         }

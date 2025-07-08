@@ -3,7 +3,9 @@ version: '${project.version}'
 main: com.denied403.hardcoursecheckpoints.HardcourseCheckpoints
 api-version: '1.21'
 depend: [Core403, Vault]
-author: "403Denied"
+authors:
+  - 403Denied
+  - Rockyy321
 description: "Hardcourse Checkpoints plugin for managing player checkpoints and commands."
 prefix: "HARDCOURSE"
 
@@ -65,3 +67,8 @@ commands:
     usage: "/purgeinactive confirm"
     permission: hardcourse.admin
     aliases: [purgecheckpoints, purgeinactivecheckpoints]
+  winnertp:
+    description: "Allows winners to teleport to other players."
+    usage: "/winnertp <player>"
+    permission: hardcourse.winner
+    aliases: wtp

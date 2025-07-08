@@ -1,9 +1,12 @@
 package com.denied403.hardcoursecheckpoints.Discord.Commands;
 
+import com.denied403.hardcoursecheckpoints.Discord.Tickets.BlockFromTickets;
+import com.denied403.hardcoursecheckpoints.Discord.Tickets.SendTicketPanel;
 import com.denied403.hardcoursecheckpoints.HardcourseCheckpoints;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import org.jetbrains.annotations.NotNull;
@@ -17,11 +20,15 @@ public class CommandManager extends ListenerAdapter {
     private final Console consoleCommand;
     private final List listCommand;
     private final Info infoCommand;
+    private final SendTicketPanel setupTicketsCommand;
+    private final BlockFromTickets blockFromTicketsCommand;
 
     public CommandManager(HardcourseCheckpoints plugin) {
         this.consoleCommand = new Console(plugin);
-        this.listCommand = new List(); // If needed, pass plugin here too
-        this.infoCommand = new Info(); // Same here
+        this.listCommand = new List();
+        this.infoCommand = new Info();
+        this.setupTicketsCommand = new SendTicketPanel();
+        this.blockFromTicketsCommand = new BlockFromTickets();
     }
 
     @Override
@@ -32,6 +39,8 @@ public class CommandManager extends ListenerAdapter {
                 case "list" -> listCommand.run(event);
                 case "info" -> infoCommand.run(event);
                 case "console" -> consoleCommand.run(event);
+                case "setuptickets" -> setupTicketsCommand.run(event);
+                case "blockfromtickets" -> blockFromTicketsCommand.run(event);
             }
         }
     }
@@ -45,6 +54,13 @@ public class CommandManager extends ListenerAdapter {
                     .addOptions(Info.infoType, Info.playerName));
             commandData.add(Commands.slash("console", "Run a console command")
                     .addOptions(Console.toRunCommandOption()));
+            commandData.add(Commands.slash("setuptickets", "Setup the ticket system")
+                    .setDefaultPermissions(DefaultMemberPermissions.DISABLED)
+                    .addOptions(SendTicketPanel.channel())
+            );
+            commandData.add(Commands.slash("blockfromtickets", "Block a user from creating tickets")
+                    .setDefaultPermissions(DefaultMemberPermissions.DISABLED)
+                    .addOptions(BlockFromTickets.userToBlock()));
             event.getGuild().updateCommands().addCommands(commandData).queue();
         }
     }
