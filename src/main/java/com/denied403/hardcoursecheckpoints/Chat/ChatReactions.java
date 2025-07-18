@@ -2,6 +2,7 @@ package com.denied403.hardcoursecheckpoints.Chat;
 
 import com.denied403.hardcoursecheckpoints.Points.PointsManager;
 import com.denied403.hardcoursecheckpoints.HardcourseCheckpoints;
+import com.denied403.hardcoursecheckpoints.Utils.Colorize;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
@@ -26,6 +27,7 @@ import java.util.List;
 import java.util.Random;
 
 import static com.denied403.hardcoursecheckpoints.HardcourseCheckpoints.isUnscrambleEnabled;
+import static com.denied403.hardcoursecheckpoints.Utils.Colorize.Colorize;
 
 public class ChatReactions implements Listener {
 
@@ -61,22 +63,11 @@ public class ChatReactions implements Listener {
         return words.get(random.nextInt(words.size()));
     }
 
-    public static void runGame(String word) {
+    public static void runGame(String currentWord) {
         if(!gameActive) {
-            currentWord = word;
             scrambledWord = Shuffler.shuffleWord(currentWord);
-            MiniMessage mm = MiniMessage.miniMessage();
-
-            for (Player p : Bukkit.getServer().getOnlinePlayers()) {
-                Component message = mm.deserialize("<red><bold>HARDCOURSE<reset> <hover:show_text:'" + scrambledWord + "'>Hover here for a word to unscramble.</hover>");
-                p.sendMessage(message);
-            }
-            Audience audience = Bukkit.getConsoleSender();
-            audience.sendMessage(Component.text()
-                    .append(Component.text("HARDCOURSE ", NamedTextColor.RED, TextDecoration.BOLD))
-                    .append(Component.text("Unscramble: ", NamedTextColor.WHITE))
-                    .append(Component.text(scrambledWord + " ", NamedTextColor.RED))
-                    .append(Component.text("(" + currentWord + ")", NamedTextColor.WHITE)));
+            Bukkit.broadcast(Colorize("&c&lHARDCOURSE&r <hover:show_text:'" + scrambledWord + "'>Hover here for a word to unscramble."));
+            Bukkit.getConsoleSender().sendMessage(Colorize("&c&lHARDCOURSE &r&cUnscramble: &f" + scrambledWord + " &c(" + currentWord + ")"));
 
 
             gameActive = true;
@@ -85,8 +76,7 @@ public class ChatReactions implements Listener {
                 @Override
                 public void run() {
                     if (gameActive) {
-                        Component endMsg = mm.deserialize("<red><bold>HARDCOURSE</bold></red> <reset>Time's Up! The correct word was <red>" + currentWord + "</red>");
-                        Bukkit.broadcast(endMsg);
+                        Bukkit.broadcast(Colorize("&c&lHARDCOURSE &rTime's Up! The correct word was &c" + currentWord));
                         gameActive = false;
                     }
                 }
@@ -104,7 +94,7 @@ public class ChatReactions implements Listener {
             PointsManager pointsManager = ((HardcourseCheckpoints) plugin).getPointsManager();
             pointsManager.addPoints(p.getUniqueId(), points);
 
-            Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', "&c&lHARDCOURSE &r&c" + p.getDisplayName() + "&r successfully unscrambled the word and earned &c" + points + "&f points! It was &c" + currentWord));
+            Bukkit.broadcast(Colorize("&c&lHARDCOURSE &r&c" + p.getDisplayName() + "&r successfully unscrambled the word and earned &c" + points + "&f points! It was &c" + currentWord));
 
             event.setCancelled(true);
             gameActive = false;

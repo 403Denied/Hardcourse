@@ -72,6 +72,14 @@ public class PointsCommand implements CommandExecutor {
                 sender.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "HARDCOURSE " + ChatColor.WHITE + "Removed " + ChatColor.RED + amount + ChatColor.WHITE + " points from " + ChatColor.RED + targetName + ChatColor.WHITE + ".");
                 target.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "HARDCOURSE " + ChatColor.WHITE + ChatColor.RED + amount + ChatColor.WHITE + " points were removed by " + ChatColor.RED + sender.getName() + ChatColor.WHITE + ".");
                 break;
+            case "view":
+                int currentPoints = pointsManager.getPoints(targetUUID);
+                if(target == sender){
+                    sender.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "HARDCOURSE " + ChatColor.WHITE + "You have " + currentPoints + ChatColor.WHITE + " points.");
+                } else {
+                    sender.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "HARDCOURSE " + ChatColor.WHITE + targetName + ChatColor.RED + " has " + currentPoints + ChatColor.WHITE + " points.");
+                }
+                break;
 
             default:
                 sender.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "HARDCOURSE" + ChatColor.WHITE + "Invalid action. Use set, give, or remove.");

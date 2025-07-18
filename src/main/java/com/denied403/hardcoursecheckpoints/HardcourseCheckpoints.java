@@ -67,10 +67,11 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
         UnscrambleEnabled = getConfig().getBoolean("unscramble-enabled");
         messages = getConfig().getStringList("broadcast-messages");
 
-        PointsShop pointsShop = new PointsShop(this);
-        getServer().getPluginManager().registerEvents(pointsShop, this);
 
         this.pointsManager = new PointsManager(this);
+
+        CosmeticsShop cosmeticsShop = new CosmeticsShop();
+        PointsShop pointsShop = new PointsShop(this, cosmeticsShop);
 
         if(DiscordEnabled) {
             HardcourseDiscord discordBot = new HardcourseDiscord(this);
@@ -80,6 +81,7 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
                 getLogger().severe("Failed to initialize Discord bot: " + e.getMessage());
             }
         }
+
 
         checkpointFile = new File(getDataFolder(), "checkpoints.yml");
         if(!checkpointFile.exists()) {
@@ -107,6 +109,7 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
         getServer().getPluginManager().registerEvents(new JumpBoost(), this);
         getServer().getPluginManager().registerEvents(new DoubleJump(), this);
         getServer().getPluginManager().registerEvents(new TempCheckpoint(), this);
+        getServer().getPluginManager().registerEvents(pointsShop, this);
         Bukkit.getPluginManager().registerEvents(new JumpBoost(), this);
         Bukkit.getPluginManager().registerEvents(new Portal(), this);
         getCommand("resetcheckpoint").setExecutor(new CheckpointCommands(this));
@@ -123,6 +126,8 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
         getCommand("points").setTabCompleter(new PointsTabCompleter());
         getCommand("stuck").setExecutor(new Stuck());
         getCommand("winnertp").setExecutor(new WinnerTP());
+        getCommand("endtrail").setExecutor(new Endrod(this));
+        getCommand("ominoustrail").setExecutor(new Ominous(this));
 
         setupWordsConfig();
         setupCheckpointsConfig();
@@ -290,6 +295,9 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e){
+        if(getHighestCheckpoint(e.getPlayer().getUniqueId()) < 2){
+            highestCheckpoint.remove(e.getPlayer().getUniqueId());
+        }
         if(DiscordEnabled) {
             sendMessage(e.getPlayer(), null, "leave", null, null);
         }

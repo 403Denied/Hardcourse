@@ -21,11 +21,7 @@ import java.util.List;
 
 public class PointsShop implements Listener {
 
-    private final HardcourseCheckpoints plugin;
-
-    public PointsShop(HardcourseCheckpoints plugin) {
-        this.plugin = plugin;
-    }
+    private HardcourseCheckpoints plugin;
 
     private boolean isPointsShopPaper(ItemStack item) {
         if (item == null || item.getType() != Material.PAPER || !item.hasItemMeta()) return false;
@@ -167,6 +163,14 @@ public class PointsShop implements Listener {
             }
         }
     }
+
+    private final CosmeticsShop cosmeticsShop;
+
+    public PointsShop(HardcourseCheckpoints plugin, CosmeticsShop cosmeticsShop) {
+        this.plugin = plugin;
+        this.cosmeticsShop = cosmeticsShop;
+    }
+
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         if (!(event.getWhoClicked() instanceof Player)) return;
@@ -253,8 +257,11 @@ public class PointsShop implements Listener {
                 player.sendMessage(ChatColor.RED + "You don't have enough points!");
             }
         } else if (name.equalsIgnoreCase("Cosmetics")) {
-            player.sendMessage(ChatColor.YELLOW + "Cosmetics are not yet configured.");
             player.closeInventory();
+
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                cosmeticsShop.openCosmeticsShop(player);
+            }, 2L);
         }
     }
     public static void givePointsShopChest(Player player, Boolean inSpot) {

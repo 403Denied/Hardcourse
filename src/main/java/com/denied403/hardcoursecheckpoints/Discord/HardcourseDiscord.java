@@ -44,7 +44,7 @@ public class HardcourseDiscord {
     private static final Map<String, Message> lastHackAlert = new HashMap<>();
 
 
-    public void InitJDA() throws LoginException {
+    public void InitJDA() {
         if(isDiscordEnabled()) {
             String discordToken = plugin.getConfig().getString("DISCORD_TOKEN");
             if (discordToken == null) {
@@ -126,7 +126,7 @@ public class HardcourseDiscord {
         }
         if (type.equals("hacks")) {
             String playerName = player.getDisplayName();
-            String messageContent = "**`" + playerName + "`** may be hacking. They skipped from level `" + extra1 + "` to level `" + extra2 + "`!";
+            String messageContent = "**`" + playerName + "`** skipped from level `" + extra1 + "` to level `" + extra2 + "`!";
 
             if (lastHackAlert.containsKey(playerName)) {
                 Message oldMessage = lastHackAlert.get(playerName);

@@ -39,6 +39,7 @@ public class TicketButtonListener extends ListenerAdapter {
             case "ticket:general" -> {
                 TextInput reason = TextInput.create("reason", "What is this ticket about?", TextInputStyle.PARAGRAPH)
                         .setRequired(true)
+                        .setMaxLength(1024)
                         .build();
 
                 Modal ticketModal = Modal.create("modal:ticket", "Open a Ticket")
@@ -104,6 +105,7 @@ public class TicketButtonListener extends ListenerAdapter {
                 channel.getHistory().retrievePast(1).queue(messages -> {
                     if (!messages.isEmpty()) {
                         Message firstMessage = messages.get(0);
+                        channel.sendMessage(firstMessage.toString()).queue();
                         List<User> mentionedUsers = firstMessage.getMentions().getUsers();
 
                         if (!mentionedUsers.isEmpty()) {

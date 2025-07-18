@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 public class PointsTabCompleter implements TabCompleter {
 
-    private static final List<String> ACTIONS = Arrays.asList("set", "give", "remove");
+    private static final List<String> ACTIONS = Arrays.asList("set", "give", "remove", "view");
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
