@@ -65,7 +65,7 @@ public class ChatReactions implements Listener {
 
     public static void runGame(String word) {
         if(!gameActive) {
-            currentWord = word
+            currentWord = word;
             scrambledWord = Shuffler.shuffleWord(currentWord);
             Bukkit.broadcast(Colorize("&c&lHARDCOURSE&r <hover:show_text:'" + scrambledWord + "'>Hover here for a word to unscramble."));
             Bukkit.getConsoleSender().sendMessage(Colorize("&c&lHARDCOURSE &r&cUnscramble: &f" + scrambledWord + " &c(" + currentWord + ")"));
