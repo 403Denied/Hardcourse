@@ -9,7 +9,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import static com.denied403.hardcoursecheckpoints.Utils.Colorize.Colorize;
+import static com.denied403.hardcoursecheckpoints.Utils.ColorUtil.Colorize;
 
 public class RestartForUpdate {
 
@@ -35,10 +35,9 @@ public class RestartForUpdate {
                                 cancel();
                                 return;
                             }
-
                             timeLeft--;
                         }
-                    }.runTaskTimer(plugin, 20L, 20L); // 1-second interval
+                    }.runTaskTimer(plugin, 20L, 20L);
 
                     return Command.SINGLE_SUCCESS;
                 })

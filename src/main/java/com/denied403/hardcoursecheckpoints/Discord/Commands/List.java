@@ -8,13 +8,15 @@ import org.bukkit.entity.Player;
 import java.awt.*;
 import java.util.ArrayList;
 
+import static com.denied403.hardcoursecheckpoints.Utils.ColorUtil.stripAllColors;
+
 public class List {
     public static void run(SlashCommandInteractionEvent event) {
         java.util.List<String> onlinePlayers = new ArrayList<>();
         java.util.List<String> staffMembers = new ArrayList<>();
 
         for (Player player : Bukkit.getOnlinePlayers()) {
-            String name = "`" + player.getDisplayName() + "`";
+            String name = "`" + stripAllColors(player.displayName()) + "`";
             if (player.hasPermission("hardcourse.jrmod")) {
                 staffMembers.add(name);
             } else {

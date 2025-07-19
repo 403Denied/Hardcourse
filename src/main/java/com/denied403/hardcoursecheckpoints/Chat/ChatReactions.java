@@ -2,22 +2,14 @@ package com.denied403.hardcoursecheckpoints.Chat;
 
 import com.denied403.hardcoursecheckpoints.Points.PointsManager;
 import com.denied403.hardcoursecheckpoints.HardcourseCheckpoints;
-import com.denied403.hardcoursecheckpoints.Utils.Colorize;
 import io.papermc.paper.event.player.AsyncChatEvent;
-import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -27,7 +19,7 @@ import java.util.List;
 import java.util.Random;
 
 import static com.denied403.hardcoursecheckpoints.HardcourseCheckpoints.isUnscrambleEnabled;
-import static com.denied403.hardcoursecheckpoints.Utils.Colorize.Colorize;
+import static com.denied403.hardcoursecheckpoints.Utils.ColorUtil.Colorize;
 
 public class ChatReactions implements Listener {
 

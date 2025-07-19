@@ -53,9 +53,6 @@ public class Info {
                 playerNames.add(player.getName());
             }
             String playersList = String.join(", ", playerNames);
-            if(playersList == null){
-                playersList = "No players online";
-            }
             try {
                 EmbedBuilder serverEmbed = new EmbedBuilder();
                 serverEmbed.setThumbnail(Objects.requireNonNull(event.getGuild().getIconUrl()));
@@ -118,10 +115,8 @@ public class Info {
             playerEmbed.addField("Level", level, false);
             playerEmbed.addField("Playtime: ", Playtime.getPlaytime(offlinePlayer), false);
             event.replyEmbeds(playerEmbed.build()).queue();
-            return;
         } catch (NoClassDefFoundError | Exception e) {
             event.reply("An error occurred while fetching player info. Please send this to an administrator: ```" + e.getMessage() + "```").setEphemeral(true).queue();
-            return;
         }
     }
 }

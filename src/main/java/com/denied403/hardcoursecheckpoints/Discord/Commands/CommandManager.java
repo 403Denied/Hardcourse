@@ -18,15 +18,11 @@ import static com.denied403.hardcoursecheckpoints.HardcourseCheckpoints.isDiscor
 public class CommandManager extends ListenerAdapter {
 
     private final Console consoleCommand;
-    private final List listCommand;
-    private final Info infoCommand;
     private final SendTicketPanel setupTicketsCommand;
     private final BlockFromTickets blockFromTicketsCommand;
 
     public CommandManager(HardcourseCheckpoints plugin) {
         this.consoleCommand = new Console(plugin);
-        this.listCommand = new List();
-        this.infoCommand = new Info();
         this.setupTicketsCommand = new SendTicketPanel();
         this.blockFromTicketsCommand = new BlockFromTickets();
     }
@@ -36,8 +32,8 @@ public class CommandManager extends ListenerAdapter {
         if (isDiscordEnabled()) {
             String command = event.getName();
             switch (command.toLowerCase()) {
-                case "list" -> listCommand.run(event);
-                case "info" -> infoCommand.run(event);
+                case "list" -> List.run(event);
+                case "info" -> Info.run(event);
                 case "console" -> consoleCommand.run(event);
                 case "setuptickets" -> setupTicketsCommand.run(event);
                 case "blockfromtickets" -> blockFromTicketsCommand.run(event);

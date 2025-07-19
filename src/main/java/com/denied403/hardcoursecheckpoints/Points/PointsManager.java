@@ -1,9 +1,6 @@
 package com.denied403.hardcoursecheckpoints.Points;
 
 import com.denied403.hardcoursecheckpoints.HardcourseCheckpoints;
-import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.UUID;
 

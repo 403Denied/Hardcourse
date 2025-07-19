@@ -19,7 +19,7 @@ import java.util.concurrent.CompletableFuture;
 
 import static com.denied403.hardcoursecheckpoints.HardcourseCheckpoints.highestCheckpoint;
 import static com.denied403.hardcoursecheckpoints.HardcourseCheckpoints.setHighestCheckpoint;
-import static com.denied403.hardcoursecheckpoints.Utils.Colorize.Colorize;
+import static com.denied403.hardcoursecheckpoints.Utils.ColorUtil.Colorize;
 import static com.denied403.hardcoursecheckpoints.Utils.PermissionChecker.playerHasPermission;
 
 public class CheckpointCommand {

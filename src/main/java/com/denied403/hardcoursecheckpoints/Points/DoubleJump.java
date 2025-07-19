@@ -1,6 +1,5 @@
 package com.denied403.hardcoursecheckpoints.Points;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
@@ -11,6 +10,8 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
+import static com.denied403.hardcoursecheckpoints.Utils.ColorUtil.stripAllColors;
+
 public class DoubleJump implements Listener {
 
     @EventHandler
@@ -19,9 +20,10 @@ public class DoubleJump implements Listener {
         if (!event.hasItem()) return;
 
         ItemStack item = event.getItem();
+        if(item == null) return;
         if (item.getType() != Material.FEATHER || !item.hasItemMeta()) return;
 
-        String name = ChatColor.stripColor(item.getItemMeta().getDisplayName());
+        String name = stripAllColors(item.getItemMeta().displayName());
         if (!name.equalsIgnoreCase("Double Jump")) return;
 
         Player player = event.getPlayer();

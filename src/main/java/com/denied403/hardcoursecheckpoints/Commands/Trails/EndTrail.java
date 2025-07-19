@@ -20,7 +20,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import static com.denied403.hardcoursecheckpoints.Utils.Colorize.Colorize;
+import static com.denied403.hardcoursecheckpoints.Utils.ColorUtil.Colorize;
 
 public class EndTrail implements Listener {
 

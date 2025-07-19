@@ -8,7 +8,7 @@ import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.command.CommandSender;
 
 import static com.denied403.hardcoursecheckpoints.HardcourseCheckpoints.loadConfigValues;
-import static com.denied403.hardcoursecheckpoints.Utils.Colorize.Colorize;
+import static com.denied403.hardcoursecheckpoints.Utils.ColorUtil.Colorize;
 
 public class ReloadHardcourse {
 

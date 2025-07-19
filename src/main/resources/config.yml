@@ -2,6 +2,7 @@ DISCORD_TOKEN: TOKEN_HERE
 Chat-Channel-Id: CHANNEL_ID_HERE
 Staff-Chat-Channel-Id: CHANNEL_ID_HERE
 Report-Channel-Id: CHANNEL_ID_HERE
+Logs-Channel-Id: CHANNEL_ID_HERE
 
 discord-enabled: true/false
 broadcast-enabled: true/false

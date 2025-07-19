@@ -7,6 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
+import static com.denied403.hardcoursecheckpoints.Chat.ChatReactions.getCurrentWord;
 import static com.denied403.hardcoursecheckpoints.Discord.HardcourseDiscord.sendMessage;
 import static com.denied403.hardcoursecheckpoints.HardcourseCheckpoints.isDiscordEnabled;
 
@@ -14,10 +15,23 @@ public class onChat implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onAsyncChat(AsyncChatEvent event) {
-        if (event.isCancelled() || !isDiscordEnabled()) return;
-
+        String content = LegacyComponentSerializer.legacySection().serialize(event.message());
+        if(!isDiscordEnabled()){
+            return;
+        }
+        if (event.isCancelled()){
+            if(content.startsWith("#") && event.getPlayer().hasPermission("hardcourse.jrmod")){
+                return;
+            }
+            if(content.equalsIgnoreCase(getCurrentWord())){
+                return;
+            }
+            sendMessage(event.getPlayer(), content, "logs", "true", null);
+            return;
+        }
+        sendMessage(event.getPlayer(), content, "logs", "false", null);
         Player player = event.getPlayer();
-        String content = LegacyComponentSerializer.legacySection().serialize(event.message())
+        content = content
                 .replaceAll("@everyone", "`@everyone`")
                 .replaceAll("@here", "`@here`")
                 .replaceAll("<@", "`<@`")
@@ -32,7 +46,6 @@ public class onChat implements Listener {
             case "season4" -> "4-";
             default -> "";
         };
-
         if (content.startsWith("#") && player.hasPermission("hardcourse.jrmod")) {
             sendMessage(player, content.substring(1), "staffchat", null, null);
         } else {

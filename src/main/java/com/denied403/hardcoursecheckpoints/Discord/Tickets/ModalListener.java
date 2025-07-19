@@ -79,9 +79,7 @@ public class ModalListener extends ListenerAdapter {
 
                     event.getHook().sendMessage("🎟️ Your ticket has been created: " + textChannel.getAsMention())
                             .setEphemeral(true).queue();
-                }, failure -> {
-                    event.getHook().sendMessage("❌ Failed to create ticket channel. Please contact staff.").queue();
-                });
+                }, failure -> event.getHook().sendMessage("❌ Failed to create ticket channel. Please contact staff.").queue());
             }
 
             case "modal:appeal" -> {

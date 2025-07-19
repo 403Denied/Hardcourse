@@ -8,7 +8,7 @@ import com.denied403.hardcoursecheckpoints.Events.*;
 import com.denied403.hardcoursecheckpoints.Chat.*;
 import com.denied403.hardcoursecheckpoints.Points.*;
 import com.denied403.hardcoursecheckpoints.Utils.*;
-import com.denied403.hardcoursecheckpoints.Utils.Colorize;
+import com.denied403.hardcoursecheckpoints.Utils.ColorUtil;
 
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.Bukkit;
@@ -71,7 +71,7 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
         PointsShop pointsShop = new PointsShop(this, cosmeticsShop);
 
         if(DiscordEnabled) {
-            Bukkit.broadcast(Colorize.Colorize("Meow!!!! Discord is enabled!"));
+            Bukkit.broadcast(ColorUtil.Colorize("Meow!!!! Discord is enabled!"));
             HardcourseDiscord discordBot = new HardcourseDiscord(this);
             try {
                 discordBot.InitJDA();
@@ -79,7 +79,7 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
                 getLogger().severe("Failed to initialize Discord bot: " + e.getMessage());
             }
         } else {
-            Bukkit.broadcast(Colorize.Colorize("Meow!!!! Discord is disabled!"));
+            Bukkit.broadcast(ColorUtil.Colorize("Meow!!!! Discord is disabled!"));
         }
 
         checkpointFile = new File(getDataFolder(), "checkpoints.yml");
@@ -110,13 +110,14 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
         getServer().getPluginManager().registerEvents(new TempCheckpoint(), this);
         getServer().getPluginManager().registerEvents(pointsShop, this);
         Bukkit.getPluginManager().registerEvents(new JumpBoost(), this);
-        Bukkit.getPluginManager().registerEvents(new Portal(), this);
+        Bukkit.getPluginManager().registerEvents(new onPortalEnter(), this);
         Bukkit.getPluginManager().registerEvents(new EndTrail(this), this);
         Bukkit.getPluginManager().registerEvents(new OminousTrail(this), this);
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, cmd -> {
             cmd.registrar().register(Clock.createCommand("clock"));
             cmd.registrar().register(Clock.createCommand("shop"));
             cmd.registrar().register(CheckpointCommand.createCommand("checkpoint"));
+            cmd.registrar().register(CheckpointCommand.createCommand("checkpoints"));
             cmd.registrar().register(EndChatGame.createCommand("endchatgame"));
             cmd.registrar().register(EndChatGame.createCommand("ecg"));
             cmd.registrar().register(RunChatGame.createCommand("runchatgame"));
@@ -138,9 +139,9 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
         Bukkit.getScheduler().runTaskTimer(this, () -> {
             if(isBroadcastEnabled()){
                 String message = messages.get(random.nextInt(messages.size()));
-                Bukkit.broadcast(Colorize.Colorize(" "));
-                Bukkit.broadcast(Colorize.Colorize("&c&lHARDCOURSE &r" + message));
-                Bukkit.broadcast(Colorize.Colorize(" "));
+                Bukkit.broadcast(ColorUtil.Colorize(" "));
+                Bukkit.broadcast(ColorUtil.Colorize("&c&lHARDCOURSE &r" + message));
+                Bukkit.broadcast(ColorUtil.Colorize(" "));
             }}, 0L, 20 * 60 * 5);
 
         new BukkitRunnable() {

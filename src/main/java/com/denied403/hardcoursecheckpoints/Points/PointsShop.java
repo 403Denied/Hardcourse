@@ -1,8 +1,8 @@
 package com.denied403.hardcoursecheckpoints.Points;
 
 import com.denied403.hardcoursecheckpoints.HardcourseCheckpoints;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -19,27 +19,31 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.denied403.hardcoursecheckpoints.Utils.ColorUtil.Colorize;
+import static com.denied403.hardcoursecheckpoints.Utils.ColorUtil.stripAllColors;
+
 public class PointsShop implements Listener {
 
-    private HardcourseCheckpoints plugin;
+    private final HardcourseCheckpoints plugin;
 
     private boolean isPointsShopPaper(ItemStack item) {
         if (item == null || item.getType() != Material.PAPER || !item.hasItemMeta()) return false;
-        String displayName = item.getItemMeta().getDisplayName();
-        return displayName != null && ChatColor.stripColor(displayName).equalsIgnoreCase("Points Shop");
+        Component displayName = item.getItemMeta().displayName();
+        return displayName != null && stripAllColors(displayName).equalsIgnoreCase("Points Shop");
     }
 
     private ItemStack getJumpBootsItem() {
         ItemStack jumpBoots = new ItemStack(Material.LEATHER_BOOTS);
         LeatherArmorMeta meta = (LeatherArmorMeta) jumpBoots.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&c&lJump Boost"));
+            meta.displayName(Colorize("&c&lJump Boost"));
+            meta.itemName(Colorize("&c&lJump Boost"));
             meta.setColor(Color.LIME);
 
-            List<String> lore = new ArrayList<>();
-            lore.add(ChatColor.GRAY + "Gives you 10 seconds of Jump Boost");
-            lore.add(ChatColor.YELLOW + "Cost: " + ChatColor.GOLD + "1500 Points");
-            meta.setLore(lore);
+            List<Component> lore = new ArrayList<>();
+            lore.add(Colorize("<gray>Gives you 10 seconds of Jump Boost"));
+            lore.add(Colorize("&eCost: &61500 Points"));
+            meta.lore(lore);
 
             meta.setUnbreakable(true);
             meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
@@ -52,12 +56,13 @@ public class PointsShop implements Listener {
         ItemStack feather = new ItemStack(Material.FEATHER);
         ItemMeta meta = feather.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&c&lDouble Jump"));
+            meta.displayName(Colorize("&c&lDouble Jump"));
+            meta.itemName(Colorize("&c&lDouble Jump"));
 
-            List<String> lore = new ArrayList<>();
-            lore.add(ChatColor.GRAY + "Acts like a second jump");
-            lore.add(ChatColor.YELLOW + "Cost: " + ChatColor.GOLD + "2000 Points");
-            meta.setLore(lore);
+            List<Component> lore = new ArrayList<>();
+            lore.add(Colorize("<gray>Acts like a second jump"));
+            lore.add(Colorize("<gray>Cost: <gold>2000 Points"));
+            meta.lore(lore);
 
             meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
             feather.setItemMeta(meta);
@@ -72,12 +77,13 @@ public class PointsShop implements Listener {
         ItemStack boots = new ItemStack(Material.DIAMOND_BOOTS);
         ItemMeta meta = boots.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&b&lBuy everyone jump boost"));
+            meta.displayName(Colorize("&b&lBuy everyone jump boost"));
+            meta.itemName(Colorize("&b&lBuy everyone jump boost"));
 
-            List<String> lore = new ArrayList<>();
-            lore.add(ChatColor.GRAY + "Gives all online players jump boost boots");
-            lore.add(ChatColor.YELLOW + "Cost: " + ChatColor.GOLD + totalCost + " Points");
-            meta.setLore(lore);
+            List<Component> lore = new ArrayList<>();
+            lore.add(Colorize("<gray>Gives all online players jump boost boots"));
+            lore.add(Colorize("<yellow>Cost: <gold>" + totalCost + " Points"));
+            meta.lore(lore);
 
             meta.setUnbreakable(true);
             meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
@@ -90,12 +96,13 @@ public class PointsShop implements Listener {
         ItemStack book = new ItemStack(Material.BOOK);
         ItemMeta meta = book.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&d&lTemporary Checkpoint"));
+            meta.displayName(Colorize("&d&lTemporary Checkpoint"));
+            meta.itemName(Colorize("&d&lTemporary Checkpoint"));
 
-            List<String> lore = new ArrayList<>();
-            lore.add(ChatColor.GRAY + "Gives you a temporary checkpoint book");
-            lore.add(ChatColor.YELLOW + "Cost: " + ChatColor.GOLD + "7500 Points");
-            meta.setLore(lore);
+            List<Component> lore = new ArrayList<>();
+            lore.add(Colorize("<gray>Gives you a temporary checkpoint book"));
+            lore.add(Colorize("<yellow>Cost: <gold>7500 Points"));
+            meta.lore(lore);
 
             meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
             book.setItemMeta(meta);
@@ -107,10 +114,11 @@ public class PointsShop implements Listener {
         ItemStack book = new ItemStack(Material.BOOK);
         ItemMeta meta = book.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&d&lTemporary Checkpoint"));
-            List<String> lore = new ArrayList<>();
-            lore.add(ChatColor.GRAY + "Use this book to set a temporary checkpoint.");
-            meta.setLore(lore);
+            meta.displayName(Colorize("&d&lTemporary Checkpoint"));
+            meta.itemName(Colorize("&d&lTemporary Checkpoint"));
+            List<Component> lore = new ArrayList<>();
+            lore.add(Colorize("Use this book to set a temporary checkpoint."));
+            meta.lore(lore);
             book.setItemMeta(meta);
         }
         return book;
@@ -120,11 +128,12 @@ public class PointsShop implements Listener {
         ItemStack chest = new ItemStack(Material.CHEST);
         ItemMeta meta = chest.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&c&lCosmetics"));
+            meta.displayName(Colorize("&c&lCosmetics"));
+            meta.itemName(Colorize("&c&lCosmetics"));
 
-            List<String> lore = new ArrayList<>();
-            lore.add(ChatColor.GRAY + "Not yet configured");
-            meta.setLore(lore);
+            List<Component> lore = new ArrayList<>();
+            lore.add(Colorize("Not yet configured"));
+            meta.lore(lore);
 
             meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
             chest.setItemMeta(meta);
@@ -141,7 +150,7 @@ public class PointsShop implements Listener {
             Player player = event.getPlayer();
             event.setCancelled(true);
 
-            Inventory pointsShopInventory = Bukkit.createInventory(null, 36, "Points Shop");
+            Inventory pointsShopInventory = Bukkit.createInventory(null, 36, Colorize("Points Shop"));
             pointsShopInventory.setItem(10, getJumpBootsItem());
             pointsShopInventory.setItem(12, getDoubleJumpItem());
             pointsShopInventory.setItem(14, getJumpBoostAllItem());
@@ -173,10 +182,10 @@ public class PointsShop implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        if (!(event.getWhoClicked() instanceof Player)) return;
+        if (!(event.getWhoClicked() instanceof Player player)) return;
         if (event.getClickedInventory() == null) return;
 
-        String title = ChatColor.stripColor(event.getView().getTitle());
+        String title = stripAllColors(event.getView().title());
         if (!title.equalsIgnoreCase("Points Shop")) return;
 
         // Prevent taking items from the GUI
@@ -189,39 +198,38 @@ public class PointsShop implements Listener {
         ItemStack clicked = event.getCurrentItem();
         if (clicked == null || !clicked.hasItemMeta()) return;
 
-        String name = ChatColor.stripColor(clicked.getItemMeta().getDisplayName());
-        Player player = (Player) event.getWhoClicked();
+        String name = stripAllColors(clicked.getItemMeta().displayName());
         PointsManager pointsManager = plugin.getPointsManager();
 
         if (name.equalsIgnoreCase("Jump Boost")) {
             int cost = 1500;
-            int currentPoints = pointsManager.getPoints(player.getUniqueId());
+            int currentPoints = PointsManager.getPoints(player.getUniqueId());
 
             if (currentPoints >= cost) {
                 pointsManager.removePoints(player.getUniqueId(), cost);
                 player.getInventory().addItem(getJumpBootsItem());
-                player.sendMessage(ChatColor.GREEN + "You purchased Jump Boost boots!");
+                player.sendMessage(Colorize("&c&lHARDCOURSE &rYou purchased Jump Boost boots!"));
                 player.closeInventory();
             } else {
-                player.sendMessage(ChatColor.RED + "You don't have enough points!");
+                player.sendMessage(Colorize("<red>You don't have enough points!"));
             }
         } else if (name.equalsIgnoreCase("Double Jump")) {
             int cost = 2000;
-            int currentPoints = pointsManager.getPoints(player.getUniqueId());
+            int currentPoints = PointsManager.getPoints(player.getUniqueId());
 
             if (currentPoints >= cost) {
                 pointsManager.removePoints(player.getUniqueId(), cost);
                 player.getInventory().addItem(getDoubleJumpItem());
-                player.sendMessage(ChatColor.GREEN + "You purchased Double Jump!");
+                player.sendMessage(Colorize("&c&lHARDCOURSE &rYou purchased Double Jump!"));
                 player.closeInventory();
             } else {
-                player.sendMessage(ChatColor.RED + "You don't have enough points!");
+                player.sendMessage(Colorize("<red>You don't have enough points!"));
             }
         } else if (name.equalsIgnoreCase("Buy everyone jump boost")) {
             int costPerPlayer = 1500;
             int onlinePlayers = Bukkit.getOnlinePlayers().size();
             int totalCost = costPerPlayer * onlinePlayers;
-            int currentPoints = pointsManager.getPoints(player.getUniqueId());
+            int currentPoints = PointsManager.getPoints(player.getUniqueId());
 
             if (currentPoints >= totalCost) {
                 pointsManager.removePoints(player.getUniqueId(), totalCost);
@@ -229,46 +237,38 @@ public class PointsShop implements Listener {
 
                 for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
                     onlinePlayer.getInventory().addItem(jumpBoots.clone());
-                    onlinePlayer.sendMessage(ChatColor.AQUA + "You received Jump Boost boots from " + player.getName() + "!");
+                    onlinePlayer.sendMessage(Colorize("&c&lHARDCOURSE &rYou received Jump Boost boots from &c" + player.getName() + "!"));
                 }
 
-                String broadcastMsg = ChatColor.RED + "" + ChatColor.BOLD + "HARDCOURSE "
-                        + ChatColor.RESET + ChatColor.RED + player.getName()
-                        + ChatColor.RESET + " bought "
-                        + ChatColor.RESET + "everyone "
-                        + ChatColor.RED + "Jump Boost";
-
-                Bukkit.broadcastMessage(broadcastMsg);
+                Bukkit.broadcast(Colorize("&c&lHARDCOURSE &r&c" + player.getName() + "&r bought everyone &cJump Boost&f!"));
 
                 player.closeInventory();
             } else {
-                player.sendMessage(ChatColor.RED + "You don't have enough points!");
+                player.sendMessage(Colorize("&cYou don't have enough points!"));
             }
         } else if (name.equalsIgnoreCase("Temporary Checkpoint")) {
             int cost = 7500;
-            int currentPoints = pointsManager.getPoints(player.getUniqueId());
+            int currentPoints = PointsManager.getPoints(player.getUniqueId());
 
             if (currentPoints >= cost) {
                 pointsManager.removePoints(player.getUniqueId(), cost);
                 player.getInventory().addItem(getCheckpointBook());
-                player.sendMessage(ChatColor.GREEN + "You purchased a Temporary Checkpoint book!");
+                player.sendMessage(Colorize("&c&lHARDCOURSE &rYou purchased a Temporary Checkpoint book!"));
                 player.closeInventory();
             } else {
-                player.sendMessage(ChatColor.RED + "You don't have enough points!");
+                player.sendMessage(Colorize("&cYou don't have enough points!"));
             }
         } else if (name.equalsIgnoreCase("Cosmetics")) {
             player.closeInventory();
 
-            Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                cosmeticsShop.openCosmeticsShop(player);
-            }, 2L);
+            Bukkit.getScheduler().runTaskLater(plugin, () -> cosmeticsShop.openCosmeticsShop(player), 2L);
         }
     }
     public static void givePointsShopChest(Player player, Boolean inSpot) {
         ItemStack paper = new ItemStack(Material.PAPER);
         ItemMeta meta = paper.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&c&lPoints Shop"));
+            meta.displayName(Colorize("&c&lPoints Shop"));
             paper.setItemMeta(meta);
         }
         if(inSpot) {

@@ -5,9 +5,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.Inventory;
 
+import static com.denied403.hardcoursecheckpoints.Utils.ColorUtil.Colorize;
+
 public class CosmeticsShop implements Listener {
     public void openCosmeticsShop(Player player){
-        Inventory gui = Bukkit.createInventory(null, 36, "Cosmetics Shop");
+        Inventory gui = Bukkit.createInventory(null, 36, Colorize("Cosmetics Shop"));
         player.openInventory(gui);
     }
 }

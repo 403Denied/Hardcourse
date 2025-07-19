@@ -104,12 +104,12 @@ public class TicketButtonListener extends ListenerAdapter {
 
                 channel.getHistory().retrievePast(1).queue(messages -> {
                     if (!messages.isEmpty()) {
-                        Message firstMessage = messages.get(0);
+                        Message firstMessage = messages.getFirst();
                         channel.sendMessage(firstMessage.toString()).queue();
                         List<User> mentionedUsers = firstMessage.getMentions().getUsers();
 
                         if (!mentionedUsers.isEmpty()) {
-                            User ticketCreator = mentionedUsers.get(0);
+                            User ticketCreator = mentionedUsers.getFirst();
                             Member member = Objects.requireNonNull(event.getGuild()).getMember(ticketCreator);
 
                             if (member != null) {
@@ -155,11 +155,11 @@ public class TicketButtonListener extends ListenerAdapter {
 
                 channel.getHistory().retrievePast(1).queue(messages -> {
                     if (!messages.isEmpty()) {
-                        Message firstMessage = messages.get(0);
+                        Message firstMessage = messages.getFirst();
                         List<User> mentionedUsers = firstMessage.getMentions().getUsers();
 
                         if (!mentionedUsers.isEmpty()) {
-                            User ticketCreator = mentionedUsers.get(0);
+                            User ticketCreator = mentionedUsers.getFirst();
                             Member member = Objects.requireNonNull(event.getGuild()).getMember(ticketCreator);
 
                             if (member != null) {
@@ -202,7 +202,7 @@ public class TicketButtonListener extends ListenerAdapter {
                             applicationAnswers.put(userId, new ArrayList<>());
 
                             channel.sendMessage("Welcome to the application process!").queue();
-                            channel.sendMessage("**Question 1:** " + questions.get(0)).queue();
+                            channel.sendMessage("**Question 1:** " + questions.getFirst()).queue();
                         },
                         failure -> event.getHook().sendMessage("❌ Couldn't DM you. Please enable DMs.").setEphemeral(true).queue()
                 );

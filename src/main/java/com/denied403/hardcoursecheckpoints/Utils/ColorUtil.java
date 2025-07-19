@@ -2,8 +2,9 @@ package com.denied403.hardcoursecheckpoints.Utils;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
-public class Colorize {
+public class ColorUtil {
     private static final MiniMessage miniMessage = MiniMessage.miniMessage();
     public static Component Colorize(String input){
         String mmFormatted = convertLegacyToMiniMessage(input);
@@ -32,5 +33,13 @@ public class Colorize {
                 .replace("&n", "<underlined>")
                 .replace("&o", "<italic>")
                 .replace("&r", "<reset>");
+    }
+    public static String stripAllColors(String input) {
+        String noLegacy = input.replaceAll("(?i)&[0-9A-FK-OR]", "");
+        return noLegacy.replaceAll("<[^>]+>", "");
+    }
+
+    public static String stripAllColors(Component component) {
+        return PlainTextComponentSerializer.plainText().serialize(component);
     }
 }
