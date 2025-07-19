@@ -1,35 +1,61 @@
 package com.denied403.hardcoursecheckpoints.Commands;
 
-import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
+import com.mojang.brigadier.Command;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import com.mojang.brigadier.tree.LiteralCommandNode;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
+import io.papermc.paper.command.brigadier.Commands;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
-public class WinnerTP implements CommandExecutor {
+import java.util.concurrent.CompletableFuture;
 
-    @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String[] strings) {
-        if(!(sender instanceof Player p)){
-            sender.sendMessage("This command can only be used by players.");
-            return false;
+import static com.denied403.hardcoursecheckpoints.Utils.Colorize.Colorize;
+
+public class WinnerTP {
+
+    public static LiteralCommandNode<CommandSourceStack> createCommand(String commandName) {
+        return Commands.literal(commandName)
+                .requires(source -> source.getSender() instanceof Player &&
+                        source.getSender().hasPermission("hardcourse.winner"))
+                .then(Commands.argument("player", StringArgumentType.word())
+                        .suggests(WinnerTP::onlinePlayerSuggestions)
+                        .executes(WinnerTP::executeTP))
+                .build();
+    }
+
+    private static int executeTP(CommandContext<CommandSourceStack> context) {
+        CommandSender sender = context.getSource().getSender();
+
+        if (!(sender instanceof Player player)) {
+            sender.sendMessage(Colorize("&c&lHARDCOURSE &rThis command can only be used by players."));
+            return 0;
         }
-        if(!p.hasPermission("hardcourse.winner")){
-            p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c&lHARDCOURSE &rYou do not have permission to use this command!"));
-            return false;
+
+        String targetName = StringArgumentType.getString(context, "player");
+        Player target = Bukkit.getPlayerExact(targetName);
+
+        if (target == null) {
+            player.sendMessage(Colorize("&c&lHARDCOURSE &rPlayer not found or not online!"));
+            return 0;
         }
-        if(strings.length == 0){
-            p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c&lHARDCOURSE &rPlease specify a player!"));
-            return false;
+
+        player.teleport(target);
+        player.sendMessage(Colorize("&c&lHARDCOURSE &rTeleported to &c" + targetName));
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private static CompletableFuture<Suggestions> onlinePlayerSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
+        String input = builder.getRemaining().toLowerCase();
+        for (Player online : Bukkit.getOnlinePlayers()) {
+            if (online.getName().toLowerCase().startsWith(input)) {
+                builder.suggest(online.getName());
+            }
         }
-        String playerName = strings[0];
-        Player target = p.getServer().getPlayerExact(playerName);
-        if(target == null){
-            p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c&lHARDCOURSE &rPlayer not found or not online!"));
-            return false;
-        }
-        p.teleport(target);
-        return false;
+        return builder.buildFuture();
     }
 }

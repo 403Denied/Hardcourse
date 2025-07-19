@@ -73,6 +73,7 @@ public class onJoin implements Listener {
             World targetWorld = Bukkit.getServer().getWorld("Season1");
             Location spawnLocation = targetWorld.getSpawnLocation();
             player.teleport(spawnLocation);
+            player.updateCommands();
             player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c&lHARDCOURSE &rWelcome to hardcourse. This server contains over 1000 levels that will test your patience (and your will to live). Think it's worth it? &cYou may begin&r."));
             Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', "&c&lHARDCOURSE &r&c" + player.getDisplayName() + " &rhas joined for the first time. Welcome! &c[#" + Bukkit.getOfflinePlayers().length + "]"));
         }

@@ -1,14 +1,17 @@
 package com.denied403.hardcoursecheckpoints;
 
 import com.denied403.hardcoursecheckpoints.Commands.*;
+import com.denied403.hardcoursecheckpoints.Commands.Trails.EndTrail;
+import com.denied403.hardcoursecheckpoints.Commands.Trails.OminousTrail;
 import com.denied403.hardcoursecheckpoints.Discord.*;
 import com.denied403.hardcoursecheckpoints.Events.*;
 import com.denied403.hardcoursecheckpoints.Chat.*;
 import com.denied403.hardcoursecheckpoints.Points.*;
 import com.denied403.hardcoursecheckpoints.Utils.*;
+import com.denied403.hardcoursecheckpoints.Utils.Colorize;
 
+import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -61,27 +64,23 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
     public void onEnable() {
 
         plugin = this;
-
-        DiscordEnabled = getConfig().getBoolean("discord-enabled");
-        BroadcastEnabled = getConfig().getBoolean("broadcast-enabled");
-        UnscrambleEnabled = getConfig().getBoolean("unscramble-enabled");
-        messages = getConfig().getStringList("broadcast-messages");
-
-
+        loadConfigValues(this);
         this.pointsManager = new PointsManager(this);
 
         CosmeticsShop cosmeticsShop = new CosmeticsShop();
         PointsShop pointsShop = new PointsShop(this, cosmeticsShop);
 
         if(DiscordEnabled) {
+            Bukkit.broadcast(Colorize.Colorize("Meow!!!! Discord is enabled!"));
             HardcourseDiscord discordBot = new HardcourseDiscord(this);
             try {
                 discordBot.InitJDA();
             } catch (Exception e) {
                 getLogger().severe("Failed to initialize Discord bot: " + e.getMessage());
             }
+        } else {
+            Bukkit.broadcast(Colorize.Colorize("Meow!!!! Discord is disabled!"));
         }
-
 
         checkpointFile = new File(getDataFolder(), "checkpoints.yml");
         if(!checkpointFile.exists()) {
@@ -112,43 +111,45 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
         getServer().getPluginManager().registerEvents(pointsShop, this);
         Bukkit.getPluginManager().registerEvents(new JumpBoost(), this);
         Bukkit.getPluginManager().registerEvents(new Portal(), this);
-        getCommand("resetcheckpoint").setExecutor(new CheckpointCommands(this));
-        getCommand("resetallcheckpoints").setExecutor(new CheckpointCommands(this));
-        getCommand("purgeinactive").setExecutor(new CheckpointCommands(this));
-        getCommand("clock").setExecutor(new Clock());
-        getCommand("runchatgame").setExecutor(new runChatGame());
-        getCommand("endchatgame").setExecutor(new endChatGame());
-        getCommand("getlevel").setExecutor(new getLevel());
-        getCommand("restartforupdate").setExecutor(new restartForUpdate(this));
-        getCommand("setlevel").setExecutor(new setLevel());
-        getCommand("reloadhardcourseconfig").setExecutor(new reloadHardcourseConfig(this));
-        getCommand("points").setExecutor(new PointsCommand(new PointsManager(this)));
-        getCommand("points").setTabCompleter(new PointsTabCompleter());
-        getCommand("stuck").setExecutor(new Stuck());
-        getCommand("winnertp").setExecutor(new WinnerTP());
-        getCommand("endtrail").setExecutor(new Endrod(this));
-        getCommand("ominoustrail").setExecutor(new Ominous(this));
+        Bukkit.getPluginManager().registerEvents(new EndTrail(this), this);
+        Bukkit.getPluginManager().registerEvents(new OminousTrail(this), this);
+        getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, cmd -> {
+            cmd.registrar().register(Clock.createCommand("clock"));
+            cmd.registrar().register(Clock.createCommand("shop"));
+            cmd.registrar().register(CheckpointCommand.createCommand("checkpoint"));
+            cmd.registrar().register(EndChatGame.createCommand("endchatgame"));
+            cmd.registrar().register(EndChatGame.createCommand("ecg"));
+            cmd.registrar().register(RunChatGame.createCommand("runchatgame"));
+            cmd.registrar().register(RunChatGame.createCommand("rcg"));
+            cmd.registrar().register(RestartForUpdate.createCommand(this, "restartforupdate"));
+            cmd.registrar().register(ReloadHardcourse.createCommand(this, "reloadhardcourse"));
+            cmd.registrar().register(ReloadHardcourse.createCommand(this, "hardcoursereload"));
+            cmd.registrar().register(WinnerTP.createCommand("winnertp"));
+            cmd.registrar().register(WinnerTP.createCommand("wtp"));
+            cmd.registrar().register(Points.createCommand(pointsManager, "points"));
+            cmd.registrar().register(Points.createCommand(pointsManager, "pts"));
+            cmd.registrar().register(EndTrail.createCommand("endtrail"));
+            cmd.registrar().register(OminousTrail.createCommand("ominoustrail"));
+        });
 
         setupWordsConfig();
         setupCheckpointsConfig();
 
-        if(isBroadcastEnabled()) {
-            Bukkit.getScheduler().runTaskTimer(this, () -> {
+        Bukkit.getScheduler().runTaskTimer(this, () -> {
+            if(isBroadcastEnabled()){
                 String message = messages.get(random.nextInt(messages.size()));
-                Bukkit.broadcastMessage(" ");
-                Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', "&c&lHARDCOURSE &r" + message));
-                Bukkit.broadcastMessage(" ");
-            }, 0L, 20 * 60 * 5);
-        }
+                Bukkit.broadcast(Colorize.Colorize(" "));
+                Bukkit.broadcast(Colorize.Colorize("&c&lHARDCOURSE &r" + message));
+                Bukkit.broadcast(Colorize.Colorize(" "));
+            }}, 0L, 20 * 60 * 5);
 
-        if(UnscrambleEnabled) {
-            new BukkitRunnable() {
-                @Override
-                public void run() {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if(isUnscrambleEnabled()) {
                     ChatReactions.runGame(ChatReactions.getRandomWord());
                 }
-            }.runTaskTimer(this, 0L, 4800L);
-        }
+            }}.runTaskTimer(this, 0L, 4800L);
 
         new PermissionChecker(this);
 
@@ -281,13 +282,9 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
     public void reloadWordsConfig() {
         wordsConfig = YamlConfiguration.loadConfiguration(wordsFile);
     }
-
-    public void loadBroadcastMessages() {
-        messages = getConfig().getStringList("broadcast-messages");
-    }
     public List<String> getApplicationQuestions(){return getConfig().getStringList("application-questions");}
 
-    private List<String> messages = new ArrayList<>();
+    private static List<String> messages = new ArrayList<>();
     private static boolean DiscordEnabled;
     private static boolean BroadcastEnabled;
     private static boolean UnscrambleEnabled;
@@ -301,5 +298,12 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
         if(DiscordEnabled) {
             sendMessage(e.getPlayer(), null, "leave", null, null);
         }
+    }
+    public static void loadConfigValues(HardcourseCheckpoints plugin) {
+        FileConfiguration config = plugin.getConfig();
+        DiscordEnabled = config.getBoolean("discord-enabled");
+        BroadcastEnabled = config.getBoolean("broadcast-enabled");
+        UnscrambleEnabled = config.getBoolean("unscramble-enabled");
+        messages = config.getStringList("broadcast-messages");
     }
 }

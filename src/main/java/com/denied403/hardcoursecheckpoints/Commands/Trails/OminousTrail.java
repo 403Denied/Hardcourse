@@ -1,34 +1,31 @@
-package com.denied403.hardcoursecheckpoints.Points;
+package com.denied403.hardcoursecheckpoints.Commands.Trails;
 
+import com.mojang.brigadier.Command;
+import com.mojang.brigadier.tree.LiteralCommandNode;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
+import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
-public class Ominous implements Listener, CommandExecutor {
+import static com.denied403.hardcoursecheckpoints.Utils.Colorize.Colorize;
 
-    private final Set<UUID> activeTrails = new HashSet<>();
-    private final Map<UUID, Double> rotationAngles = new HashMap<>(); // Track per-player rotation
-    private final JavaPlugin plugin;
+public class OminousTrail implements Listener {
 
-    public Ominous(JavaPlugin plugin) {
-        this.plugin = plugin;
+    private static final Set<UUID> activeTrails = new HashSet<>();
+    private static final Map<UUID, Double> rotationAngles = new HashMap<>();
+
+    public OminousTrail(JavaPlugin plugin) {
         Bukkit.getPluginManager().registerEvents(this, plugin);
-        plugin.getCommand("ominoustrail").setExecutor(this);
 
+        // Start particle animation loop
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -43,13 +40,11 @@ public class Ominous implements Listener, CommandExecutor {
                         int particles = 10;
                         double radius = 0.5;
 
-                        // Get and update this player's current rotation
                         double rotation = rotationAngles.getOrDefault(uuid, 0.0);
-                        rotation += Math.PI / 30; // Increase angle to rotate
+                        rotation += Math.PI / 30;
                         rotationAngles.put(uuid, rotation);
 
                         for (int i = 0; i < particles; i++) {
-                            // Add rotation to each angle
                             double angle = 2 * Math.PI * i / particles + rotation;
                             double xOffset = radius * Math.cos(angle);
                             double zOffset = radius * Math.sin(angle);
@@ -77,23 +72,26 @@ public class Ominous implements Listener, CommandExecutor {
         }.runTaskTimer(plugin, 0L, 2L);
     }
 
-    @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!(sender instanceof Player player)) {
-            sender.sendMessage(ChatColor.RED + "Only players can use this command.");
-            return true;
-        }
+    public static LiteralCommandNode<CommandSourceStack> createCommand(String commandName) {
+        return Commands.literal(commandName)
+                .requires(source -> source.getSender() instanceof Player)
+                .executes(ctx -> {
+                    CommandSender sender = ctx.getSource().getSender();
+                    Player player = (Player) sender;
+                    UUID uuid = player.getUniqueId();
 
-        UUID uuid = player.getUniqueId();
-        if (activeTrails.contains(uuid)) {
-            activeTrails.remove(uuid);
-            rotationAngles.remove(uuid); // stop tracking rotation
-            player.sendMessage(ChatColor.GRAY + "Ominous trail " + ChatColor.RED + "disabled" + ChatColor.GRAY + ".");
-        } else {
-            activeTrails.add(uuid);
-            rotationAngles.put(uuid, 0.0); // initialize rotation
-            player.sendMessage(ChatColor.GRAY + "Ominous trail " + ChatColor.DARK_PURPLE + "enabled" + ChatColor.GRAY + "!");
-        }
-        return true;
+                    if (activeTrails.contains(uuid)) {
+                        activeTrails.remove(uuid);
+                        rotationAngles.remove(uuid);
+                        player.sendMessage(Colorize("&c&lHARDCOURSE &rOminous trail &cdisabled&r."));
+                    } else {
+                        activeTrails.add(uuid);
+                        rotationAngles.put(uuid, 0.0);
+                        player.sendMessage(Colorize("&c&lHARDCOURSE &rOminous trail &cenabled&r!"));
+                    }
+
+                    return Command.SINGLE_SUCCESS;
+                })
+                .build();
     }
 }

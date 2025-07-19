@@ -1,11 +1,12 @@
-package com.denied403.hardcoursecheckpoints.Points;
+package com.denied403.hardcoursecheckpoints.Commands.Trails;
 
+import com.mojang.brigadier.Command;
+import com.mojang.brigadier.tree.LiteralCommandNode;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
+import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -19,13 +20,13 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-public class Endrod implements Listener, CommandExecutor {
+import static com.denied403.hardcoursecheckpoints.Utils.Colorize.Colorize;
 
-    private final Set<UUID> activeWings = new HashSet<>();
-    private final JavaPlugin plugin;
+public class EndTrail implements Listener {
 
-    public Endrod(JavaPlugin plugin) {
-        this.plugin = plugin;
+    private static final Set<UUID> activeWings = new HashSet<>();
+
+    public EndTrail(JavaPlugin plugin) {
         Bukkit.getPluginManager().registerEvents(this, plugin);
 
         new BukkitRunnable() {
@@ -38,7 +39,7 @@ public class Endrod implements Listener, CommandExecutor {
                     }
                 }
             }
-        }.runTaskTimer(plugin, 0L, 2L); // Every 2 ticks
+        }.runTaskTimer(plugin, 0L, 2L);
     }
 
     private void spawnWings(Player player) {
@@ -103,21 +104,25 @@ public class Endrod implements Listener, CommandExecutor {
 
 
 
-    @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!(sender instanceof Player player)) {
-            sender.sendMessage(ChatColor.RED + "Only players can use this command.");
-            return true;
-        }
+    public static LiteralCommandNode<CommandSourceStack> createCommand(String commandName) {
+        return Commands.literal(commandName)
+                .requires(source -> source.getSender() instanceof Player)
+                .requires(source -> source.getSender().hasPermission("hardcourse.endtrail"))
+                .executes(ctx -> {
+                    CommandSender sender = ctx.getSource().getSender();
+                    Player player = (Player) sender;
+                    UUID uuid = player.getUniqueId();
 
-        UUID uuid = player.getUniqueId();
-        if (activeWings.contains(uuid)) {
-            activeWings.remove(uuid);
-            player.sendMessage(ChatColor.GRAY + "Petal wings " + ChatColor.RED + "disabled" + ChatColor.GRAY + ".");
-        } else {
-            activeWings.add(uuid);
-            player.sendMessage(ChatColor.GRAY + "Petal wings " + ChatColor.LIGHT_PURPLE + "enabled" + ChatColor.GRAY + "!");
-        }
-        return true;
+                    if (activeWings.contains(uuid)) {
+                        activeWings.remove(uuid);
+                        player.sendMessage(Colorize("&c&lHARDCOURSE &rPetal wings &cdisabled&r."));
+                    } else {
+                        activeWings.add(uuid);
+                        player.sendMessage(Colorize("&c&lHARDCOURSE &rPetal wings &cenabled&r!"));
+                    }
+
+                    return Command.SINGLE_SUCCESS;
+                })
+                .build();
     }
 }
