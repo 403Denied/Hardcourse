@@ -1,5 +1,6 @@
 package com.denied403.hardcoursecheckpoints.Events;
 
+import com.denied403.hardcoursecheckpoints.Utils.CheckpointDatabase;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.entity.Player;
@@ -7,11 +8,24 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
-import static com.denied403.hardcoursecheckpoints.Chat.ChatReactions.getCurrentWord;
 import static com.denied403.hardcoursecheckpoints.Discord.HardcourseDiscord.sendMessage;
 import static com.denied403.hardcoursecheckpoints.HardcourseCheckpoints.isDiscordEnabled;
+import com.transfemme.dev.core403.Punishments.Api.CustomEvents.ChatFilterEvent;
 
 public class onChat implements Listener {
+
+    private static CheckpointDatabase database;
+
+    public static void initialize(CheckpointDatabase db) {
+        database = db;
+    }
+    @EventHandler
+    public void onChatFiltered(ChatFilterEvent event){
+        String message = event.getMessage();
+        if(isDiscordEnabled()) {
+            sendMessage(event.getPlayer(), message, "logs", "true", null);
+        }
+    }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onAsyncChat(AsyncChatEvent event) {
@@ -20,13 +34,6 @@ public class onChat implements Listener {
             return;
         }
         if (event.isCancelled()){
-            if(content.startsWith("#") && event.getPlayer().hasPermission("hardcourse.jrmod")){
-                return;
-            }
-            if(content.equalsIgnoreCase(getCurrentWord())){
-                return;
-            }
-            sendMessage(event.getPlayer(), content, "logs", "true", null);
             return;
         }
         sendMessage(event.getPlayer(), content, "logs", "false", null);
@@ -38,21 +45,14 @@ public class onChat implements Listener {
                 .replaceAll("https://", "`https://`")
                 .replaceAll("http://", "`http://`");
 
-        String world = player.getWorld().getName().toLowerCase();
-        String level = switch (world) {
-            case "season1" -> "1-";
-            case "season2" -> "2-";
-            case "season3" -> "3-";
-            case "season4" -> "4-";
-            default -> "";
-        };
+        String season = database.getSeason(player.getUniqueId()).toString() + "-";
         if (content.startsWith("#") && player.hasPermission("hardcourse.jrmod")) {
             sendMessage(player, content.substring(1), "staffchat", null, null);
         } else {
             if (!player.hasPermission("hardcourse.jrmod")){
-                sendMessage(player, content, "chat", level, null);
+                sendMessage(player, content, "chat", season, null);
             } else {
-                sendMessage(player, content, "staffmessage", level, player.getUniqueId().toString());
+                sendMessage(player, content, "staffmessage", season, player.getUniqueId().toString());
             }
         }
     }

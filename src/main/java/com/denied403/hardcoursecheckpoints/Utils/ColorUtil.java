@@ -10,7 +10,7 @@ public class ColorUtil {
         String mmFormatted = convertLegacyToMiniMessage(input);
         return miniMessage.deserialize(mmFormatted);
     }
-    private static String convertLegacyToMiniMessage(String legacyText) {
+    public static String convertLegacyToMiniMessage(String legacyText) {
         return legacyText
                 .replace("&0", "<black>")
                 .replace("&1", "<dark_blue>")
@@ -27,7 +27,8 @@ public class ColorUtil {
                 .replace("&c", "<red>")
                 .replace("&d", "<light_purple>")
                 .replace("&e", "<yellow>")
-                .replace("&f", "<reset>")
+                .replace("&f", "<white>")
+                .replace("&k", "<obfuscated>")
                 .replace("&l", "<bold>")
                 .replace("&m", "<strikethrough>")
                 .replace("&n", "<underlined>")

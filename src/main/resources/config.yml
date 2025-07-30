@@ -1,8 +1,10 @@
 DISCORD_TOKEN: TOKEN_HERE
 Chat-Channel-Id: CHANNEL_ID_HERE
 Staff-Chat-Channel-Id: CHANNEL_ID_HERE
-Report-Channel-Id: CHANNEL_ID_HERE
+Anticheat-Channel-Id: CHANNEL_ID_HERE
 Logs-Channel-Id: CHANNEL_ID_HERE
+Punishment-Channel-Id: CHANNEL_ID_HERE
+Reports-Channel-Id: CHANNEL_ID_HERE
 
 discord-enabled: true/false
 broadcast-enabled: true/false
@@ -10,4 +12,7 @@ unscramble-enabled: true/false
 
 broadcast-messages:
   - "This is an auto broadcast message."
+
+skip-alert-exemptions:
+  - "*-9999"
 

@@ -1,15 +1,20 @@
 package com.denied403.hardcoursecheckpoints.Scoreboard;
 
+import com.denied403.hardcoursecheckpoints.Utils.CheckpointDatabase;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.*;
 
-import static com.denied403.hardcoursecheckpoints.HardcourseCheckpoints.getHighestCheckpoint;
 import static com.denied403.hardcoursecheckpoints.Points.PointsManager.getPoints;
 import static com.denied403.hardcoursecheckpoints.Utils.ColorUtil.Colorize;
 import static com.denied403.hardcoursecheckpoints.Utils.Playtime.getPlaytimeShort;
 
 public class ScoreboardMain {
+    private static CheckpointDatabase database;
+
+    public static void initialize(CheckpointDatabase db) {
+        database = db;
+    }
 
     private static final String OBJECTIVE_NAME = "hardcourse";
 
@@ -46,7 +51,7 @@ public class ScoreboardMain {
         Scoreboard board = player.getScoreboard();
 
         String world = formatWorldName(player.getWorld().getName());
-        String level = getHighestCheckpoint(player.getUniqueId()).toString().replace(".0", "");
+        String level = database.getLevel(player.getUniqueId()).toString().replace(".0", "");
         String deaths = String.valueOf(player.getStatistic(org.bukkit.Statistic.DEATHS));
         String playtime = getPlaytimeShort(player);
         int points = getPoints(player.getUniqueId());

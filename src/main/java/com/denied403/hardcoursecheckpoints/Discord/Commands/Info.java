@@ -1,6 +1,6 @@
 package com.denied403.hardcoursecheckpoints.Discord.Commands;
 
-import com.denied403.hardcoursecheckpoints.HardcourseCheckpoints;
+import com.denied403.hardcoursecheckpoints.Utils.CheckpointDatabase;
 import com.denied403.hardcoursecheckpoints.Utils.Playtime;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -17,9 +17,13 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.UUID;
 
-import static com.denied403.hardcoursecheckpoints.Utils.PermissionChecker.playerHasPermission;
-
 public class Info {
+    private static CheckpointDatabase database;
+
+    public static void initialize(CheckpointDatabase db) {
+        database = db;
+    }
+
     static OptionMapping typeOption;
     public static OptionData infoType = new OptionData(OptionType.STRING, "info_type", "Type of information").addChoices(
             new Command.Choice("Server", "server"),
@@ -87,27 +91,8 @@ public class Info {
         }
         EmbedBuilder playerEmbed = new EmbedBuilder();
         playerEmbed.setThumbnail(Objects.requireNonNull(event.getGuild().getIconUrl()));
-        String level = String.valueOf(HardcourseCheckpoints.getHighestCheckpoint(uuid)).replace(".0", "");
-        if(!offlinePlayer.isOnline()) {
-            if (playerHasPermission(offlinePlayer.getName(), "hardcourse.season3")) {
-                level = "3-" + level;
-            } else if (playerHasPermission(offlinePlayer.getName(), "hardcourse.season2")) {
-                level = "2-" + level;
-            } else if (playerHasPermission(offlinePlayer.getName(), "hardcourse.season1")) {
-                level = "1-" + level;
-            } else { level = ""; }
-        }
-        if(offlinePlayer.isOnline()) {
-            Player onlinePlayer = (Player) offlinePlayer;
-            switch (onlinePlayer.getWorld().getName().toLowerCase()) {
-                case "season1" -> level = "1-";
-                case "season2" -> level = "2-";
-                case "season3" -> level = "3-";
-                case "season4" -> level = "4-";
-                default -> level = "";
-            }
-
-        }
+        String level = String.valueOf(database.getLevel(uuid)).replace(".0", "");
+        level = database.getSeason(uuid).toString() + "-" + level;
         try {
             playerEmbed.setTitle(offlinePlayer.getName());
             playerEmbed.setFooter("Requested by " + event.getUser().getName(), event.getUser().getEffectiveAvatarUrl());

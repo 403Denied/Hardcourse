@@ -43,25 +43,22 @@ public class EndTrail implements Listener {
     }
 
     private void spawnWings(Player player) {
-        // Get player's feet location and raise to approx chest height (~0.9 blocks)
         Location base = player.getLocation().clone().subtract(0, player.getEyeHeight() - 0.9, 0);
-        base.setPitch(0); // Ignore pitch to keep horizontal wings
+        base.setPitch(0);
 
         Vector forward = base.getDirection().setY(0).normalize();
         Vector right = new Vector(-forward.getZ(), 0, forward.getX());
 
-        // Increased back distance to move wings further behind
         double backDistance = 0.3;
         Vector backOffset = forward.clone().multiply(-backDistance);
 
-        // Slightly lower vertical offset
         double verticalOffset = 1.7;
 
         Location wingBase = base.clone()
                 .add(0, verticalOffset, 0)
                 .add(backOffset);
 
-        int segments = 7; // smooth wing curve
+        int segments = 7;
         double wingLength = 0.6;
         double wingHeight = 0.4;
 
@@ -99,10 +96,6 @@ public class EndTrail implements Listener {
             );
         }
     }
-
-
-
-
 
     public static LiteralCommandNode<CommandSourceStack> createCommand(String commandName) {
         return Commands.literal(commandName)

@@ -1,14 +1,16 @@
 name: Hardcourse
 version: '1.0'
 main: com.denied403.hardcoursecheckpoints.HardcourseCheckpoints
-api-version: '1.21.7'
+api-version: '1.21.8'
+author: 403Denied
+contributors:
+  - Rockyy321
+  - Evelyn344
 dependencies:
   server:
-    Vault:
+    Core403:
       load: BEFORE
       required: true
-authors:
-    - 403Denied
-    - Rockyy321
+      join-classpath: true
 description: "Hardcourse Checkpoints plugin for managing player checkpoints and commands."
 prefix: "HARDCOURSE"

@@ -17,16 +17,19 @@ repositories {
         url = "https://oss.sonatype.org/content/groups/public/"
     }
     maven { url 'https://jitpack.io' }
+    flatDir {
+        dirs 'libs'
+    }
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.21.7-R0.1-SNAPSHOT")
-    compileOnly("com.github.MilkBowl:VaultAPI:1.7"){exclude group: 'org.bukkit', module: 'bukkit'}
+    compileOnly("io.papermc.paper:paper-api:1.21.8-R0.1-SNAPSHOT")
     implementation 'org.xerial:sqlite-jdbc:3.50.2.0'
     implementation("net.dv8tion:JDA:5.6.1") {
         exclude module: 'opus-java'
         exclude module: 'tink'
     }
+    compileOnly name: "Core403-1.0"
 }
 
 tasks {

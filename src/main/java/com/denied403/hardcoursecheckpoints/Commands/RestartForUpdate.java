@@ -6,7 +6,6 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import static com.denied403.hardcoursecheckpoints.Utils.ColorUtil.Colorize;
@@ -17,7 +16,6 @@ public class RestartForUpdate {
         return Commands.literal(commandName)
                 .requires(source -> source.getSender().hasPermission("hardcourse.admin"))
                 .executes(ctx -> {
-                    CommandSender sender = ctx.getSource().getSender();
 
                     Bukkit.broadcast(Colorize("&c&lHARDCOURSE &fThe server will be restarting to apply updates in &c30 seconds&f. Please find a safe stopping point."));
 

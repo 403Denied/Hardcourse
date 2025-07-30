@@ -1,5 +1,6 @@
 package com.denied403.hardcoursecheckpoints.Commands;
 
+import com.denied403.hardcoursecheckpoints.Discord.HardcourseDiscord;
 import com.denied403.hardcoursecheckpoints.HardcourseCheckpoints;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.tree.LiteralCommandNode;
@@ -7,6 +8,7 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.command.CommandSender;
 
+import static com.denied403.hardcoursecheckpoints.HardcourseCheckpoints.isDiscordEnabled;
 import static com.denied403.hardcoursecheckpoints.HardcourseCheckpoints.loadConfigValues;
 import static com.denied403.hardcoursecheckpoints.Utils.ColorUtil.Colorize;
 
@@ -19,12 +21,12 @@ public class ReloadHardcourse {
                     CommandSender sender = ctx.getSource().getSender();
 
                     loadConfigValues(plugin);
-                    plugin.saveCheckpoints();
                     plugin.reloadConfig();
-                    plugin.reloadCheckpointsConfig();
-                    plugin.reloadPointsConfig();
                     plugin.reloadWordsConfig();
-
+                    HardcourseDiscord hardcourseDiscord = new HardcourseDiscord(plugin);
+                    if(isDiscordEnabled()) {
+                        hardcourseDiscord.InitJDA();
+                    }
                     sender.sendMessage(Colorize("&c&lHARDCOURSE &fHardcourse config reloaded."));
                     return Command.SINGLE_SUCCESS;
                 })

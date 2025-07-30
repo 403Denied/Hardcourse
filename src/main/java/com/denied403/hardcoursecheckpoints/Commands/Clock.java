@@ -69,10 +69,6 @@ public class Clock {
         soulTorchMeta.itemName(Colorize("&cShow &rPlayers").decoration(TextDecoration.ITALIC, false));
         soulTorch.setItemMeta(soulTorchMeta);
 
-        if(player.getInventory().contains(soulTorch)) {
-            player.getInventory().setItem(0, soulTorch);
-        } else {
-            player.getInventory().setItem(0, torch);
-        }
+        player.getInventory().setItem(0, torch);
     }
 }

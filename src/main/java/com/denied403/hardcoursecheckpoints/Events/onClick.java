@@ -14,7 +14,7 @@ public class onClick implements Listener {
     public void onClick(org.bukkit.event.player.PlayerInteractEvent event) {
         if(event.getItem() == null) {
             return;
-        } if(event.getItem().getItemMeta().displayName().equals(Colorize("&c&lStuck").decoration(TextDecoration.ITALIC, false)) && event.getItem().getType() == Material.CLOCK){
+        } if(event.getItem().getItemMeta().itemName().equals(Colorize("&c&lStuck").decoration(TextDecoration.ITALIC, false)) && event.getItem().getType() == Material.CLOCK){
             event.getPlayer().setHealth(0);
             return;
         } if(event.getItem().getType() == Material.TORCH && event.getItem().getItemMeta().itemName().equals(Colorize("&cHide &rPlayers").decoration(TextDecoration.ITALIC, false))){

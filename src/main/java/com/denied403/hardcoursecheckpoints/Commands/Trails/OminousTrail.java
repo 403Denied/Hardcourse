@@ -75,6 +75,7 @@ public class OminousTrail implements Listener {
     public static LiteralCommandNode<CommandSourceStack> createCommand(String commandName) {
         return Commands.literal(commandName)
                 .requires(source -> source.getSender() instanceof Player)
+                .requires(source -> source.getSender().hasPermission("hardcourse.ominoustrail"))
                 .executes(ctx -> {
                     CommandSender sender = ctx.getSource().getSender();
                     Player player = (Player) sender;
@@ -89,7 +90,6 @@ public class OminousTrail implements Listener {
                         rotationAngles.put(uuid, 0.0);
                         player.sendMessage(Colorize("&c&lHARDCOURSE &rOminous trail &cenabled&r!"));
                     }
-
                     return Command.SINGLE_SUCCESS;
                 })
                 .build();

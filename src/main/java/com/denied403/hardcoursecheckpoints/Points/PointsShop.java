@@ -2,6 +2,7 @@ package com.denied403.hardcoursecheckpoints.Points;
 
 import com.denied403.hardcoursecheckpoints.HardcourseCheckpoints;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -188,7 +189,6 @@ public class PointsShop implements Listener {
         String title = stripAllColors(event.getView().title());
         if (!title.equalsIgnoreCase("Points Shop")) return;
 
-        // Prevent taking items from the GUI
         if (event.getClickedInventory().equals(event.getWhoClicked().getInventory())) return;
 
         event.setCancelled(true);
@@ -268,7 +268,7 @@ public class PointsShop implements Listener {
         ItemStack paper = new ItemStack(Material.PAPER);
         ItemMeta meta = paper.getItemMeta();
         if (meta != null) {
-            meta.displayName(Colorize("&c&lPoints Shop"));
+            meta.displayName(Colorize("&c&lPoints Shop").decoration(TextDecoration.ITALIC, false));
             paper.setItemMeta(meta);
         }
         if(inSpot) {
