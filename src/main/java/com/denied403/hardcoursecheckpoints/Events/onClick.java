@@ -7,6 +7,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import static com.denied403.hardcoursecheckpoints.HardcourseCheckpoints.isDev;
 import static com.denied403.hardcoursecheckpoints.Utils.ColorUtil.Colorize;
 
 public class onClick implements Listener {
@@ -17,25 +18,29 @@ public class onClick implements Listener {
         } if(event.getItem().getItemMeta().itemName().equals(Colorize("&c&lStuck").decoration(TextDecoration.ITALIC, false)) && event.getItem().getType() == Material.CLOCK){
             event.getPlayer().setHealth(0);
             return;
-        } if(event.getItem().getType() == Material.TORCH && event.getItem().getItemMeta().itemName().equals(Colorize("&cHide &rPlayers").decoration(TextDecoration.ITALIC, false))){
-            event.getPlayer().performCommand("hideplayers");
-            event.setCancelled(true);
-            ItemStack soulTorch = new ItemStack(Material.SOUL_TORCH, 1);
-            ItemMeta soulTorchMeta = soulTorch.getItemMeta();
-            soulTorchMeta.displayName(Colorize("&cShow &rPlayers").decoration(TextDecoration.ITALIC, false));
-            soulTorchMeta.itemName(Colorize("&cShow &rPlayers").decoration(TextDecoration.ITALIC, false));
-            soulTorch.setItemMeta(soulTorchMeta);
-            event.getPlayer().getInventory().setItem(event.getPlayer().getInventory().getHeldItemSlot(), soulTorch);
-            return;
+        } if(event.getItem().getType() == Material.TORCH && event.getItem().getItemMeta().itemName().equals(Colorize("&cHide &rPlayers").decoration(TextDecoration.ITALIC, false))) {
+            if (isDev()){
+                event.getPlayer().performCommand("hideplayers");
+                event.setCancelled(true);
+                ItemStack soulTorch = new ItemStack(Material.SOUL_TORCH, 1);
+                ItemMeta soulTorchMeta = soulTorch.getItemMeta();
+                soulTorchMeta.displayName(Colorize("&cShow &rPlayers").decoration(TextDecoration.ITALIC, false));
+                soulTorchMeta.itemName(Colorize("&cShow &rPlayers").decoration(TextDecoration.ITALIC, false));
+                soulTorch.setItemMeta(soulTorchMeta);
+                event.getPlayer().getInventory().setItem(event.getPlayer().getInventory().getHeldItemSlot(), soulTorch);
+                return;
+            }
         } if(event.getItem().getType() == Material.SOUL_TORCH && event.getItem().getItemMeta().itemName().equals(Colorize("&cShow &rPlayers").decoration(TextDecoration.ITALIC, false))){
-            event.setCancelled(true);
-            event.getPlayer().performCommand("hideplayers");
-            ItemStack torch = new ItemStack(Material.TORCH, 1);
-            ItemMeta torchMeta = torch.getItemMeta();
-            torchMeta.displayName(Colorize("&cHide &rPlayers").decoration(TextDecoration.ITALIC, false));
-            torchMeta.itemName(Colorize("&cHide &rPlayers").decoration(TextDecoration.ITALIC, false));
-            torch.setItemMeta(torchMeta);
-            event.getPlayer().getInventory().setItem(event.getPlayer().getInventory().getHeldItemSlot(), torch);
+            if(isDev()) {
+                event.setCancelled(true);
+                event.getPlayer().performCommand("hideplayers");
+                ItemStack torch = new ItemStack(Material.TORCH, 1);
+                ItemMeta torchMeta = torch.getItemMeta();
+                torchMeta.displayName(Colorize("&cHide &rPlayers").decoration(TextDecoration.ITALIC, false));
+                torchMeta.itemName(Colorize("&cHide &rPlayers").decoration(TextDecoration.ITALIC, false));
+                torch.setItemMeta(torchMeta);
+                event.getPlayer().getInventory().setItem(event.getPlayer().getInventory().getHeldItemSlot(), torch);
+            }
         }
     }
 }

@@ -17,6 +17,7 @@ import java.util.UUID;
 import static com.denied403.hardcoursecheckpoints.Discord.HardcourseDiscord.sendMessage;
 import static com.denied403.hardcoursecheckpoints.HardcourseCheckpoints.*;
 import static com.denied403.hardcoursecheckpoints.Utils.ColorUtil.Colorize;
+import static org.bukkit.Bukkit.getServer;
 
 public class onWalk implements Listener {
     private final PointsManager pointsManager;
@@ -54,19 +55,17 @@ public class onWalk implements Listener {
             } catch (NumberFormatException e) {
                 return;
             }
+            int playerSeason = database.getSeason(uuid) != null ? database.getSeason(uuid) : 1;
+            if(playerSeason > season){
+                return;
+            }
+            if(event.getPlayer().getGameMode() == GameMode.SPECTATOR){
+                return;
+            }
 
             double previousLevel = database.getLevel(uuid) != null ? database.getLevel(uuid) : 0;
 
-            if (previousLevel < checkpointNumber) {
-                if (!p.hasPermission("hardcourse.staff") && checkpointNumber > previousLevel + 1) {
-                    if (!plugin.isSkipExempted((int) previousLevel, (int) checkpointNumber)) {
-                        Location respawnLocation = p.getRespawnLocation();
-                        if (respawnLocation != null) p.teleport(respawnLocation);
-                        p.sendMessage(Colorize("&c&lHARDCOURSE &rCheckpoint skipped! You have been returned to your previous checkpoint. Please try to complete all levels."));
-                        return;
-                    }
-                }
-
+            if (checkpointNumber > previousLevel) {
                 if (checkpointNumber > previousLevel + 10 && !plugin.isSkipExempted((int) previousLevel, (int) checkpointNumber)) {
                     if (isDiscordEnabled()) {
                         sendMessage(p, null, "hacks",
@@ -77,13 +76,21 @@ public class onWalk implements Listener {
                             Double.toString(previousLevel).replace(".0", "") + " &fto level &c" +
                             Double.toString(checkpointNumber).replace(".0", "") + "&f!"), "hardcourse.staff");
                 }
-
+                if (!p.hasPermission("hardcourse.staff") && checkpointNumber > previousLevel + 1) {
+                    if (!plugin.isSkipExempted((int) previousLevel, (int) checkpointNumber)) {
+                        Location respawnLocation = p.getRespawnLocation();
+                        if (respawnLocation != null){ p.teleport(respawnLocation);} else {p.teleport(p.getWorld().getSpawnLocation());}
+                        p.sendMessage(Colorize("&c&lHARDCOURSE &rCheckpoint skipped! You have been returned to your previous checkpoint. Please try to complete all levels."));
+                        return;
+                    }
+                }
                 p.sendActionBar(Colorize("&fCheckpoint reached: &c" + Double.toString(checkpointNumber).replace(".0", "")));
                 p.playSound(loc, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
-
-                int pointsToAdd = 10 + random.nextInt(11);
-                pointsManager.addPoints(uuid, pointsToAdd);
-                sendPointsSubtitle(p, "&a+" + pointsToAdd + " points");
+                if(isDev()) {
+                    int pointsToAdd = 10 + random.nextInt(11);
+                    pointsManager.addPoints(uuid, pointsToAdd);
+                    sendPointsSubtitle(p, "&a+" + pointsToAdd + " points");
+                }
 
                 p.setRespawnLocation(loc.add(0, 1, 0), true);
                 database.setCheckpointData(uuid, season, (int) checkpointNumber, database.getPoints(uuid) != null ? database.getPoints(uuid) : 0);
@@ -106,8 +113,13 @@ public class onWalk implements Listener {
 
                 if (season == 3 && checkpointNumber == 240.0) {
                     if (previousLevel >= 238.0) {
+                        if(p.getStatistic(Statistic.PLAY_ONE_MINUTE) < 60 && ! p.hasPermission("hardcourse.staff")) {
+                            p.sendMessage(Colorize("&c&lHARDCOURSE &fYou have reached the end. However, we have reason to believe you are &4cheating&f. If you are not, please contact a staff member to verify your progress."));
+                            return;
+                        }
                         if (isDiscordEnabled()) sendMessage(p, null, "winning", "3", null);
                         p.sendMessage(Colorize("&aCongratulations! You have completed Season 3! There is currently no Season 4, so you have reached the end of the Hardcourse for now."));
+                        getServer().dispatchCommand(Bukkit.getConsoleSender(), "lp user " + p.getName() + " parent add winner");
                     } else if (!p.hasPermission("hardcourse.staff")) {
                         p.sendMessage(Colorize("&c&lHARDCOURSE &fYou have reached the end. However, we have reason to believe you are &4cheating&f. If you are not, please contact a staff member to verify your progress."));
                     }
@@ -123,7 +135,7 @@ public class onWalk implements Listener {
         p.setGameMode(GameMode.ADVENTURE);
         p.setRespawnLocation(p.getLocation().add(0, 1, 0), true);
         database.setCheckpointData(p.getUniqueId(), nextSeason, 1, database.getPoints(p.getUniqueId()));
-        Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "lp user " + p.getName() + " parent add " + nextSeason);
+        getServer().dispatchCommand(getServer().getConsoleSender(), "lp user " + p.getName() + " parent add " + nextSeason);
         p.sendMessage(Colorize("&aYou have been teleported to the next season. You can now continue your journey!"));
     }
 

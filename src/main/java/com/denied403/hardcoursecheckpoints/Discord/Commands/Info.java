@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.UUID;
 
+import static com.denied403.hardcoursecheckpoints.HardcourseCheckpoints.isDev;
+
 public class Info {
     private static CheckpointDatabase database;
 
@@ -91,13 +93,25 @@ public class Info {
         }
         EmbedBuilder playerEmbed = new EmbedBuilder();
         playerEmbed.setThumbnail(Objects.requireNonNull(event.getGuild().getIconUrl()));
-        String level = String.valueOf(database.getLevel(uuid)).replace(".0", "");
-        level = database.getSeason(uuid).toString() + "-" + level;
+        String fullLevelString;
+        Double level = database.getLevel(uuid);
+
+        if (level == null) {
+            fullLevelString = "Not Migrated";
+        } else {
+            String levelString = level.intValue() + "";
+            Integer season = database.getSeason(uuid);
+            fullLevelString = (season != null ? season + "-" : "") + levelString;
+        }
+
         try {
             playerEmbed.setTitle(offlinePlayer.getName());
             playerEmbed.setFooter("Requested by " + event.getUser().getName(), event.getUser().getEffectiveAvatarUrl());
             playerEmbed.setImage("https://crafatar.com/renders/body/" + uuid + "?default=MHF_Steve&overlay");
-            playerEmbed.addField("Level", level, false);
+            playerEmbed.addField("Level", fullLevelString, false);
+            if(isDev()) {
+                playerEmbed.addField("Points", String.valueOf(database.getPoints(uuid)), false);
+            }
             playerEmbed.addField("Playtime: ", Playtime.getPlaytime(offlinePlayer), false);
             event.replyEmbeds(playerEmbed.build()).queue();
         } catch (NoClassDefFoundError | Exception e) {

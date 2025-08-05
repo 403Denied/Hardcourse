@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 
+import static com.denied403.hardcoursecheckpoints.HardcourseCheckpoints.isDev;
 import static com.denied403.hardcoursecheckpoints.HardcourseCheckpoints.isDiscordEnabled;
 
 public class CommandManager extends ListenerAdapter {
@@ -50,13 +51,15 @@ public class CommandManager extends ListenerAdapter {
                     .addOptions(Info.infoType, Info.playerName));
             commandData.add(Commands.slash("console", "Run a console command")
                     .addOptions(Console.toRunCommandOption()));
-            commandData.add(Commands.slash("setuptickets", "Setup the ticket system")
-                    .setDefaultPermissions(DefaultMemberPermissions.DISABLED)
-                    .addOptions(SendTicketPanel.channel())
-            );
-            commandData.add(Commands.slash("blockfromtickets", "Block a user from creating tickets")
-                    .setDefaultPermissions(DefaultMemberPermissions.DISABLED)
-                    .addOptions(BlockFromTickets.userToBlock()));
+            if(isDev()) {
+                commandData.add(Commands.slash("setuptickets", "Setup the ticket system")
+                        .setDefaultPermissions(DefaultMemberPermissions.DISABLED)
+                        .addOptions(SendTicketPanel.channel())
+                );
+                commandData.add(Commands.slash("blockfromtickets", "Block a user from creating tickets")
+                        .setDefaultPermissions(DefaultMemberPermissions.DISABLED)
+                        .addOptions(BlockFromTickets.userToBlock()));
+            }
             event.getGuild().updateCommands().addCommands(commandData).queue();
         }
     }

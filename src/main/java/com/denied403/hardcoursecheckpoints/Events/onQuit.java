@@ -20,7 +20,8 @@ public class onQuit implements Listener {
             sendMessage(e.getPlayer(), null, "leave", null, null);
         }
         Double highestLevel = database.getLevel(e.getPlayer().getUniqueId());
-        if(highestLevel <= 3){
+        int season = database.getSeason(e.getPlayer().getUniqueId());
+        if(highestLevel <= 3 && season == 1){
             database.deleteSpecific(e.getPlayer().getUniqueId());
         }
     }

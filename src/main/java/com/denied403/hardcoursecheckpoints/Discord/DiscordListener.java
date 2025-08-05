@@ -26,23 +26,20 @@ public final class DiscordListener extends ListenerAdapter {
                 Component formattedMessage;
                 String firstFormattedMessage;
 
-                // Initialize default role color
-                String hexColor = "#FFFFFF";  // Default color (white)
+                String hexColor = "#FFFFFF";
 
-                // Check if the member has roles and access the first role safely
                 if (member.getRoles().isEmpty()) {
                     firstFormattedMessage = "&a&lDC &r&7" + name + " &f: ";
                 } else {
                     Role firstRole = member.getRoles().getFirst();
                     if (firstRole.getColor() != null) {
                         String hex = Integer.toHexString(firstRole.getColor().getRGB()).toUpperCase();
-                        if (hex.length() == 8) hex = hex.substring(2);  // Strip alpha if present
+                        if (hex.length() == 8) hex = hex.substring(2);
                         hexColor = "#" + hex;
                     }
                     firstFormattedMessage = "&a&lDC &r<" + hexColor + ">" + name + "&f: ";
                 }
 
-                // Check if the member has the "Staff" role
                 if (member.getRoles().stream().anyMatch(role -> role.getName().equalsIgnoreCase("Staff"))) {
                     formattedMessage = Colorize(firstFormattedMessage + "&f" + message);
                 } else {
@@ -51,7 +48,6 @@ public final class DiscordListener extends ListenerAdapter {
                 Bukkit.broadcast(formattedMessage);
             }
 
-            // Staff chat handling remains the same
             if (event.getChannel().equals(staffChatChannel)) {
                 Member member = event.getMember();
                 if (member == null || member.getUser().isBot()) return;

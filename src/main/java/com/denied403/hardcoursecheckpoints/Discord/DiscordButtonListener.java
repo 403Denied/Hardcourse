@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.bukkit.Bukkit;
 
 import static com.denied403.hardcoursecheckpoints.Events.BanListener.runBanCleanup;
+import static com.denied403.hardcoursecheckpoints.HardcourseCheckpoints.isDev;
 import static com.denied403.hardcoursecheckpoints.HardcourseCheckpoints.isDiscordEnabled;
 
 public class DiscordButtonListener extends ListenerAdapter {
@@ -23,10 +24,8 @@ public class DiscordButtonListener extends ListenerAdapter {
             if (id.startsWith("ban:")) {
                 String playerName = id.substring("ban:".length());
 
-                // Optionally acknowledge the button press
-                event.reply("Issued ban command for **" + playerName + "**.").setEphemeral(true).queue();
+                event.reply("Issued ban command for **`" + playerName + "`**.").setEphemeral(true).queue();
 
-                // Dispatch ban command to server
                 Bukkit.getScheduler().runTask(plugin, () -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "consolepunish " + playerName + " unfair_advantage Discord ban issued by " + event.getUser().getName()));
                 runBanCleanup(playerName);
             }

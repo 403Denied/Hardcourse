@@ -15,6 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.Material;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import static com.denied403.hardcoursecheckpoints.HardcourseCheckpoints.isDev;
 import static com.denied403.hardcoursecheckpoints.Points.PointsShop.givePointsShopChest;
 import static com.denied403.hardcoursecheckpoints.Utils.ColorUtil.Colorize;
 
@@ -55,20 +56,22 @@ public class Clock {
         killItemStack.setItemMeta(killItemMeta);
 
         player.getInventory().setItem(8, killItemStack);
-        givePointsShopChest(player, true);
+        if(isDev()) {
+            givePointsShopChest(player, true);
 
-        ItemStack torch = new ItemStack(Material.TORCH);
-        ItemMeta torchMeta = torch.getItemMeta();
-        torchMeta.displayName(Colorize("&cHide &rPlayers").decoration(TextDecoration.ITALIC, false));
-        torchMeta.itemName(Colorize("&cHide &rPlayers").decoration(TextDecoration.ITALIC, false));
-        torch.setItemMeta(torchMeta);
+            ItemStack torch = new ItemStack(Material.TORCH);
+            ItemMeta torchMeta = torch.getItemMeta();
+            torchMeta.displayName(Colorize("&cHide &rPlayers").decoration(TextDecoration.ITALIC, false));
+            torchMeta.itemName(Colorize("&cHide &rPlayers").decoration(TextDecoration.ITALIC, false));
+            torch.setItemMeta(torchMeta);
 
-        ItemStack soulTorch = new ItemStack(Material.SOUL_TORCH);
-        ItemMeta soulTorchMeta = soulTorch.getItemMeta();
-        soulTorchMeta.displayName(Colorize("&cShow &rPlayers").decoration(TextDecoration.ITALIC, false));
-        soulTorchMeta.itemName(Colorize("&cShow &rPlayers").decoration(TextDecoration.ITALIC, false));
-        soulTorch.setItemMeta(soulTorchMeta);
+            ItemStack soulTorch = new ItemStack(Material.SOUL_TORCH);
+            ItemMeta soulTorchMeta = soulTorch.getItemMeta();
+            soulTorchMeta.displayName(Colorize("&cShow &rPlayers").decoration(TextDecoration.ITALIC, false));
+            soulTorchMeta.itemName(Colorize("&cShow &rPlayers").decoration(TextDecoration.ITALIC, false));
+            soulTorch.setItemMeta(soulTorchMeta);
 
-        player.getInventory().setItem(0, torch);
+            player.getInventory().setItem(0, torch);
+        }
     }
 }

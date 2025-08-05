@@ -73,23 +73,24 @@ public class onJoin implements Listener {
         if(database.getSeason(player.getUniqueId()) == 0) {
             database.setSeason(player.getUniqueId(), 1);
         }
-        boolean hasPointsShop = false;
+        if(isDev()) {
+            boolean hasPointsShop = false;
 
-        for (ItemStack item : player.getInventory().getContents()) {
-            if (item == null || item.getType() != Material.PAPER) continue;
+            for (ItemStack item : player.getInventory().getContents()) {
+                if (item == null || item.getType() != Material.PAPER) continue;
 
-            ItemMeta meta = item.getItemMeta();
-            if (meta != null && meta.hasDisplayName() && stripAllColors(meta.displayName()).equalsIgnoreCase("Points Shop")) {
-                hasPointsShop = true;
-                break;
+                ItemMeta meta = item.getItemMeta();
+                if (meta != null && meta.hasDisplayName() && stripAllColors(meta.displayName()).equalsIgnoreCase("Points Shop")) {
+                    hasPointsShop = true;
+                    break;
+                }
             }
-        }
-        if (!hasPointsShop) {
-            givePointsShopChest(player, true);
-        }
+            if (!hasPointsShop) {
+                givePointsShopChest(player, true);
+            }
 
-        initScoreboard(player);
-
+            initScoreboard(player);
+        }
         Material killItem = Material.CLOCK;
         ItemStack killItemStack = new ItemStack(killItem);
         org.bukkit.inventory.meta.ItemMeta killItemMeta = killItemStack.getItemMeta();
@@ -127,14 +128,17 @@ public class onJoin implements Listener {
         soulTorchMeta.itemName(Colorize("&cShow &rPlayers").decoration(TextDecoration.ITALIC, false));
         soulTorch.setItemMeta(soulTorchMeta);
 
-        if(player.getInventory().contains(soulTorch)) {
-            int index = player.getInventory().first(soulTorch);
-            if (index != -1) {
-                player.getInventory().setItem(index, torch);
-                player.updateInventory();
+        if(isDev()) {
+            if (player.getInventory().contains(soulTorch)) {
+                int index = player.getInventory().first(soulTorch);
+                if (index != -1) {
+                    player.getInventory().setItem(index, torch);
+                    player.updateInventory();
+                }
             }
-        } if (!player.getInventory().contains(torch) || !player.getInventory().contains(soulTorch)) {
-            player.getInventory().setItem(0, torch);
+            if (!player.getInventory().contains(torch) || !player.getInventory().contains(soulTorch)) {
+                player.getInventory().setItem(0, torch);
+            }
         }
     }
 }

@@ -27,7 +27,7 @@ public class ReloadHardcourse {
                     if(isDiscordEnabled()) {
                         hardcourseDiscord.InitJDA();
                     }
-                    sender.sendMessage(Colorize("&c&lHARDCOURSE &fHardcourse config reloaded."));
+                    sender.sendMessage(Colorize("&c&lHARDCOURSE &rHardcourse config reloaded."));
                     return Command.SINGLE_SUCCESS;
                 })
                 .build();

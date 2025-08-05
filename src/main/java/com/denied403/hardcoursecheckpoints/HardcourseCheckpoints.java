@@ -43,16 +43,18 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
         CheckpointDatabase checkpointDatabase = new CheckpointDatabase(this);
         loadConfigValues(this);
 
-        PointsManager.initialize(checkpointDatabase);
+        if(isDev) {
+            PointsManager.initialize(checkpointDatabase);
+            ScoreboardMain.initialize(checkpointDatabase);
+            Points.initialize(checkpointDatabase);
+        }
         onWalk.initalize(checkpointDatabase);
         CheckpointCommand.initialize(checkpointDatabase);
         HardcourseDiscord.initialize(checkpointDatabase);
         onChat.initialize(checkpointDatabase);
         onJoin.initialize(checkpointDatabase);
         onQuit.initialize(checkpointDatabase);
-        ScoreboardMain.initialize(checkpointDatabase);
         Info.initialize(checkpointDatabase);
-        Points.initialize(checkpointDatabase);
 
         CosmeticsShop cosmeticsShop = new CosmeticsShop();
         PointsShop pointsShop = new PointsShop(this, cosmeticsShop);
@@ -79,18 +81,19 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
         getServer().getPluginManager().registerEvents(new onHunger(), this);
         getServer().getPluginManager().registerEvents(this, this);
         getServer().getPluginManager().registerEvents(new BanListener(this), this);
-        getServer().getPluginManager().registerEvents(new JumpBoost(), this);
-        getServer().getPluginManager().registerEvents(new DoubleJump(), this);
-        getServer().getPluginManager().registerEvents(new TempCheckpoint(), this);
-        getServer().getPluginManager().registerEvents(pointsShop, this);
-        getServer().getPluginManager().registerEvents(new JumpBoost(), this);
-        getServer().getPluginManager().registerEvents(new onPortalEnter(), this);
-        getServer().getPluginManager().registerEvents(new EndTrail(this), this);
-        getServer().getPluginManager().registerEvents(new OminousTrail(this), this);
+        if(isDev) {
+            getServer().getPluginManager().registerEvents(new OminousTrail(this), this);
+            getServer().getPluginManager().registerEvents(new onPortalEnter(), this);
+            getServer().getPluginManager().registerEvents(new EndTrail(this), this);
+            getServer().getPluginManager().registerEvents(pointsShop, this);
+            getServer().getPluginManager().registerEvents(new JumpBoost(), this);
+            getServer().getPluginManager().registerEvents(new DoubleJump(), this);
+            getServer().getPluginManager().registerEvents(new TempCheckpoint(), this);
+            getServer().getPluginManager().registerEvents(new JumpBoost(), this);
+        }
         getServer().getPluginManager().registerEvents(new ReportListener(), this);
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, cmd -> {
             cmd.registrar().register(Clock.createCommand("clock"));
-            cmd.registrar().register(Clock.createCommand("shop"));
             cmd.registrar().register(CheckpointCommand.createCommand(this, "checkpoint"));
             cmd.registrar().register(CheckpointCommand.createCommand(this, "checkpoints"));
             cmd.registrar().register(EndChatGame.createCommand("endchatgame"));
@@ -102,10 +105,13 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
             cmd.registrar().register(ReloadHardcourse.createCommand(this, "hardcoursereload"));
             cmd.registrar().register(WinnerTP.createCommand("winnertp"));
             cmd.registrar().register(WinnerTP.createCommand("wtp"));
-            cmd.registrar().register(Points.createCommand(this, pointsManager, "points"));
-            cmd.registrar().register(Points.createCommand(this, pointsManager, "pts"));
-            cmd.registrar().register(EndTrail.createCommand("endtrail"));
-            cmd.registrar().register(OminousTrail.createCommand("ominoustrail"));
+            if(isDev) {
+                cmd.registrar().register(Clock.createCommand("shop"));
+                cmd.registrar().register(Points.createCommand(this, pointsManager, "points"));
+                cmd.registrar().register(Points.createCommand(this, pointsManager, "pts"));
+                cmd.registrar().register(EndTrail.createCommand("endtrail"));
+                cmd.registrar().register(OminousTrail.createCommand("ominoustrail"));
+            }
         });
 
         setupWordsConfig();
@@ -113,9 +119,7 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
         Bukkit.getScheduler().runTaskTimer(this, () -> {
             if(isBroadcastEnabled()){
                 String message = messages.get(random.nextInt(messages.size()));
-                Bukkit.broadcast(ColorUtil.Colorize(" "));
-                Bukkit.broadcast(ColorUtil.Colorize("&c&lHARDCOURSE &r" + message));
-                Bukkit.broadcast(ColorUtil.Colorize(" "));
+                Bukkit.broadcast(ColorUtil.Colorize("\n&c&lHARDCOURSE &r" + message + "\n"));
             }}, 0L, 20 * 60 * 5);
 
         new BukkitRunnable() {
@@ -125,15 +129,16 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
                     ChatReactions.runGame(ChatReactions.getRandomWord());
                 }
             }}.runTaskTimer(this, 0L, 20 * 60 * 4);
-
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    updateScoreboard(player);
+        if(isDev) {
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    for (Player player : Bukkit.getOnlinePlayers()) {
+                        updateScoreboard(player);
+                    }
                 }
-            }
-        }.runTaskTimer(this, 0L, 20L);
+            }.runTaskTimer(this, 0L, 20L);
+        }
     }
 
     public PointsManager getPointsManager() {
@@ -171,6 +176,10 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
         return UnscrambleEnabled;
     }
 
+    public static boolean isDev() {
+        return isDev;
+    }
+
     public void reloadWordsConfig() {
         wordsConfig = YamlConfiguration.loadConfiguration(wordsFile);
     }
@@ -180,6 +189,7 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
     private static boolean DiscordEnabled;
     private static boolean BroadcastEnabled;
     private static boolean UnscrambleEnabled;
+    private static boolean isDev;
     private static List<String> exemptions;
     private final Random random = new Random();
 
@@ -188,6 +198,7 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
         DiscordEnabled = config.getBoolean("discord-enabled");
         BroadcastEnabled = config.getBoolean("broadcast-enabled");
         UnscrambleEnabled = config.getBoolean("unscramble-enabled");
+        isDev = config.getBoolean("is-dev");
         messages = config.getStringList("broadcast-messages");
         exemptions = config.getStringList("skip-alert-exemptions");
     }

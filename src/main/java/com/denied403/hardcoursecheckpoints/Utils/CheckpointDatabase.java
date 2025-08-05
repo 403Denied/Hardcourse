@@ -83,8 +83,7 @@ public class CheckpointDatabase {
         if(!(season == null)) {
             return getSingleIntField(uuid, "season");
         } else {
-            setSeason(uuid, 1);
-            return 1;
+            return null;
         }
     }
 
@@ -93,8 +92,7 @@ public class CheckpointDatabase {
         if(!(level == null)) {
             return level;
         } else {
-            setLevel(uuid, 1.0);
-            return 1.0;
+            return null;
         }
     }
 

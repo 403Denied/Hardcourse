@@ -154,7 +154,7 @@ public class CheckpointCommand {
                                 })
                         )
                 )
-                .then(Commands.literal("migrate")
+                /*.then(Commands.literal("migrate")
                         .requires(source -> source.getSender().isOp())
                         .executes(ctx -> {
                             CommandSender sender = ctx.getSource().getSender();
@@ -184,7 +184,7 @@ public class CheckpointCommand {
                             });
                             return Command.SINGLE_SUCCESS;
                         })
-                )
+                )*/
                 .build();
     }
 

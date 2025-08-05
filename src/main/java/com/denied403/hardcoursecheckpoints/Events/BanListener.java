@@ -13,6 +13,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Statistic;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
@@ -58,8 +59,10 @@ public class BanListener implements Listener {
         String reason = event.getReason();
         if (event.getTypeOfPunishment().startsWith("ban")) {
             if(reason.equalsIgnoreCase("Unfair Advantage")) {
-                if(Bukkit.getOfflinePlayer(event.getTargetUUID()).getStatistic(Statistic.PLAY_ONE_MINUTE) >= 60){
-                    getServer().getPlayer(event.getStaff()).sendMessage("&c&lHARDCOURSE &rThis player has more than 1 hour of playtime. Remember to provide evidence in &c#punishment-proof&f.");
+                if(!(event.getStaff().equals("CONSOLE"))) {
+                    if (Bukkit.getOfflinePlayer(event.getTargetUUID()).getStatistic(Statistic.PLAY_ONE_MINUTE) >= 60) {
+                        getServer().getPlayer(event.getStaff()).sendMessage("&c&lHARDCOURSE &rThis player has more than 1 hour of playtime. Remember to provide evidence in &c#punishment-proof&f.");
+                    }
                 }
                 if(isDiscordEnabled()) {
                     runBanCleanup(playerName);

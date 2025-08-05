@@ -166,7 +166,11 @@ public class HardcourseDiscord {
             chatChannel.sendMessage(":octagonal_sign: **The server has shut down!**").queue();
         }
         if (type.equals("winning")){
-            chatChannel.sendMessage(":trophy: **`" + stripAllColors(player.displayName()) + "`** has completed **Season " + extra1 + "**! Their playtime was " + getPlaytime(player)).queue();
+            if(!(extra1.equals("3"))) {
+                chatChannel.sendMessage(":trophy: **`" + stripAllColors(player.displayName()) + "`** has completed **Season " + extra1 + "**! Their playtime was " + getPlaytime(player)).queue();
+            } else {
+                chatChannel.sendMessage(":trophy: **`" + stripAllColors(player.displayName()) + "`** has completed **Season " + extra1 + "**! Their playtime was " + getPlaytime(player) + ". This player has finished hardcourse!").queue();
+            }
         }
         if(type.equals("logs")){
             final SimpleDateFormat f = new SimpleDateFormat("HH:mm:ss z");
