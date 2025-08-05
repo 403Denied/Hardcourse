@@ -81,6 +81,7 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
         getServer().getPluginManager().registerEvents(new onHunger(), this);
         getServer().getPluginManager().registerEvents(this, this);
         getServer().getPluginManager().registerEvents(new BanListener(this), this);
+        getServer().getPluginManager().registerEvents(new onQuit(), this);
         if(isDev) {
             getServer().getPluginManager().registerEvents(new OminousTrail(this), this);
             getServer().getPluginManager().registerEvents(new onPortalEnter(), this);
