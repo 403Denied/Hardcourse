@@ -66,7 +66,7 @@ public class onWalk implements Listener {
             double previousLevel = database.getLevel(uuid) != null ? database.getLevel(uuid) : 0;
 
             if (checkpointNumber > previousLevel) {
-                if (checkpointNumber > previousLevel + 10 && !plugin.isSkipExempted((int) previousLevel, (int) checkpointNumber)) {
+                if (checkpointNumber > previousLevel + 10 && !plugin.isSkipExempted((int) previousLevel, (int) checkpointNumber) && !p.hasPermission("hardcourse.staff")) {
                     if (isDiscordEnabled()) {
                         sendMessage(p, null, "hacks",
                                 Double.toString(previousLevel).replace(".0", ""),
@@ -102,7 +102,6 @@ public class onWalk implements Listener {
                         p.sendMessage(Colorize("&c&lHARDCOURSE &fYou have reached the end. However, we have reason to believe you are &4cheating&f. If you are not, please contact a staff member to verify your progress."));
                     }
                 }
-
                 if (season == 2 && checkpointNumber == 365.0) {
                     if (previousLevel >= 363.0) {
                         handleSeasonComplete(p, 3, "2");
@@ -110,7 +109,6 @@ public class onWalk implements Listener {
                         p.sendMessage(Colorize("&c&lHARDCOURSE &fYou have reached the end. However, we have reason to believe you are &4cheating&f. If you are not, please contact a staff member to verify your progress."));
                     }
                 }
-
                 if (season == 3 && checkpointNumber == 240.0) {
                     if (previousLevel >= 238.0) {
                         if(p.getStatistic(Statistic.PLAY_ONE_MINUTE) < 60 && ! p.hasPermission("hardcourse.staff")) {
@@ -127,7 +125,6 @@ public class onWalk implements Listener {
             }
         }
     }
-
     private void handleSeasonComplete(Player p, int nextSeason, String discordSeasonId) {
         if (isDiscordEnabled()) sendMessage(p, null, "winning", discordSeasonId, null);
         p.sendMessage(Colorize("&aCongratulations! You have completed Season " + discordSeasonId + "!"));
@@ -138,7 +135,6 @@ public class onWalk implements Listener {
         getServer().dispatchCommand(getServer().getConsoleSender(), "lp user " + p.getName() + " parent add " + nextSeason);
         p.sendMessage(Colorize("&aYou have been teleported to the next season. You can now continue your journey!"));
     }
-
     private void sendPointsSubtitle(Player player, String pointsMessage) {
         Title title = Title.title(
                 Colorize(""),

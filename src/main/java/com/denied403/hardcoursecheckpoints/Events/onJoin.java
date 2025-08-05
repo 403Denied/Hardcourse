@@ -64,11 +64,13 @@ public class onJoin implements Listener {
                 } catch (Exception e) {
                     Bukkit.getLogger().severe("Failed to save checkpoints file: " + e.getMessage());
                 }
-                player.sendMessage(Colorize("&c&lHARDCOURSE &rYour checkpoint data has sucessfully been migrated from legacy storage to the new system. Level: &c" + String.valueOf(level).replaceAll(".0", "") + "&r Season: &c" + season + "&r. If you believe there is an error with these numbers, please contact an administrator."));
+                player.sendMessage(Colorize("&c&lHARDCOURSE &rYour checkpoint data has successfully been migrated from legacy storage to the new system. Level: &c" + String.valueOf(level).replaceAll(".0", "") + "&r Season: &c" + season + "&r. If you believe there is an error with these numbers, please contact an administrator."));
+                database.setCheckpointData(player.getUniqueId(), season, level, 0);
+            } else {
+                database.setCheckpointData(player.getUniqueId(), 1, 1, 0);
+                player.teleport(player.getWorld().getSpawnLocation());
+                player.setRespawnLocation(player.getLocation());
             }
-            database.setCheckpointData(player.getUniqueId(), season, level, 0);
-            player.teleport(player.getWorld().getSpawnLocation());
-            player.setRespawnLocation(player.getLocation());
         }
         if(database.getSeason(player.getUniqueId()) == 0) {
             database.setSeason(player.getUniqueId(), 1);
