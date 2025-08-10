@@ -16,6 +16,9 @@ repositories {
         name = "sonatype"
         url = "https://oss.sonatype.org/content/groups/public/"
     }
+    maven {
+        url = "https://repo.extendedclip.com/content/repositories/placeholderapi/"
+    }
     maven { url 'https://jitpack.io' }
     flatDir {
         dirs 'libs'
@@ -29,12 +32,13 @@ dependencies {
         exclude module: 'opus-java'
         exclude module: 'tink'
     }
+    compileOnly("me.clip:placeholderapi:2.11.6")
     compileOnly name: "Core403-1.0"
 }
 
 tasks {
     runServer {
-        minecraftVersion("1.21.7")
+        minecraftVersion("1.21.8")
     }
 }
 
@@ -67,7 +71,7 @@ processResources {
 jar {
     manifest {
         attributes(
-                'Main-Class': 'com.denied403.hardcoursecheckpoints.HardcourseCheckpoints',
+                'Main-Class': 'com.denied403.Hardcourse.Hardcourse',
         )
     }
     from {
