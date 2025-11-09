@@ -6,7 +6,7 @@ import java.util.List;
 
 public class Shuffler {
     public static String shuffleWord(String word){
-        List<Character> list = new ArrayList<Character>();
+        List<Character> list = new ArrayList<>();
         for (char c : word.toCharArray()){
             list.add(c);
         }

@@ -38,6 +38,7 @@ public class onJoin implements Listener {
             } else {
                 sendMessage(player, null, "firstjoin", null, null);
             }
+            sendMessage(player, null, "logs", "join", null);
         }
         if(!player.hasPlayedBefore()) {
             database.setCheckpointData(player.getUniqueId(), 1, 1, 0);

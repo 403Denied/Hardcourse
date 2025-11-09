@@ -53,7 +53,7 @@ public class CheckpointCommand {
 
                                             database.setLevel(uuid, level);
 
-                                            int season = database.getSeason(uuid); // Existing season
+                                            int season = database.getSeason(uuid);
                                             String formattedLevel = (level % 1 == 0) ? String.valueOf((int) level) : String.valueOf(level);
 
                                             sender.sendMessage(Colorize("&c&lHARDCOURSE &rThe level of &c" + playerName +

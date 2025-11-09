@@ -64,7 +64,7 @@ public class Info {
                 EmbedBuilder serverEmbed = new EmbedBuilder();
                 serverEmbed.setThumbnail(Objects.requireNonNull(Objects.requireNonNull(event.getGuild()).getIconUrl()));
                 serverEmbed.setTitle("Server Info • Hardcourse");
-                serverEmbed.addField("Server IP", isDev() ? "hardcourse.minehut.gg" : "hardcourse.dev.falixsrv.me", false);
+                serverEmbed.addField("Server IP", isDev() ? "hardcourse.dev.falixsrv.me" : "hardcourse.minehut.gg", false);
                 serverEmbed.addField("Server Version", Bukkit.getVersion(), false);
                 serverEmbed.addField("Server Uptime", getUptime(), false);
                 serverEmbed.addField("Server TPS", String.format("%.2f", Bukkit.getTPS()[0]), false);
@@ -87,11 +87,11 @@ public class Info {
         String name = nameOption.getAsString();
         Player onlineTarget = Bukkit.getPlayerExact(name);
         OfflinePlayer offlinePlayer = (onlineTarget != null) ? onlineTarget : Bukkit.getOfflinePlayer(name);
-        UUID uuid = offlinePlayer.getUniqueId();
-        if(offlinePlayer.getName() == null) {
+        if(!offlinePlayer.hasPlayedBefore()) {
             event.reply("This player has never played on the server!").setEphemeral(true).queue();
             return;
         }
+        UUID uuid = offlinePlayer.getUniqueId();
         EmbedBuilder playerEmbed = new EmbedBuilder();
         playerEmbed.setThumbnail(Objects.requireNonNull(Objects.requireNonNull(event.getGuild()).getIconUrl()));
         String fullLevelString;
@@ -112,10 +112,13 @@ public class Info {
             if(isDev()) {
                 playerEmbed.addField("Points", String.valueOf(database.getPoints(uuid)), false);
             }
-            playerEmbed.addField("First Joined", formatUnixTimestamp(offlinePlayer.getFirstPlayed()), false);
+            playerEmbed.addBlankField(false);
+            playerEmbed.addField("First Joined", formatUnixTimestamp(offlinePlayer.getFirstPlayed()) + " (" + formatDurationAgo(offlinePlayer.getFirstPlayed()) + ")", false);
             playerEmbed.addField("Playtime", Playtime.getPlaytime(offlinePlayer), false);
             if(!offlinePlayer.isOnline()) {
                 playerEmbed.addField("Last Seen", formatUnixTimestamp(offlinePlayer.getLastSeen()) + " (" + formatDurationAgo(offlinePlayer.getLastSeen()) + ")", false);
+            } else {
+                playerEmbed.addField("Online Since", formatUnixTimestamp(offlinePlayer.getLastLogin()), false);
             }
             event.replyEmbeds(playerEmbed.build()).setEphemeral(true).queue();
         } catch (NoClassDefFoundError | Exception e) {

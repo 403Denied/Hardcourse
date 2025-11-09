@@ -18,6 +18,7 @@ public class onQuit implements Listener {
     public void onPlayerQuit(PlayerQuitEvent e){
         if(isDiscordEnabled()) {
             sendMessage(e.getPlayer(), null, "leave", null, null);
+            sendMessage(e.getPlayer(), null, "logs", "quit", null);
         }
         Double highestLevel = database.getLevel(e.getPlayer().getUniqueId());
         int season = database.getSeason(e.getPlayer().getUniqueId());

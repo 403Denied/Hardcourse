@@ -29,10 +29,9 @@ public final class Hardcourse extends JavaPlugin implements Listener {
 
     private File wordsFile;
     private FileConfiguration wordsConfig;
-
     private PointsManager pointsManager;
-
     public static Hardcourse plugin;
+    public static boolean DiabolicalUnscrambles;
 
     @Override
     public void onEnable() {
@@ -54,7 +53,8 @@ public final class Hardcourse extends JavaPlugin implements Listener {
         onJoin.initialize(checkpointDatabase);
         onQuit.initialize(checkpointDatabase);
         Info.initialize(checkpointDatabase);
-        Placeholders.initalize(checkpointDatabase);
+        onSneak.initialize(checkpointDatabase);
+        Placeholders.initialize(checkpointDatabase);
 
         CosmeticsShop cosmeticsShop = new CosmeticsShop();
         PointsShop pointsShop = new PointsShop(this, cosmeticsShop);
@@ -83,6 +83,7 @@ public final class Hardcourse extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(this, this);
         getServer().getPluginManager().registerEvents(new BanListener(this), this);
         getServer().getPluginManager().registerEvents(new onQuit(), this);
+        getServer().getPluginManager().registerEvents(new onSneak(), this);
         if(isDev) {
             getServer().getPluginManager().registerEvents(new OminousTrail(this), this);
             getServer().getPluginManager().registerEvents(new onPortalEnter(), this);
@@ -93,6 +94,7 @@ public final class Hardcourse extends JavaPlugin implements Listener {
             getServer().getPluginManager().registerEvents(new TempCheckpoint(), this);
             getServer().getPluginManager().registerEvents(new JumpBoost(), this);
         }
+        getServer().getPluginManager().registerEvents(new GamemodeChange(), this);
         getServer().getPluginManager().registerEvents(new ReportListener(), this);
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, cmd -> {
             cmd.registrar().register(Clock.createCommand("clock"));
@@ -107,6 +109,7 @@ public final class Hardcourse extends JavaPlugin implements Listener {
             cmd.registrar().register(ReloadHardcourse.createCommand(this, "hardcoursereload"));
             cmd.registrar().register(WinnerTP.createCommand("winnertp"));
             cmd.registrar().register(WinnerTP.createCommand("wtp"));
+            cmd.registrar().register(ToggleDiabolicalUnscrambles.createCommand("togglediabolicalunscrambles"));
             if(isDev) {
                 cmd.registrar().register(Clock.createCommand("shop"));
                 cmd.registrar().register(Points.createCommand(this, pointsManager, "points"));
@@ -120,6 +123,7 @@ public final class Hardcourse extends JavaPlugin implements Listener {
 
         Bukkit.getScheduler().runTaskTimer(this, () -> {
             if(isBroadcastEnabled()){
+                if(Bukkit.getOnlinePlayers().isEmpty()) return;
                 String message = messages.get(random.nextInt(messages.size()));
                 Bukkit.broadcast(ColorUtil.Colorize("\n&c&lHARDCOURSE &r" + message + "\n"));
             }}, 0L, 20 * 60 * 5);
@@ -128,6 +132,7 @@ public final class Hardcourse extends JavaPlugin implements Listener {
             @Override
             public void run() {
                 if(isUnscrambleEnabled()) {
+                    if(Bukkit.getOnlinePlayers().isEmpty()) return;
                     ChatReactions.runGame(ChatReactions.getRandomWord());
                 }
             }}.runTaskTimer(this, 0L, 20 * 60 * 4);
@@ -155,15 +160,10 @@ public final class Hardcourse extends JavaPlugin implements Listener {
         wordsConfig = YamlConfiguration.loadConfiguration(wordsFile);
     }
 
-
     public static boolean isDiscordEnabled(){return DiscordEnabled;}
-
     public static boolean isBroadcastEnabled(){return BroadcastEnabled;}
-
     public static boolean isUnscrambleEnabled(){return UnscrambleEnabled;}
-
     public static boolean isDev() {return isDev;}
-
     public void reloadWordsConfig() {wordsConfig = YamlConfiguration.loadConfiguration(wordsFile);}
     public List<String> getApplicationQuestions(){return getConfig().getStringList("application-questions");}
 

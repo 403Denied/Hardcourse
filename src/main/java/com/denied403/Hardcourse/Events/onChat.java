@@ -47,7 +47,7 @@ public class onChat implements Listener {
                 .replaceAll("http://", "`http://`");
 
         String season = database.getSeason(player.getUniqueId()).toString() + "-";
-        if (content.startsWith("#") && player.hasPermission("hardcourse.jrmod")) {
+        if (content.startsWith("#") && player.hasPermission("core403.staffchat")) {
             sendMessage(player, content.substring(1), "staffchat", null, null);
         } else {
             if (!player.hasPermission("hardcourse.jrmod")){

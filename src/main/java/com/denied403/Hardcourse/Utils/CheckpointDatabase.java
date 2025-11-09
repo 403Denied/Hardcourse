@@ -15,14 +15,14 @@ public class CheckpointDatabase {
 
     public CheckpointDatabase(Plugin plugin) {
         this.plugin = plugin;
-        createCheckpointTale();
+        createCheckpointTable();
     }
     public Connection getConnection() throws SQLException {
         File dbFile = new File(plugin.getDataFolder(), "data.db");
         dbFile.getParentFile().mkdirs();
         return DriverManager.getConnection("jdbc:sqlite:" + dbFile);
     }
-    private void createCheckpointTale() {
+    private void createCheckpointTable() {
         String sql = """
             CREATE TABLE IF NOT EXISTS checkpoints (
                 uuid TEXT PRIMARY KEY NOT NULL,

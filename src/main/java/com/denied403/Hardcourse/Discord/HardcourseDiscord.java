@@ -190,6 +190,12 @@ public class HardcourseDiscord {
             } if(extra1.equals("false")){
                 logsChannel.sendMessage("`[" + f.format(new Date()) + "] " + stripAllColors(player.getName()) + ": " + content.replaceAll("`", "'") + "`").queue();
             }
+            if(extra1.equals("join")){
+                logsChannel.sendMessage("`[" + f.format(new Date()) + "] " + stripAllColors(player.getName()) + " joined`").queue();
+            }
+            if(extra1.equals("quit")){
+                logsChannel.sendMessage("`[" + f.format(new Date()) + "] " + stripAllColors(player.getName()) + " quit`").queue();
+            }
         }
     }
 }

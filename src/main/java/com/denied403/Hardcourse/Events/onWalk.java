@@ -99,14 +99,14 @@ public class onWalk implements Listener {
                     if (previousLevel >= 542.0) {
                         handleSeasonComplete(p, 2, "1");
                     } else {
-                        p.sendMessage(Colorize("&c&lHARDCOURSE &fYou have reached the end. However, we have reason to believe you are &4cheating&f. If you are not, please contact a staff member to verify your progress."));
+                        p.sendMessage(Colorize("&c&lHARDCOURSE &rYou have reached the end. However, we have reason to believe you are &4cheating&f. If you are not, please contact a staff member to verify your progress."));
                     }
                 }
                 if (season == 2 && checkpointNumber == 365.0) {
                     if (previousLevel >= 363.0) {
                         handleSeasonComplete(p, 3, "2");
                     } else {
-                        p.sendMessage(Colorize("&c&lHARDCOURSE &fYou have reached the end. However, we have reason to believe you are &4cheating&f. If you are not, please contact a staff member to verify your progress."));
+                        p.sendMessage(Colorize("&c&lHARDCOURSE &rYou have reached the end. However, we have reason to believe you are &4cheating&f. If you are not, please contact a staff member to verify your progress."));
                     }
                 }
                 if (season == 3 && checkpointNumber == 240.0) {
@@ -119,7 +119,7 @@ public class onWalk implements Listener {
                         p.sendMessage(Colorize("&aCongratulations! You have completed Season 3! There is currently no Season 4, so you have reached the end of the Hardcourse for now."));
                         getServer().dispatchCommand(Bukkit.getConsoleSender(), "lp user " + p.getName() + " parent add winner");
                     } else if (!p.hasPermission("hardcourse.staff")) {
-                        p.sendMessage(Colorize("&c&lHARDCOURSE &fYou have reached the end. However, we have reason to believe you are &4cheating&f. If you are not, please contact a staff member to verify your progress."));
+                        p.sendMessage(Colorize("&c&lHARDCOURSE &rYou have reached the end. However, we have reason to believe you are &4cheating&f. If you are not, please contact a staff member to verify your progress."));
                     }
                 }
             }

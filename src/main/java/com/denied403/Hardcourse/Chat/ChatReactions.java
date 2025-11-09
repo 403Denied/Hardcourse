@@ -18,8 +18,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Random;
 
-import static com.denied403.Hardcourse.Hardcourse.isDev;
-import static com.denied403.Hardcourse.Hardcourse.isUnscrambleEnabled;
+import static com.denied403.Hardcourse.Hardcourse.*;
 import static com.denied403.Hardcourse.Utils.ColorUtil.Colorize;
 import static com.denied403.Hardcourse.Utils.ColorUtil.stripAllColors;
 
@@ -55,9 +54,24 @@ public class ChatReactions implements Listener {
         return words.get(random.nextInt(words.size()));
     }
 
+    public static String randomizeCapitalization(String word) {
+        StringBuilder randomized = new StringBuilder();
+        for (char c : word.toCharArray()) {
+            if (random.nextBoolean()) {
+                randomized.append(Character.toUpperCase(c));
+            } else {
+                randomized.append(Character.toLowerCase(c));
+            }
+        }
+        return randomized.toString();
+    }
+
     public static void runGame(String word) {
         if(!gameActive) {
             currentWord = word;
+            if(DiabolicalUnscrambles) {
+                currentWord = randomizeCapitalization(currentWord);
+            }
             String scrambledWord = Shuffler.shuffleWord(currentWord);
             Bukkit.broadcast(Colorize("&c&lHARDCOURSE&r <hover:show_text:'" + scrambledWord + "'>Hover here for a word to unscramble."));
             Bukkit.getConsoleSender().sendMessage(Colorize("&c&lHARDCOURSE &r&cUnscramble: &f" + scrambledWord + " &c(" + currentWord + ")"));
@@ -79,19 +93,20 @@ public class ChatReactions implements Listener {
     @EventHandler
     public void onPlayerChat(AsyncChatEvent event) {
         String message = LegacyComponentSerializer.legacySection().serialize(event.message());
-        if (gameActive && message.equalsIgnoreCase(currentWord)) {
-            Player p = event.getPlayer();
-            if(isDev()) {
-                int points = 5 + random.nextInt(11);
-                PointsManager pointsManager = ((Hardcourse) plugin).getPointsManager();
-                pointsManager.addPoints(p.getUniqueId(), points);
-                Bukkit.broadcast(Colorize("&c&lHARDCOURSE &r&c" + stripAllColors(p.getName()) + "&r successfully unscrambled the word and earned &c" + points + "&f points! It was &c" + currentWord));
-            } else {
-                Bukkit.broadcast(Colorize("&c&lHARDCOURSE &r&c" + stripAllColors(p.getName()) + "&r sucessfully unscrambled the word! It was &c" + currentWord));
+        if (gameActive) {
+            if ((!DiabolicalUnscrambles && message.equalsIgnoreCase(currentWord)) || (DiabolicalUnscrambles && message.equals(currentWord))) {
+                Player p = event.getPlayer();
+                if (isDev()) {
+                    int points = 5 + random.nextInt(11);
+                    PointsManager pointsManager = ((Hardcourse) plugin).getPointsManager();
+                    pointsManager.addPoints(p.getUniqueId(), points);
+                    Bukkit.broadcast(Colorize("&c&lHARDCOURSE &r&c" + stripAllColors(p.getName()) + "&r successfully unscrambled the word and earned &c" + points + "&f points! It was &c" + currentWord));
+                } else {
+                    Bukkit.broadcast(Colorize("&c&lHARDCOURSE &r&c" + stripAllColors(p.getName()) + "&r successfully unscrambled the word! It was &c" + currentWord));
+                }
+                event.setCancelled(true);
+                gameActive = false;
             }
-
-            event.setCancelled(true);
-            gameActive = false;
         }
     }
 

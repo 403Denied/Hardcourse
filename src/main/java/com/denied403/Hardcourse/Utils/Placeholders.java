@@ -8,7 +8,7 @@ import static com.denied403.Hardcourse.Points.PointsManager.getPoints;
 
 public class Placeholders extends PlaceholderExpansion {
     private static CheckpointDatabase database;
-    public static void initalize(CheckpointDatabase db) {database = db;}
+    public static void initialize(CheckpointDatabase db) {database = db;}
     @Override
     public @NotNull String getIdentifier() {return "hardcourse";}
     @Override

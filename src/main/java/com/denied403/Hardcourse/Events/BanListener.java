@@ -17,6 +17,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static com.denied403.Hardcourse.Discord.HardcourseDiscord.*;
 import static com.denied403.Hardcourse.Hardcourse.isDiscordEnabled;
@@ -30,7 +31,7 @@ public class BanListener implements Listener {
     }
 
     public static void runBanCleanup(String playerName) {
-        MessageChannel channel = jda.getTextChannelById(plugin.getConfig().getString("Anticheat-Channel-Id"));
+        MessageChannel channel = jda.getTextChannelById(Objects.requireNonNull(plugin.getConfig().getString("Anticheat-Channel-Id")));
         if (channel == null) return;
 
         channel.getHistory().retrievePast(100).queue(messages -> {
@@ -61,7 +62,7 @@ public class BanListener implements Listener {
             if(reason.equalsIgnoreCase("Unfair Advantage")) {
                 if(!(event.getStaff().equals("CONSOLE"))) {
                     if (Bukkit.getOfflinePlayer(event.getTargetUUID()).getStatistic(Statistic.PLAY_ONE_MINUTE) >= 72000) {
-                        getServer().getPlayer(event.getStaff()).sendMessage(Colorize("&c&lHARDCOURSE &rThis player has more than 1 hour of playtime. Remember to provide evidence in &c#punishment-proof&f."));
+                        Objects.requireNonNull(getServer().getPlayer(event.getStaff())).sendMessage(Colorize("&c&lHARDCOURSE &rThis player has more than 1 hour of playtime. Remember to provide evidence in &c#punishment-proof&f."));
                     }
                 }
                 if(isDiscordEnabled()) {
