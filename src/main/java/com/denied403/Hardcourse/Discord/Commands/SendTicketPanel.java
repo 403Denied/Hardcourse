@@ -1,4 +1,4 @@
-package com.denied403.Hardcourse.Discord.Tickets;
+package com.denied403.Hardcourse.Discord.Commands;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -24,17 +24,15 @@ public class SendTicketPanel {
         TextChannel targetChannel = e.getOption("channel").getAsChannel().asTextChannel();
 
         EmbedBuilder embed = new EmbedBuilder();
-        embed.setTitle("🎫 Open a Ticket");
-        embed.setDescription("Please select the reason for your ticket:");
+        embed.setTitle("Apply For Staff");
+        embed.setDescription("Do you want to contribute to the server through your amazing skills? Well lucky for you, applications are **open**! Click the button below to begin your application.");
         embed.setColor(Color.BLUE);
         embed.setThumbnail(guild.getIconUrl());
 
-        Button application = Button.success("ticket:application", "Application").withEmoji(Emoji.fromUnicode("🛡️"));
-        Button appeal = Button.primary("ticket:appeal", "Appeal").withEmoji(Emoji.fromUnicode("❓"));
-        Button general = Button.secondary("ticket:general", "Support Ticket").withEmoji(Emoji.fromUnicode("🎟️"));
+        Button application = Button.success("ticket:application", "Apply Now").withEmoji(Emoji.fromUnicode("🛡️"));
 
         targetChannel.sendMessageEmbeds(embed.build())
-                .addActionRow(application, appeal, general)
+                .addActionRow(application)
                 .queue(
                         success -> e.reply("✅ Ticket panel sent to " + targetChannel.getAsMention()).setEphemeral(true).queue(),
                         failure -> e.reply("❌ Failed to send ticket panel.").setEphemeral(true).queue()

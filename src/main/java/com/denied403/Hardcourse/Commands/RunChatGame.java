@@ -17,7 +17,7 @@ public class RunChatGame {
         return Commands.literal(commandName)
                 .requires(source -> {
                     CommandSender sender = source.getSender();
-                    return !(sender instanceof Player player) || player.isOp(); // OP or console
+                    return !(sender instanceof Player player) || player.isOp();
                 })
                 .then(Commands.argument("phrase", StringArgumentType.greedyString())
                         .executes(ctx -> {

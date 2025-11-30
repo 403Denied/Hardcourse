@@ -1,10 +1,10 @@
 package com.denied403.Hardcourse.Discord;
 
 import com.denied403.Hardcourse.Discord.Commands.CommandManager;
-import com.denied403.Hardcourse.Discord.Tickets.ApplicationButtonListener;
-import com.denied403.Hardcourse.Discord.Tickets.ApplicationMessageListener;
-import com.denied403.Hardcourse.Discord.Tickets.ModalListener;
-import com.denied403.Hardcourse.Discord.Tickets.TicketButtonListener;
+import com.denied403.Hardcourse.Discord.Tickets.Applications.ApplicationButtonListener;
+import com.denied403.Hardcourse.Discord.Tickets.Applications.ApplicationMessageListener;
+import com.denied403.Hardcourse.Discord.Tickets.PanelButtonListener;
+import com.denied403.Hardcourse.Events.BanListener;
 import com.denied403.Hardcourse.Hardcourse;
 import com.denied403.Hardcourse.Utils.CheckpointDatabase;
 import net.dv8tion.jda.api.JDA;
@@ -53,7 +53,6 @@ public class HardcourseDiscord {
         database = db;
     }
 
-
     public void InitJDA() {
         if(isDiscordEnabled()) {
             String discordToken = plugin.getConfig().getString("DISCORD_TOKEN");
@@ -76,13 +75,13 @@ public class HardcourseDiscord {
                         .addEventListeners(
                                 new DiscordListener(),
                                 new CommandManager((Hardcourse) plugin),
-                                new DiscordButtonListener((Hardcourse) plugin),
-                                new TicketButtonListener((Hardcourse) plugin),
+                                new DiscordButtonListener(),
+                                new PanelButtonListener((Hardcourse) plugin),
                                 new ApplicationMessageListener((Hardcourse) plugin),
                                 new ApplicationButtonListener((Hardcourse) plugin),
-                                new ModalListener()
-                        )
-                        .build().awaitReady();
+                                new BanListener()
+
+                        ).build().awaitReady();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

@@ -15,30 +15,128 @@ public class CheckpointDatabase {
 
     public CheckpointDatabase(Plugin plugin) {
         this.plugin = plugin;
-        createCheckpointTable();
+        try {
+            createCheckpointTableAndMigrateIfNeeded();
+        } catch (SQLException e) {
+            Bukkit.getLogger().severe("[HARDCOURSE] Failed to initialize checkpoint DB: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
+
+    /* ----------------------------
+       CONNECTION
+       ---------------------------- */
     public Connection getConnection() throws SQLException {
         File dbFile = new File(plugin.getDataFolder(), "data.db");
         dbFile.getParentFile().mkdirs();
         return DriverManager.getConnection("jdbc:sqlite:" + dbFile);
     }
-    private void createCheckpointTable() {
-        String sql = """
-            CREATE TABLE IF NOT EXISTS checkpoints (
-                uuid TEXT PRIMARY KEY NOT NULL,
-                season INTEGER NOT NULL,
-                level REAL NOT NULL,
-                points INTEGER NOT NULL
-            )
-        """;
-        try (Connection conn = getConnection(); Statement stmt = conn.createStatement()){
-            stmt.executeUpdate(sql);
-        } catch (SQLException e) {
-            Bukkit.getLogger().severe("Failed to create data table:");
-            e.printStackTrace();
+
+    /* ----------------------------
+       SCHEMA CREATION + MIGRATION
+       ---------------------------- */
+    private void createCheckpointTableAndMigrateIfNeeded() throws SQLException {
+        try (Connection conn = getConnection(); Statement stmt = conn.createStatement()) {
+            // If table does not exist, create it with correct schema (including defaults)
+            if (!tableExists(conn, "checkpoints")) {
+                stmt.executeUpdate("""
+                    CREATE TABLE IF NOT EXISTS checkpoints (
+                        uuid TEXT PRIMARY KEY NOT NULL,
+                        season INTEGER NOT NULL DEFAULT 0,
+                        level REAL NOT NULL DEFAULT 0,
+                        points INTEGER NOT NULL DEFAULT 0,
+                        discord TEXT
+                    )
+                """);
+                Bukkit.getLogger().info("[HARDCOURSE] Created checkpoints table.");
+                return;
+            }
+
+            // If table exists, check columns
+            boolean hasDiscord = false;
+            boolean seasonHasDefault = false;
+            boolean levelHasDefault = false;
+            boolean pointsHasDefault = false;
+
+            try (ResultSet rs = stmt.executeQuery("PRAGMA table_info(checkpoints)")) {
+                while (rs.next()) {
+                    String name = rs.getString("name");
+                    String dflt_value = rs.getString("dflt_value"); // may be null
+                    if ("discord".equalsIgnoreCase(name)) hasDiscord = true;
+                    if ("season".equalsIgnoreCase(name) && dflt_value != null) seasonHasDefault = true;
+                    if ("level".equalsIgnoreCase(name) && dflt_value != null) levelHasDefault = true;
+                    if ("points".equalsIgnoreCase(name) && dflt_value != null) pointsHasDefault = true;
+                }
+            }
+
+            // Add discord column if missing
+            if (!hasDiscord) {
+                Bukkit.getLogger().info("[HARDCOURSE] Adding missing 'discord' column to checkpoints table...");
+                stmt.executeUpdate("ALTER TABLE checkpoints ADD COLUMN discord TEXT");
+                Bukkit.getLogger().info("[HARDCOURSE] 'discord' column added.");
+            }
+
+            // If any of season/level/points don't have defaults, rebuild table with defaults to avoid NOT NULL insert failures
+            if (!seasonHasDefault || !levelHasDefault || !pointsHasDefault) {
+                Bukkit.getLogger().info("[HARDCOURSE] Ensuring NOT NULL DEFAULTs for season/level/points...");
+                rebuildTableWithDefaults(conn);
+                Bukkit.getLogger().info("[HARDCOURSE] Migration to add defaults complete.");
+            }
         }
     }
 
+    private boolean tableExists(Connection conn, String tableName) throws SQLException {
+        try (PreparedStatement ps = conn.prepareStatement(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name = ?")) {
+            ps.setString(1, tableName);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
+
+    private void rebuildTableWithDefaults(Connection conn) throws SQLException {
+        // This rebuild preserves existing data and sets defaults for missing values.
+        // We do it in a single transaction to be safe.
+        conn.setAutoCommit(false);
+        try (Statement stmt = conn.createStatement()) {
+            stmt.executeUpdate("ALTER TABLE checkpoints RENAME TO checkpoints_old");
+
+            stmt.executeUpdate("""
+                    CREATE TABLE checkpoints (
+                        uuid TEXT PRIMARY KEY NOT NULL,
+                        season INTEGER NOT NULL DEFAULT 0,
+                        level REAL NOT NULL DEFAULT 0,
+                        points INTEGER NOT NULL DEFAULT 0,
+                        discord TEXT
+                    )
+                """);
+
+            // Copy data, using COALESCE to provide defaults if old values were NULL or missing
+            stmt.executeUpdate("""
+                INSERT INTO checkpoints (uuid, season, level, points, discord)
+                SELECT
+                    uuid,
+                    COALESCE(season, 0),
+                    COALESCE(level, 0),
+                    COALESCE(points, 0),
+                    discord
+                FROM checkpoints_old
+            """);
+
+            stmt.executeUpdate("DROP TABLE checkpoints_old");
+            conn.commit();
+        } catch (SQLException e) {
+            conn.rollback();
+            throw e;
+        } finally {
+            conn.setAutoCommit(true);
+        }
+    }
+
+    /* ----------------------------
+       CORE CHECKPOINT DATA (does NOT touch discord)
+       ---------------------------- */
     public void setCheckpointData(UUID uuid, int season, double level, int points) {
         String sql = """
             INSERT INTO checkpoints (uuid, season, level, points)
@@ -56,179 +154,185 @@ public class CheckpointDatabase {
             ps.setInt(4, points);
             ps.executeUpdate();
         } catch (SQLException e) {
-            plugin.getLogger().severe("Failed to save checkpoint data: " + e.getMessage());
+            plugin.getLogger().severe("[HARDCOURSE] Failed to save checkpoint data: " + e.getMessage());
         }
     }
 
     public CheckpointData getCheckpointData(UUID uuid) {
-        String sql = "SELECT season, level, points FROM checkpoints WHERE uuid = ?";
-        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)){
+        String sql = "SELECT season, level, points, discord FROM checkpoints WHERE uuid = ?";
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, uuid.toString());
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     int season = rs.getInt("season");
-                    int level = rs.getInt("level");
+                    double level = rs.getDouble("level");
                     int points = rs.getInt("points");
-                    return new CheckpointData(uuid, season, level, points);
+                    String discord = rs.getString("discord"); // returns null if column is NULL
+                    return new CheckpointData(uuid, season, level, points, discord);
                 }
             }
         } catch (SQLException e) {
             plugin.getLogger().severe("Failed to load checkpoint data: " + e.getMessage());
         }
-
         return null;
     }
+
     public Integer getSeason(UUID uuid) {
-        Integer season = getSingleIntField(uuid, "season");
-        if(!(season == null)) {
-            return getSingleIntField(uuid, "season");
-        } else {
-            return null;
-        }
+        CheckpointData d = getCheckpointData(uuid);
+        return (d != null) ? d.season() : 0;
     }
 
     public Double getLevel(UUID uuid) {
-        Double level = getSingleDouble(uuid, "level");
-        if(!(level == null)) {
-            return level;
-        } else {
-            return null;
-        }
+        CheckpointData d = getCheckpointData(uuid);
+        return (d != null) ? d.level() : 0.0;
     }
 
     public Integer getPoints(UUID uuid) {
-        Integer points = getSingleIntField(uuid, "points");
-        if(!(points == null)) {
-            return points;
-        } else {
-            setPoints(uuid, 0);
-            return 0;
+        CheckpointData d = getCheckpointData(uuid);
+        return (d != null) ? d.points() : 0;
+    }
+
+    public void setSeason(UUID uuid, int season) {
+        int curSeason = getSeason(uuid);
+        double curLevel = getLevel(uuid);
+        int curPoints = getPoints(uuid);
+        setCheckpointData(uuid, season, curLevel, curPoints);
+    }
+
+    public void setLevel(UUID uuid, double level) {
+        int curSeason = getSeason(uuid);
+        double curLevel = getLevel(uuid);
+        int curPoints = getPoints(uuid);
+        setCheckpointData(uuid, curSeason, level, curPoints);
+    }
+
+    public void setPoints(UUID uuid, int points) {
+        int curSeason = getSeason(uuid);
+        double curLevel = getLevel(uuid);
+        setCheckpointData(uuid, curSeason, curLevel, points);
+    }
+
+    public void linkDiscord(UUID uuid, String discordId) {
+        String sql = """
+            INSERT INTO checkpoints (uuid, season, level, points, discord)
+            VALUES (?, 0, 0, 0, ?)
+            ON CONFLICT(uuid) DO UPDATE SET discord = excluded.discord
+        """;
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, uuid.toString());
+            ps.setString(2, discordId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            plugin.getLogger().severe("[HARDCOURSE] Failed to link Discord: " + e.getMessage());
         }
     }
-    private Integer getSingleIntField(UUID uuid, String fieldName) {
-        String sql = "SELECT " + fieldName + " FROM checkpoints WHERE uuid = ?";
+
+    public void unlinkDiscord(UUID uuid) {
+        String sql = "UPDATE checkpoints SET discord = NULL WHERE uuid = ?";
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, uuid.toString());
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            plugin.getLogger().severe("[HARDCOURSE] Failed to unlink Discord: " + e.getMessage());
+        }
+    }
+
+    public String getDiscordId(UUID uuid) {
+        String sql = "SELECT discord FROM checkpoints WHERE uuid = ?";
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, uuid.toString());
             try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(fieldName);
-                }
+                if (rs.next()) return rs.getString("discord");
             }
         } catch (SQLException e) {
-            plugin.getLogger().severe("Failed to get " + fieldName + " for " + uuid + ": " + e.getMessage());
+            plugin.getLogger().severe("[HARDCOURSE] Failed to get Discord ID: " + e.getMessage());
         }
         return null;
     }
-    private Double getSingleDouble(UUID uuid, String fieldName) {
-        String sql = "SELECT " + fieldName + " FROM checkpoints WHERE uuid = ?";
-        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, uuid.toString());
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getDouble(fieldName);
-                }
-            }
-        } catch (SQLException e) {
-            plugin.getLogger().severe("Failed to get " + fieldName + " for " + uuid + ": " + e.getMessage());
-        }
-        return null;
-    }
-    public void setSeason(UUID uuid, Integer season) {
-        upsertField(uuid, "season", season, null);
+
+    public boolean isLinked(UUID uuid) {
+        String id = getDiscordId(uuid);
+        return id != null && !id.isEmpty();
     }
 
-    public void setLevel(UUID uuid, Double level) {
-        upsertField(uuid, "level", null, level);
-    }
-
-    public void setPoints(UUID uuid, Integer points) {
-        upsertField(uuid, "points", points, null);
-    }
-    private void upsertField(UUID uuid, String field, Integer value, Double value2) {
-        CheckpointData current = getCheckpointData(uuid);
-
-        int season = (current != null) ? current.season() : 0;
-        double level = (current != null) ? current.level() : 0;
-        int points = (current != null) ? current.points() : 0;
-
-        switch (field) {
-            case "season" -> season = value;
-            case "level" -> level = value2;
-            case "points" -> points = value;
-            default -> throw new IllegalArgumentException("Invalid field: " + field);
-        }
-        setCheckpointData(uuid, season, level, points);
-    }
     public void deleteAll() {
         String sql = "DELETE FROM checkpoints";
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.executeUpdate();
         } catch (SQLException e) {
+            plugin.getLogger().severe("[HARDCOURSE] Failed to delete all checkpoints: " + e.getMessage());
         }
     }
+
     public void deleteSpecific(UUID uuid) {
         String sql = "DELETE FROM checkpoints WHERE uuid = ?";
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, uuid.toString());
             ps.executeUpdate();
         } catch (SQLException e) {
+            plugin.getLogger().severe("[HARDCOURSE] Failed to delete checkpoint for " + uuid + ": " + e.getMessage());
         }
     }
 
     public List<CheckpointData> getAllSortedBySeasonLevel() {
         List<CheckpointData> list = new ArrayList<>();
-        String sql = "SELECT uuid, season, level, points FROM checkpoints ORDER BY season DESC, level DESC";
+        String sql = "SELECT uuid, season, level, points, discord FROM checkpoints ORDER BY season DESC, level DESC";
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                UUID uuid = UUID.fromString(rs.getString("uuid"));
-                int season = rs.getInt("season");
-                double level = rs.getDouble("level");
-                int points = rs.getInt("points");
-                list.add(new CheckpointData(uuid, season, level, points));
+                list.add(new CheckpointData(
+                        UUID.fromString(rs.getString("uuid")),
+                        rs.getInt("season"),
+                        rs.getDouble("level"),
+                        rs.getInt("points"),
+                        rs.getString("discord")
+                ));
             }
-
         } catch (SQLException e) {
-            plugin.getLogger().severe("Failed to fetch sorted checkpoint data: " + e.getMessage());
+            plugin.getLogger().severe("[HARDCOURSE] Failed to fetch sorted checkpoint data: " + e.getMessage());
         }
         return list;
     }
+
     public List<CheckpointData> getAllSortedByPoints() {
         List<CheckpointData> list = new ArrayList<>();
-        String sql = "SELECT uuid, season, level, points FROM checkpoints ORDER BY points DESC";
-
+        String sql = "SELECT uuid, season, level, points, discord FROM checkpoints ORDER BY points DESC";
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                UUID uuid = UUID.fromString(rs.getString("uuid"));
-                int season = rs.getInt("season");
-                double level = rs.getDouble("level");
-                int points = rs.getInt("points");
-                list.add(new CheckpointData(uuid, season, level, points));
+                list.add(new CheckpointData(
+                        UUID.fromString(rs.getString("uuid")),
+                        rs.getInt("season"),
+                        rs.getDouble("level"),
+                        rs.getInt("points"),
+                        rs.getString("discord")
+                ));
             }
-
         } catch (SQLException e) {
-            plugin.getLogger().severe("Failed to fetch sorted points data: " + e.getMessage());
+            plugin.getLogger().severe("[HARDCOURSE] Failed to fetch sorted points data: " + e.getMessage());
         }
-
         return list;
     }
-    public boolean hasData(UUID uuid) {
-        String sql = "SELECT 1 FROM checkpoints WHERE uuid = ? LIMIT 1";
-        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, uuid.toString());
-            try (ResultSet rs = ps.executeQuery()) {
-                return rs.next();
-            }
-        } catch (SQLException e) {
-            plugin.getLogger().severe("Failed to check data existence for " + uuid + ": " + e.getMessage());
-            return false;
-        }
-    }
+    public String getUUIDFromDiscord(String discordId) {
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "SELECT uuid FROM checkpoints WHERE discord = ?")) {
 
-    public record CheckpointData(UUID uuid, int season, double level, int points) {}
+            stmt.setString(1, discordId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                return rs.getString("uuid");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    public record CheckpointData(UUID uuid, int season, double level, int points, String discord) {}
 }

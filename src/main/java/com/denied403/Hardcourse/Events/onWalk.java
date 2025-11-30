@@ -68,13 +68,26 @@ public class onWalk implements Listener {
             if (checkpointNumber > previousLevel) {
                 if (checkpointNumber > previousLevel + 10 && !plugin.isSkipExempted((int) previousLevel, (int) checkpointNumber) && !p.hasPermission("hardcourse.staff")) {
                     if (isDiscordEnabled()) {
-                        sendMessage(p, null, "hacks",
-                                Double.toString(previousLevel).replace(".0", ""),
-                                Double.toString(checkpointNumber).replace(".0", ""));
+                        if(playerSeason > 1) {
+                            sendMessage(p, null, "hacks",
+                                    playerSeason + "-" + Double.toString(previousLevel).replace(".0", ""),
+                                    playerSeason + "-" + Double.toString(checkpointNumber).replace(".0", ""));
+                        }
+                        else {
+                            sendMessage(p, null, "hacks",
+                                    Double.toString(previousLevel).replace(".0", ""),
+                                    Double.toString(checkpointNumber).replace(".0", ""));
+                        }
                     }
-                    Bukkit.broadcast(Colorize("&c&lHARDCOURSE&r &c" + p.getName() + " &fskipped from level &c" +
-                            Double.toString(previousLevel).replace(".0", "") + " &fto level &c" +
-                            Double.toString(checkpointNumber).replace(".0", "") + "&f!"), "hardcourse.staff");
+                    if(playerSeason > 1) {
+                        Bukkit.broadcast(Colorize("&c&lHARDCOURSE&r &c" + p.getName() + " &fskipped from level &c" + playerSeason + "-" +
+                                Double.toString(previousLevel).replace(".0", "") + " &fto level &c" + playerSeason + "-" +
+                                Double.toString(checkpointNumber).replace(".0", "") + "&f!"), "hardcourse.staff");
+                    } else {
+                        Bukkit.broadcast(Colorize("&c&lHARDCOURSE&r &c" + p.getName() + " &fskipped from level &c" +
+                                Double.toString(previousLevel).replace(".0", "") + " &fto level &c" +
+                                Double.toString(checkpointNumber).replace(".0", "") + "&f!"), "hardcourse.staff");
+                    }
                 }
                 if (!p.hasPermission("hardcourse.staff") && checkpointNumber > previousLevel + 1) {
                     if (!plugin.isSkipExempted((int) previousLevel, (int) checkpointNumber)) {

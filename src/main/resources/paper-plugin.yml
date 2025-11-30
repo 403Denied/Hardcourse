@@ -15,5 +15,8 @@ dependencies:
     PlaceholderAPI:
       load: BEFORE
       required: true
+    LuckPerms:
+      load: BEFORE
+      required: true
 description: "Hardcourse plugin for managing player checkpoints and commands."
 prefix: "HARDCOURSE"

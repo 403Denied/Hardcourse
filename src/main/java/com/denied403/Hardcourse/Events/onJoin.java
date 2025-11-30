@@ -53,7 +53,7 @@ public class onJoin implements Listener {
             }
             File file = new File(plugin.getDataFolder(), "checkpoints.yml");
             if (!file.exists()) {
-                Bukkit.getLogger().severe("Checkpoints file not found! Please ensure the file exists in the plugin data folder.");
+                return;
             }
             FileConfiguration config = YamlConfiguration.loadConfiguration(file);
             if(config.getKeys(false).contains(player.getUniqueId().toString())) {

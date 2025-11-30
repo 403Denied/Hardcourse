@@ -4,7 +4,9 @@ import com.denied403.Hardcourse.Commands.*;
 import com.denied403.Hardcourse.Commands.Trails.EndTrail;
 import com.denied403.Hardcourse.Commands.Trails.OminousTrail;
 import com.denied403.Hardcourse.Discord.*;
+import com.denied403.Hardcourse.Discord.Commands.DiscordLink;
 import com.denied403.Hardcourse.Discord.Commands.Info;
+import com.denied403.Hardcourse.Discord.Commands.Punish;
 import com.denied403.Hardcourse.Events.*;
 import com.denied403.Hardcourse.Chat.*;
 import com.denied403.Hardcourse.Points.*;
@@ -37,6 +39,7 @@ public final class Hardcourse extends JavaPlugin implements Listener {
     public void onEnable() {
         plugin = this;
         CheckpointDatabase checkpointDatabase = new CheckpointDatabase(this);
+        LinkManager linkManager = new LinkManager();
         loadConfigValues(this);
 
         if(isDev) {
@@ -48,11 +51,9 @@ public final class Hardcourse extends JavaPlugin implements Listener {
         }
         onWalk.initalize(checkpointDatabase);
         CheckpointCommand.initialize(checkpointDatabase);
-        HardcourseDiscord.initialize(checkpointDatabase);
         onChat.initialize(checkpointDatabase);
         onJoin.initialize(checkpointDatabase);
         onQuit.initialize(checkpointDatabase);
-        Info.initialize(checkpointDatabase);
         onSneak.initialize(checkpointDatabase);
         Placeholders.initialize(checkpointDatabase);
 
@@ -66,11 +67,20 @@ public final class Hardcourse extends JavaPlugin implements Listener {
             } catch (Exception e) {
                 getLogger().severe("Failed to initialize Discord bot: " + e.getMessage());
             }
+            LinkManager.initialize(checkpointDatabase);
+            Link.initialize(linkManager, checkpointDatabase);
+            Unlink.initialize(linkManager, checkpointDatabase, jda);
+            DiscordLink.initalize(linkManager, checkpointDatabase);
+            DiscordListener.initialize(checkpointDatabase);
+            HardcourseDiscord.initialize(checkpointDatabase);
+            Info.initialize(checkpointDatabase);
+            Punish.initialize(checkpointDatabase);
+            BanListener.initialize(checkpointDatabase);
+            DiscordButtonListener.initialize(checkpointDatabase);
             sendMessage(null, null, "starting", null, null);
         }
 
         saveDefaultConfig();
-
         pointsManager = new PointsManager();
 
         getServer().getPluginManager().registerEvents(new ChatReactions(this), this);
@@ -81,7 +91,7 @@ public final class Hardcourse extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new onChat(), this);
         getServer().getPluginManager().registerEvents(new onHunger(), this);
         getServer().getPluginManager().registerEvents(this, this);
-        getServer().getPluginManager().registerEvents(new BanListener(this), this);
+        getServer().getPluginManager().registerEvents(new BanListener(), this);
         getServer().getPluginManager().registerEvents(new onQuit(), this);
         getServer().getPluginManager().registerEvents(new onSneak(), this);
         if(isDev) {
@@ -94,7 +104,6 @@ public final class Hardcourse extends JavaPlugin implements Listener {
             getServer().getPluginManager().registerEvents(new TempCheckpoint(), this);
             getServer().getPluginManager().registerEvents(new JumpBoost(), this);
         }
-        getServer().getPluginManager().registerEvents(new GamemodeChange(), this);
         getServer().getPluginManager().registerEvents(new ReportListener(), this);
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, cmd -> {
             cmd.registrar().register(Clock.createCommand("clock"));
@@ -105,11 +114,16 @@ public final class Hardcourse extends JavaPlugin implements Listener {
             cmd.registrar().register(RunChatGame.createCommand("runchatgame"));
             cmd.registrar().register(RunChatGame.createCommand("rcg"));
             cmd.registrar().register(RestartForUpdate.createCommand(this, "restartforupdate"));
+            cmd.registrar().register(RestartForUpdate.createCommand(this, "restartforupdates"));
             cmd.registrar().register(ReloadHardcourse.createCommand(this, "reloadhardcourse"));
             cmd.registrar().register(ReloadHardcourse.createCommand(this, "hardcoursereload"));
             cmd.registrar().register(WinnerTP.createCommand("winnertp"));
             cmd.registrar().register(WinnerTP.createCommand("wtp"));
             cmd.registrar().register(ToggleDiabolicalUnscrambles.createCommand("togglediabolicalunscrambles"));
+            if(isDiscordEnabled()) {
+                cmd.registrar().register(Link.createCommand("link"));
+                cmd.registrar().register(Unlink.createCommand("unlink"));
+            }
             if(isDev) {
                 cmd.registrar().register(Clock.createCommand("shop"));
                 cmd.registrar().register(Points.createCommand(this, pointsManager, "points"));
@@ -132,8 +146,9 @@ public final class Hardcourse extends JavaPlugin implements Listener {
             @Override
             public void run() {
                 if(isUnscrambleEnabled()) {
-                    if(Bukkit.getOnlinePlayers().isEmpty()) return;
-                    ChatReactions.runGame(ChatReactions.getRandomWord());
+                    if(!Bukkit.getOnlinePlayers().isEmpty()) {
+                        ChatReactions.runGame(ChatReactions.getRandomWord());
+                    }
                 }
             }}.runTaskTimer(this, 0L, 20 * 60 * 4);
     }
