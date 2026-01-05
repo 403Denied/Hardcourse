@@ -7,12 +7,12 @@ import com.transfemme.dev.core403.Punishments.Api.CustomEvents.NameBanEvent;
 import com.transfemme.dev.core403.Punishments.Api.CustomEvents.PunishmentEvent;
 import com.transfemme.dev.core403.Punishments.Api.CustomEvents.RevertEvent;
 import com.transfemme.dev.core403.Punishments.Api.CustomEvents.PunishmentEditEvent;
+import com.transfemme.dev.core403.Punishments.Database.PunishmentDatabase;
 import com.transfemme.dev.core403.Punishments.Events.onChatEdit;
 import com.transfemme.dev.core403.Punishments.Utils.PunishmentDurationParser;
-import com.transfemme.dev.core403.Punishments.Enums.IPunishmentDuration;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -28,6 +28,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
 import java.awt.*;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -41,10 +42,15 @@ import static org.bukkit.Bukkit.getServer;
 
 public class BanListener extends ListenerAdapter implements Listener {
     private static CheckpointDatabase database;
-    public static void initialize(CheckpointDatabase db) {database = db;}
+    private static PunishmentDatabase punishmentDatabase;
+
+    public static void initialize(CheckpointDatabase db, PunishmentDatabase pDb) {
+        database = db;
+        punishmentDatabase = pDb;
+    }
 
     public static void runBanCleanup(String playerName) {
-        MessageChannel channel = jda.getTextChannelById(Objects.requireNonNull(plugin.getConfig().getString("Anticheat-Channel-Id")));
+        ThreadChannel channel = jda.getThreadChannelById(Objects.requireNonNull(plugin.getConfig().getString("Anticheat-Channel-Id")));
         if (channel == null) return;
 
         channel.getHistory().retrievePast(100).queue(messages -> {
@@ -90,9 +96,13 @@ public class BanListener extends ListenerAdapter implements Listener {
             if(event.getTypeOfPunishment().equalsIgnoreCase("banned")){punishment = "Ban";}
             if(event.getTypeOfPunishment().equalsIgnoreCase("muted")){punishment = "Mute";}
             if(event.getTypeOfPunishment().equalsIgnoreCase("warned")){punishment = "Warn";}
+            String durationString;
+            long durationMs = event.getDuration();
+            if(durationMs == -1){durationString = "Never";} else {durationString = "<t:" + (Instant.now().toEpochMilli() + durationMs) / 1000L + ":R>";}
+
             EmbedBuilder punishmentEmbed = new EmbedBuilder()
-                    .setTitle(punishment + " Issued")
-                    .setDescription("**ID:** " + event.getPunishmentId() + "\n**Staff:** " + event.getStaff() + "\n**Target:** " + playerName + "\n**Reason:** " + reason + "\n**Duration:** " + event.getDuration() + "\n**Note:** " + (event.getNotes() == null ? "None" : event.getNotes()))
+                    .setTitle(punishment + " Issued" + (isDev() ? " (Dev)" : ""))
+                    .setDescription("**ID:** " + event.getPunishmentId() + "\n**Staff:** `" + event.getStaff() + "`\n**Target:** `" + playerName + "`\n**Reason:** " + reason + "\n**Expires:** " + durationString + "\n**Note:** " + (event.getNotes() == null ? "None" : event.getNotes()))
                     .setThumbnail("https://mc-heads.net/avatar/" + event.getTargetUUID() + ".png")
                     .setColor(Color.RED);
             Button revert = Button.danger("punishment_revert:" + event.getPunishmentId(), "Revert");
@@ -121,6 +131,7 @@ public class BanListener extends ListenerAdapter implements Listener {
                 event.reply("❌ You do not have permission to do that!").setEphemeral(true).queue();
                 return;
             }
+            if (checkReverted(event, punishmentId)) return;
             Modal modal = Modal.create("confirm_revert:" + punishmentId, "Revert Punishment")
                     .addActionRow(
                             TextInput.create("reason", "Reason", TextInputStyle.PARAGRAPH)
@@ -139,6 +150,7 @@ public class BanListener extends ListenerAdapter implements Listener {
                 event.reply("❌ You do not have permission to do that!").setEphemeral(true).queue();
                 return;
             }
+            if (checkReverted(event, punishmentId)) return;
             Modal modal = Modal.create("add_note:" + punishmentId, "Add Note")
                     .addActionRow(
                             TextInput.create("note", "Note", TextInputStyle.PARAGRAPH)
@@ -156,6 +168,7 @@ public class BanListener extends ListenerAdapter implements Listener {
                 event.reply("❌ You do not have permission to do that!").setEphemeral(true).queue();
                 return;
             }
+            if (checkReverted(event, punishmentId)) return;
             Modal modal = Modal.create("modify:" + punishmentId, "Change Duration")
                     .addActionRow(
                             TextInput.create("duration", "Duration", TextInputStyle.SHORT)
@@ -171,13 +184,45 @@ public class BanListener extends ListenerAdapter implements Listener {
                     )
                     .build();
             event.replyModal(modal).queue();
-
         }
     }
+
+    private boolean checkReverted(ButtonInteractionEvent event, String punishmentId) {
+        if(punishmentDatabase.isReverted(punishmentId)){
+            event.deferEdit().queue();
+            event.getMessage().editMessageComponents(
+                    ActionRow.of(
+                            Button.danger("button:disabled", "Revert").asDisabled(),
+                            Button.primary("button:disabled1", "Add Note").asDisabled(),
+                            Button.success("button:disabled2", "Change Duration").asDisabled()
+                    )
+            ).queue();
+            event.getHook().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription("❌ This punishment has already been reverted!").build()).setEphemeral(true).queue();
+            return true;
+        }
+        return false;
+    }
+    private boolean checkRevertedModal(ModalInteractionEvent event, String punishmentId) {
+        event.getMessage().editMessageComponents(
+                ActionRow.of(
+                        Button.danger("button:disabled", "Revert").asDisabled(),
+                        Button.primary("button:disabled1", "Add Note").asDisabled(),
+                        Button.success("button:disabled2", "Change Duration").asDisabled()
+                )
+        ).queue();
+        if(punishmentDatabase.isReverted(punishmentId)){
+            event.deferEdit().queue();
+            event.getHook().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription("❌ This punishment has already been reverted!").build()).setEphemeral(true).queue();
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public void onModalInteraction(ModalInteractionEvent event){
         if(event.getModalId().startsWith("confirm_revert:")) {
             String punishmentId = event.getModalId().split(":")[1];
+            if (checkRevertedModal(event, punishmentId)) return;
             String note = event.getValue("reason").getAsString();
             String linkedUuidString = database.getUUIDFromDiscord(event.getMember().getId());
             UUID linkedUUID = UUID.fromString(linkedUuidString);
@@ -188,6 +233,7 @@ public class BanListener extends ListenerAdapter implements Listener {
         }
         if(event.getModalId().startsWith("add_note:")) {
             String punishmentId = event.getModalId().split(":")[1];
+            if (checkRevertedModal(event, punishmentId)) return;
             String note = event.getValue("note").getAsString();
             if(!Core403.getPunishmentDatabase().hasNotes(punishmentId)) {
                 Core403.getPunishmentDatabase().addNotes(punishmentId, note);
@@ -200,11 +246,12 @@ public class BanListener extends ListenerAdapter implements Listener {
         }
         if(event.getModalId().startsWith("modify:")) {
             String punishmentId = event.getModalId().split(":")[1];
+            if (checkRevertedModal(event, punishmentId)) return;
             String discordId = event.getMember().getId();
             UUID linkedUuid = UUID.fromString(database.getUUIDFromDiscord(discordId));
             String duration =  event.getValue("duration").getAsString();
             try {
-                IPunishmentDuration parsedDuration = PunishmentDurationParser.parse(duration);
+                PunishmentDurationParser.parse(duration);
             } catch (IllegalArgumentException e){
                 EmbedBuilder failureEmbed = new EmbedBuilder().setColor(Color.RED).setDescription("❌ Invalid duration: `" + duration + "`.");
                 event.replyEmbeds(failureEmbed.build()).setEphemeral(true).queue();
@@ -233,7 +280,7 @@ public class BanListener extends ListenerAdapter implements Listener {
         String staffName = event.getStaff();
         if(isDiscordEnabled()) {
             EmbedBuilder punishmentEmbed = new EmbedBuilder()
-                    .setTitle("Name Ban Issued")
+                    .setTitle("Name Ban Issued" + (isDev() ? " (Dev)" : ""))
                     .setDescription("**ID:** " + event.getPunishmentId() + "\n**Staff:** " + staffName + "\n**Target:** " + playerName)
                     .setThumbnail("https://mc-heads.net/avatar/" + event.getTargetUUID() + ".png")
                     .setColor(Color.RED);
@@ -246,7 +293,7 @@ public class BanListener extends ListenerAdapter implements Listener {
         String staffName = event.getStaff();
         if(isDiscordEnabled()) {
             EmbedBuilder punishmentEmbed = new EmbedBuilder()
-                    .setTitle("IP Ban Issued")
+                    .setTitle("IP Ban Issued" + (isDev() ? " (Dev)" : ""))
                     .setDescription("**ID:** " + event.getPunishmentId() + "\n**Staff:** " + staffName + "\n**Target:** " + playerName)
                     .setThumbnail("https://mc-heads.net/avatar/" + event.getTargetUUID() + ".png")
                     .setColor(Color.RED);

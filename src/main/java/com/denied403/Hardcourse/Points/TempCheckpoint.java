@@ -34,7 +34,6 @@ public class TempCheckpoint implements Listener {
 
         if (!isTemporaryCheckpointBook(itemInHand)) return;
 
-        // Get block directly beneath the player's feet
         Location belowPlayer = player.getLocation().subtract(0, 1, 0);
         Block blockBelow = belowPlayer.getBlock();
 

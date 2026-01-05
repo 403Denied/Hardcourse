@@ -49,7 +49,7 @@ public class WinnerTP {
         return Command.SINGLE_SUCCESS;
     }
 
-    private static CompletableFuture<Suggestions> onlinePlayerSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
+    public static CompletableFuture<Suggestions> onlinePlayerSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
         String input = builder.getRemaining().toLowerCase();
         for (Player online : Bukkit.getOnlinePlayers()) {
             if (online.getName().toLowerCase().startsWith(input)) {

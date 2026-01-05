@@ -1,16 +1,23 @@
 package com.denied403.Hardcourse.Discord.Commands;
 
+import com.denied403.Hardcourse.Hardcourse;
+import com.denied403.Hardcourse.Points.PointsManager;
 import com.denied403.Hardcourse.Utils.CheckpointDatabase;
 import com.denied403.Hardcourse.Utils.LinkManager;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.UserSnowflake;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
 import java.util.UUID;
 
+import static com.denied403.Hardcourse.Discord.HardcourseDiscord.jda;
 import static com.denied403.Hardcourse.Hardcourse.isDev;
 import static com.denied403.Hardcourse.Hardcourse.plugin;
 import static com.denied403.Hardcourse.Utils.ColorUtil.Colorize;
@@ -24,7 +31,6 @@ public class DiscordLink extends ListenerAdapter {
         database = db;
     }
     public static void run(SlashCommandInteractionEvent event){
-        String username = event.getOption("username").getAsString();
         String code =  event.getOption("code").getAsString();
         if(code.length() != 6 || !code.matches("\\d{6}")){
             event.reply("❌ Invalid code!").setEphemeral(true).queue();
@@ -54,6 +60,17 @@ public class DiscordLink extends ListenerAdapter {
             if(player.isOnline()){
                 player.sendMessage(Colorize("&c&lHARDCOURSE &rSuccessfully linked your Minecraft account to &c" + event.getUser().getName()));
             }
+            if(isDev()){
+                PointsManager pointsManager = plugin.getPointsManager();
+                pointsManager.addPoints(player.getUniqueId(), 500);
+            }
+            Bukkit.broadcast(Colorize("&c&lHARDCOURSE &r&c" + player.getName() + " &rjust linked their Discord account and gained access to the Minecraft <-> Discord chat" + (isDev() ? " and &c500&r points!" : "!")));
         });
+        ThreadChannel channel = jda.getThreadChannelById("1454205702032724079");
+        if (channel != null) {
+            final SimpleDateFormat f = new SimpleDateFormat("HH:mm:ss z");
+            f.setTimeZone(TimeZone.getTimeZone("UTC"));
+            channel.sendMessage("`[" + f.format(new Date()) + "] " + player.getName() + " linked to` <@" + event.getUser().getId() + ">").queue();
+        }
     }
 }

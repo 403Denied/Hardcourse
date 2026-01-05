@@ -7,12 +7,16 @@ import com.denied403.Hardcourse.Discord.*;
 import com.denied403.Hardcourse.Discord.Commands.DiscordLink;
 import com.denied403.Hardcourse.Discord.Commands.Info;
 import com.denied403.Hardcourse.Discord.Commands.Punish;
+import com.denied403.Hardcourse.Discord.Commands.Punishments;
+import com.denied403.Hardcourse.Discord.Tickets.PanelButtonListener;
 import com.denied403.Hardcourse.Events.*;
 import com.denied403.Hardcourse.Chat.*;
 import com.denied403.Hardcourse.Points.*;
 import com.denied403.Hardcourse.Utils.*;
 import com.denied403.Hardcourse.Utils.ColorUtil;
 
+import com.transfemme.dev.core403.Core403;
+import com.transfemme.dev.core403.Punishments.Database.PunishmentDatabase;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -38,7 +42,8 @@ public final class Hardcourse extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
         plugin = this;
-        CheckpointDatabase checkpointDatabase = new CheckpointDatabase(this);
+        CheckpointDatabase checkpointDatabase = new CheckpointDatabase();
+        PunishmentDatabase punishmentDatabase = Core403.getPunishmentDatabase();
         LinkManager linkManager = new LinkManager();
         loadConfigValues(this);
 
@@ -75,15 +80,17 @@ public final class Hardcourse extends JavaPlugin implements Listener {
             HardcourseDiscord.initialize(checkpointDatabase);
             Info.initialize(checkpointDatabase);
             Punish.initialize(checkpointDatabase);
-            BanListener.initialize(checkpointDatabase);
+            BanListener.initialize(checkpointDatabase, punishmentDatabase);
             DiscordButtonListener.initialize(checkpointDatabase);
+            PanelButtonListener.initialize(checkpointDatabase);
+            Punishments.initialize(checkpointDatabase, punishmentDatabase);
             sendMessage(null, null, "starting", null, null);
         }
 
         saveDefaultConfig();
         pointsManager = new PointsManager();
 
-        getServer().getPluginManager().registerEvents(new ChatReactions(this), this);
+        getServer().getPluginManager().registerEvents(new ChatReactions(), this);
         getServer().getPluginManager().registerEvents(new onJoin(), this);
         getServer().getPluginManager().registerEvents(new onDrop(), this);
         getServer().getPluginManager().registerEvents(new onClick(), this);
@@ -94,6 +101,8 @@ public final class Hardcourse extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new BanListener(), this);
         getServer().getPluginManager().registerEvents(new onQuit(), this);
         getServer().getPluginManager().registerEvents(new onSneak(), this);
+        getServer().getPluginManager().registerEvents(new onVanish(), this);
+        getServer().getPluginManager().registerEvents(new onDeath(), this);
         if(isDev) {
             getServer().getPluginManager().registerEvents(new OminousTrail(this), this);
             getServer().getPluginManager().registerEvents(new onPortalEnter(), this);
@@ -104,11 +113,12 @@ public final class Hardcourse extends JavaPlugin implements Listener {
             getServer().getPluginManager().registerEvents(new TempCheckpoint(), this);
             getServer().getPluginManager().registerEvents(new JumpBoost(), this);
         }
+        getServer().getPluginManager().registerEvents(new onCommand(), this);
         getServer().getPluginManager().registerEvents(new ReportListener(), this);
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, cmd -> {
             cmd.registrar().register(Clock.createCommand("clock"));
-            cmd.registrar().register(CheckpointCommand.createCommand(this, "checkpoint"));
-            cmd.registrar().register(CheckpointCommand.createCommand(this, "checkpoints"));
+            cmd.registrar().register(CheckpointCommand.createCommand("checkpoint"));
+            cmd.registrar().register(CheckpointCommand.createCommand("checkpoints"));
             cmd.registrar().register(EndChatGame.createCommand("endchatgame"));
             cmd.registrar().register(EndChatGame.createCommand("ecg"));
             cmd.registrar().register(RunChatGame.createCommand("runchatgame"));
@@ -120,14 +130,15 @@ public final class Hardcourse extends JavaPlugin implements Listener {
             cmd.registrar().register(WinnerTP.createCommand("winnertp"));
             cmd.registrar().register(WinnerTP.createCommand("wtp"));
             cmd.registrar().register(ToggleDiabolicalUnscrambles.createCommand("togglediabolicalunscrambles"));
+            cmd.registrar().register(Deaths.createCommand("deaths"));
             if(isDiscordEnabled()) {
                 cmd.registrar().register(Link.createCommand("link"));
                 cmd.registrar().register(Unlink.createCommand("unlink"));
             }
             if(isDev) {
                 cmd.registrar().register(Clock.createCommand("shop"));
-                cmd.registrar().register(Points.createCommand(this, pointsManager, "points"));
-                cmd.registrar().register(Points.createCommand(this, pointsManager, "pts"));
+                cmd.registrar().register(Points.createCommand(pointsManager, "points"));
+                cmd.registrar().register(Points.createCommand(pointsManager, "pts"));
                 cmd.registrar().register(EndTrail.createCommand("endtrail"));
                 cmd.registrar().register(OminousTrail.createCommand("ominoustrail"));
             }

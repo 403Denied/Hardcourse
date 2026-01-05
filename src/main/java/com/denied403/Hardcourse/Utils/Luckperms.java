@@ -33,4 +33,17 @@ public class Luckperms {
             return (prefix != null && !prefix.isEmpty()) ? prefix : null;
         });
     }
+    public static void removeRank(UUID uuid){
+        try {
+            LuckPerms lp = LuckPermsProvider.get();
+            User user = lp.getUserManager().getUser(uuid);
+            if (user == null) {
+                user = lp.getUserManager().loadUser(uuid).get();
+            }
+            user.data().clear();
+            lp.getUserManager().saveUser(user);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

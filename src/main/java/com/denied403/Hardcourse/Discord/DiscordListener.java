@@ -9,10 +9,12 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
 import java.util.UUID;
 
-import static com.denied403.Hardcourse.Discord.HardcourseDiscord.chatChannel;
-import static com.denied403.Hardcourse.Discord.HardcourseDiscord.staffChatChannel;
+import static com.denied403.Hardcourse.Discord.HardcourseDiscord.*;
 import static com.denied403.Hardcourse.Hardcourse.isDiscordEnabled;
 import static com.denied403.Hardcourse.Utils.ColorUtil.Colorize;
 import static com.denied403.Hardcourse.Utils.Luckperms.getLuckPermsPrefix;
@@ -52,15 +54,15 @@ public final class DiscordListener extends ListenerAdapter {
 
                 boolean hasPermission = hasLuckPermsPermission(linkedUUID, "hardcourse.jrmod");
 
-                broadcastMessage(displayName, discordMessage, staffChat, hasPermission);
+                broadcastMessage(mcName, displayName, discordMessage, staffChat, hasPermission);
             });
         } else {
             String displayName = getBestDiscordRoleColor(member) + member.getEffectiveName();
-            broadcastMessage(displayName, discordMessage, staffChat, false);
+            broadcastMessage(member.getEffectiveName(), displayName, discordMessage, staffChat, false);
         }
     }
 
-    private void broadcastMessage(String displayName, String message, boolean staffChat, boolean hasPermission) {
+    private void broadcastMessage(String name, String displayName, String message, boolean staffChat, boolean hasPermission) {
         String prefix = staffChat ? "&a&lSC &r" : "&a&lDC &r";
         String coloredMessage;
 
@@ -77,6 +79,9 @@ public final class DiscordListener extends ListenerAdapter {
             Bukkit.broadcast(finalMessage, "hardcourse.jrmod");
         } else {
             Bukkit.broadcast(finalMessage);
+            final SimpleDateFormat f = new SimpleDateFormat("HH:mm:ss z");
+            f.setTimeZone(TimeZone.getTimeZone("UTC"));
+            logsChannel.sendMessage("`[DISCORD] [" + f.format(new Date()) + "] " + name + ": " + message.replace("`", "'") + "`").queue();
         }
     }
 

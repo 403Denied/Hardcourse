@@ -26,7 +26,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.21.8-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
     implementation 'org.xerial:sqlite-jdbc:3.50.2.0'
     implementation("net.dv8tion:JDA:5.6.1") {
         exclude module: 'opus-java'
@@ -39,7 +39,7 @@ dependencies {
 
 tasks {
     runServer {
-        minecraftVersion("1.21.8")
+        minecraftVersion("1.21.11")
     }
 }
 

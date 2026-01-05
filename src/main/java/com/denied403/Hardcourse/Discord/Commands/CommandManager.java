@@ -39,6 +39,7 @@ public class CommandManager extends ListenerAdapter {
                 case "setuptickets" -> setupTicketsCommand.run(event);
                 case "link" -> DiscordLink.run(event);
                 case "punish" -> Punish.run(event);
+                case "puns" -> Punishments.run(event);
             }
         }
     }
@@ -50,8 +51,9 @@ public class CommandManager extends ListenerAdapter {
             commandData.add(Commands.slash("list", "Get a list of online players"));
             commandData.add(Commands.slash("info", "Get server or player info")
                     .addOptions(Info.infoType, Info.playerName));
+            commandData.add(Commands.slash("puns", "View a players punishments").addOption(OptionType.STRING, "username", "The username to check", true).setDefaultPermissions(DefaultMemberPermissions.DISABLED));
             commandData.add(Commands.slash("console", "Run a console command")
-                    .addOptions(Console.toRunCommandOption()));
+                    .addOption(OptionType.STRING, "command", "The command to run on the server console", true).setDefaultPermissions(DefaultMemberPermissions.DISABLED));
             commandData.add(Commands.slash("setuptickets", "Setup the ticket system")
                     .setDefaultPermissions(DefaultMemberPermissions.DISABLED)
                     .addOptions(SendTicketPanel.channel())
@@ -65,8 +67,10 @@ public class CommandManager extends ListenerAdapter {
 
 
             commandData.add(Commands.slash("punish", "Punish a user in-game")
+                    .setDefaultPermissions(DefaultMemberPermissions.DISABLED)
                     .addOption(OptionType.STRING, "player", "The name of the player", true)
                     .addOptions(punishments)
+                    .addOption(OptionType.BOOLEAN, "warn", "Warn the player if available", false)
                     .addOption(OptionType.STRING, "note", "The note for this punishment", false)
             );
             event.getGuild().updateCommands().addCommands(commandData).queue();
@@ -84,7 +88,6 @@ public class CommandManager extends ListenerAdapter {
                 .limit(25)
                 .map(r -> new Command.Choice(r, r))
                 .toList();
-
         event.replyChoices(choices).queue();
     }
 

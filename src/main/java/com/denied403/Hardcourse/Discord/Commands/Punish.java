@@ -1,12 +1,9 @@
 package com.denied403.Hardcourse.Discord.Commands;
 
 import com.denied403.Hardcourse.Utils.CheckpointDatabase;
-import com.transfemme.dev.core403.Core403;
-import com.transfemme.dev.core403.Punishments.Api.CustomEvents.PunishmentEvent;
 import com.transfemme.dev.core403.Punishments.Enums.PunishmentType;
 import com.transfemme.dev.core403.Punishments.PunishmentReason;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import com.transfemme.dev.core403.Punishments.Events.onConfirmClick;
 import org.bukkit.Bukkit;
@@ -15,7 +12,6 @@ import org.bukkit.OfflinePlayer;
 import java.awt.*;
 import java.util.UUID;
 
-import static com.denied403.Hardcourse.Hardcourse.isDev;
 import static com.denied403.Hardcourse.Hardcourse.plugin;
 import static com.denied403.Hardcourse.Utils.Luckperms.hasLuckPermsPermission;
 
@@ -29,6 +25,7 @@ public class Punish {
         String targetName = event.getOption("player") != null ? event.getOption("player").getAsString() : null;
         String reasonName = event.getOption("reason") != null ? event.getOption("reason").getAsString() : null;
         String notes = event.getOption("note") != null ? event.getOption("note").getAsString() : null;
+        boolean isWarn = event.getOption("warn") != null && event.getOption("warn").getAsBoolean();
         if (targetName == null || reasonName == null) {
             event.getHook().sendMessage("❌ Player or reason not specified.").queue();
             return;
@@ -40,7 +37,7 @@ public class Punish {
             return;
         }
 
-        String type = reason.getType() == PunishmentType.WARN ? "warn" : "confirm";
+        String type = reason.getType() == PunishmentType.WARN && isWarn ? "warn" : "confirm";
 
         String linkedUuidString = database.getUUIDFromDiscord(event.getMember().getId());
         UUID staffUUID;
@@ -57,7 +54,7 @@ public class Punish {
                 OfflinePlayer staff = Bukkit.getOfflinePlayer(staffUUID);
                 OfflinePlayer target = Bukkit.getOfflinePlayer(targetName);
                 if (!hasLuckPermsPermission(staff.getUniqueId(), "core403.punish.use")) {
-                    event.getHook().sendMessage("❌ You do not have permission to use this command.").queue();
+                    event.reply("❌ You do not have permission to use this command.").setEphemeral(true).queue();
                     return;
                 }
                 long expires;

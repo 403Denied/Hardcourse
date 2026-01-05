@@ -1,6 +1,6 @@
 package com.denied403.Hardcourse.Discord.Tickets;
 
-import com.denied403.Hardcourse.Hardcourse;
+import com.denied403.Hardcourse.Utils.CheckpointDatabase;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -10,13 +10,12 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 
+import static com.denied403.Hardcourse.Hardcourse.plugin;
+import static com.denied403.Hardcourse.Utils.Luckperms.hasLuckPermsPermission;
+
 public class PanelButtonListener extends ListenerAdapter {
-    private final Hardcourse plugin;
-
-    public PanelButtonListener(Hardcourse plugin) {
-        this.plugin = plugin;
-    }
-
+    private static CheckpointDatabase database;
+    public static void initialize(CheckpointDatabase db) {database = db;}
     public static final Map<String, Integer> applicationProgress = new HashMap<>();
     public static final Map<String, List<String>> applicationAnswers = new HashMap<>();
     public static final Set<String> applicationEditing = new HashSet<>();
@@ -25,6 +24,22 @@ public class PanelButtonListener extends ListenerAdapter {
     public void onButtonInteraction(ButtonInteractionEvent event) {
         String id = event.getComponentId();
         String userId = event.getUser().getId();
+        if(event.getChannel().getId().equals("720530985191735316")) {
+            String linkedUuidString = database.getUUIDFromDiscord(userId);
+            UUID linkedUUID;
+            if (linkedUuidString != null) {
+                linkedUUID = UUID.fromString(linkedUuidString);
+            } else {
+                EmbedBuilder builder = new EmbedBuilder().setColor(Color.RED).setDescription("❌ You must be *linked* to do this. To link, join Hardcourse and run `/link`.");
+                event.replyEmbeds(builder.build()).setEphemeral(true).queue();
+                return;
+            }
+            if (hasLuckPermsPermission(linkedUUID, "hardcourse.staff")) {
+                EmbedBuilder builder = new EmbedBuilder().setColor(Color.RED).setDescription("❌ You're already staff, silly!");
+                event.replyEmbeds(builder.build()).setEphemeral(true).queue();
+                return;
+            }
+        }
 
         switch (id) {
             case "ticket:application" -> {

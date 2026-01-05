@@ -2,7 +2,9 @@ package com.denied403.Hardcourse.Commands;
 
 import com.denied403.Hardcourse.Hardcourse;
 import com.denied403.Hardcourse.Utils.CheckpointDatabase;
+import com.denied403.Hardcourse.Utils.Luckperms;
 import com.mojang.brigadier.Command;
+import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -12,15 +14,20 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.Statistic;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.Location;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
-import static com.denied403.Hardcourse.Hardcourse.isDev;
+import static com.denied403.Hardcourse.Discord.HardcourseDiscord.jda;
+import static com.denied403.Hardcourse.Hardcourse.*;
 import static com.denied403.Hardcourse.Utils.ColorUtil.Colorize;
 import static com.denied403.Hardcourse.Utils.ColorUtil.stripAllColors;
 import static org.bukkit.Bukkit.getConsoleSender;
@@ -35,7 +42,7 @@ public class CheckpointCommand {
     }
     private static final Set<UUID> restartCancelled = new HashSet<>();
 
-    public static LiteralCommandNode<CommandSourceStack> createCommand(Hardcourse plugin, String commandName) {
+    public static LiteralCommandNode<CommandSourceStack> createCommand(String commandName) {
         return Commands.literal(commandName)
 
                 .then(Commands.literal("set")
@@ -59,9 +66,18 @@ public class CheckpointCommand {
                                             sender.sendMessage(Colorize("&c&lHARDCOURSE &rThe level of &c" + playerName +
                                                     "&f has been set to &c" + season + "-" + formattedLevel + "&f!"));
 
+
                                             if (offlinePlayer.isOnline() && offlinePlayer != sender) {
                                                 ((Player) offlinePlayer).sendMessage(Colorize("&c&lHARDCOURSE &rYour level has been set to &c" +
                                                         season + "-" + formattedLevel + "&f!"));
+                                            }
+                                            if(isDiscordEnabled()) {
+                                                ThreadChannel channel = jda.getThreadChannelById("1454207642854756362");
+                                                if (channel != null) {
+                                                    final SimpleDateFormat f = new SimpleDateFormat("HH:mm:ss z");
+                                                    f.setTimeZone(TimeZone.getTimeZone("UTC"));
+                                                    channel.sendMessage("`[" + f.format(new Date()) + "] " + playerName + " was set to level " + season + "-" + String.valueOf(level).replace(".0", "") + " by " + (sender instanceof Player ? sender.getName() + "`" : "CONSOLE`")).queue();
+                                                }
                                             }
 
                                             return Command.SINGLE_SUCCESS;
@@ -87,6 +103,14 @@ public class CheckpointCommand {
                                                     if (offlinePlayer.isOnline() && offlinePlayer != sender) {
                                                         ((Player) offlinePlayer).sendMessage(Colorize("&c&lHARDCOURSE &rYour level has been set to &c" +
                                                                 season + "-" + formattedLevel + "&f!"));
+                                                    }
+                                                    if(isDiscordEnabled()) {
+                                                        ThreadChannel channel = jda.getThreadChannelById("1454207642854756362");
+                                                        if (channel != null) {
+                                                            final SimpleDateFormat f = new SimpleDateFormat("HH:mm:ss z");
+                                                            f.setTimeZone(TimeZone.getTimeZone("UTC"));
+                                                            channel.sendMessage("`[" + f.format(new Date()) + "] " + playerName + " was set to level " + season + "-" + String.valueOf(level).replace(".0", "") + " by " + (sender instanceof Player ? sender.getName() + "`" : "CONSOLE`")).queue();
+                                                        }
                                                     }
 
                                                     return Command.SINGLE_SUCCESS;
@@ -206,7 +230,16 @@ public class CheckpointCommand {
                                     player.performCommand("spawn");
                                     player.setRespawnLocation(player.getWorld().getSpawnLocation());
                                     player.sendMessage(Colorize("&c&lHARDCOURSE &rYou have been reset to the beginning."));
-                                    getServer().dispatchCommand(getConsoleSender(), "lp user " + stripAllColors(player.getName() + " parent set default"));
+                                    Luckperms.removeRank(player.getUniqueId());
+                                    player.setStatistic(Statistic.DEATHS, 0);
+                                    if(isDiscordEnabled()) {
+                                        final SimpleDateFormat f = new SimpleDateFormat("HH:mm:ss z");
+                                        f.setTimeZone(TimeZone.getTimeZone("UTC"));
+                                        ThreadChannel channel = jda.getThreadChannelById("1454207642854756362");
+                                        if (channel != null) {
+                                            channel.sendMessage("`[" + f.format(new Date()) + "] " + player.getName() + " reset back to level 0!`").queue();
+                                        }
+                                    }
                                 }
                                 restartCancelled.remove(player.getUniqueId());
                             }, 200L);
@@ -221,7 +254,205 @@ public class CheckpointCommand {
                             restartCancelled.add(player.getUniqueId());
                             return Command.SINGLE_SUCCESS;
                         })))
-                .build();
+                .then(Commands.literal("info")
+                        .requires(source -> source.getSender().isOp())
+                        .then(Commands.argument("level", DoubleArgumentType.doubleArg(0))
+                                .executes(ctx -> {
+                                    CommandSender sender = ctx.getSource().getSender();
+                                    double level = DoubleArgumentType.getDouble(ctx, "level");
+                                    int season = 1;
+
+                                    Location location = database.getCheckpointLocation(season, level);
+                                    if (location == null) {
+                                        sender.sendMessage(Colorize("&c&lHARDCOURSE &rThis checkpoint has no data recorded. It may not have been entered into the database yet."));
+                                        return Command.SINGLE_SUCCESS;
+                                    }
+
+                                    String locationString =
+                                            "&fWorld: &c" + location.getWorld().getName() +
+                                                    "&f, X: &c" + location.getX() +
+                                                    "&f, Y: &c" + location.getY() +
+                                                    "&f, Z: &c" + location.getZ();
+
+                                    String difficulty = database.getCheckpointDifficulty(season, level);
+
+                                    sender.sendMessage(Colorize(
+                                            "&c&lHARDCOURSE &rCheckpoint Info for level &c1-" +
+                                                    String.valueOf(level).replace(".0", "") +
+                                                    "&f: " + locationString +
+                                                    "&f\nDifficulty: &c" + difficulty
+                                    ));
+                                    return Command.SINGLE_SUCCESS;
+                                })
+                                .then(Commands.argument("season", IntegerArgumentType.integer(1, 3))
+                                        .executes(ctx -> {
+                                            CommandSender sender = ctx.getSource().getSender();
+                                            double level = DoubleArgumentType.getDouble(ctx, "level");
+                                            int season = IntegerArgumentType.getInteger(ctx, "season");
+
+                                            Location location = database.getCheckpointLocation(season, level);
+                                            if (location == null) {
+                                                sender.sendMessage(Colorize("&c&lHARDCOURSE &rThis checkpoint has no data recorded. It may not have been entered into the database yet."));
+                                                return Command.SINGLE_SUCCESS;
+                                            }
+
+                                            String locationString =
+                                                    "&fWorld: &c" + location.getWorld().getName() +
+                                                            "&f, X: &c" + location.getX() +
+                                                            "&f, Y: &c" + location.getY() +
+                                                            "&f, Z: &c" + location.getZ();
+
+                                            String difficulty = database.getCheckpointDifficulty(season, level);
+
+                                            sender.sendMessage(Colorize(
+                                                    "&c&lHARDCOURSE &rCheckpoint Info for level &c" +
+                                                            season + "-" +
+                                                            String.valueOf(level).replace(".0", "") +
+                                                            "&f: " + locationString +
+                                                            "&f\nDifficulty: &c" + difficulty
+                                            ));
+                                            return Command.SINGLE_SUCCESS;
+                                        }))))
+                .then(Commands.literal("removedata")
+                        .requires(source -> source.getSender().isOp())
+                        .then(Commands.argument("level", DoubleArgumentType.doubleArg(0))
+                                .executes(ctx -> {
+                                    CommandSender sender = ctx.getSource().getSender();
+                                    double level = DoubleArgumentType.getDouble(ctx, "level");
+                                    int season = 1;
+
+                                    database.removeCheckpointLocation(season, level);
+                                    sender.sendMessage(Colorize("&c&lHARDCOURSE &rCheckpoint data for &c1-" + String.valueOf(level).replace(".0", "") + "&f has been removed from the database."));
+                                    return Command.SINGLE_SUCCESS;
+                                })
+                                .then(Commands.argument("season", IntegerArgumentType.integer(1, 3))
+                                        .executes(ctx -> {
+                                            CommandSender sender = ctx.getSource().getSender();
+                                            double level = DoubleArgumentType.getDouble(ctx, "level");
+                                            int season = IntegerArgumentType.getInteger(ctx, "season");
+
+                                            database.removeCheckpointLocation(season, level);
+                                            sender.sendMessage(Colorize("&c&lHARDCOURSE &rCheckpoint data for &c" + season + "-" + String.valueOf(level).replace(".0", "") + "&f has been removed from the database."));
+                                            return Command.SINGLE_SUCCESS;
+                                        }))))
+                .then(Commands.literal("tp")
+                        .requires(source -> source.getSender().isOp() || source.getSender().hasPermission("hardcourse.winner"))
+                        .then(Commands.argument("level", DoubleArgumentType.doubleArg(0))
+                                .executes(ctx -> {
+                                    CommandSender sender = ctx.getSource().getSender();
+                                    if (!(sender instanceof Player player)) {
+                                        sender.sendMessage(Colorize("&c&lHARDCOURSE &rThis command can only be run by a player!"));
+                                        return Command.SINGLE_SUCCESS;
+                                    }
+
+                                    double level = DoubleArgumentType.getDouble(ctx, "level");
+                                    int season = database.getSeason(player.getUniqueId());
+
+                                    Location loc = database.getCheckpointLocation(season, level);
+                                    if (loc == null) {
+                                        sender.sendMessage(Colorize("&c&lHARDCOURSE &rNo checkpoint location set for &c"
+                                                + season + "-" + String.valueOf(level).replace(".0", "") + "&f."));
+                                        return Command.SINGLE_SUCCESS;
+                                    }
+
+                                    player.teleport(loc);
+                                    sender.sendMessage(Colorize("&c&lHARDCOURSE &rTeleported to checkpoint &c"
+                                            + season + "-" + String.valueOf(level).replace(".0", "") + "&f."));
+                                    return Command.SINGLE_SUCCESS;
+                                })
+                                .then(Commands.argument("season", IntegerArgumentType.integer(1, 3))
+                                        .executes(ctx -> {
+                                            CommandSender sender = ctx.getSource().getSender();
+                                            if (!(sender instanceof Player player)) {
+                                                sender.sendMessage(Colorize("&c&lHARDCOURSE &rThis command can only be run by a player!"));
+                                                return Command.SINGLE_SUCCESS;
+                                            }
+
+                                            double level = DoubleArgumentType.getDouble(ctx, "level");
+                                            int season = IntegerArgumentType.getInteger(ctx, "season");
+
+                                            Location loc = database.getCheckpointLocation(season, level);
+                                            if (loc == null) {
+                                                sender.sendMessage(Colorize("&c&lHARDCOURSE &rNo checkpoint location set for &c"
+                                                        + season + "-" + String.valueOf(level).replace(".0", "") + "&f."));
+                                                return Command.SINGLE_SUCCESS;
+                                            }
+
+                                            player.teleport(loc);
+                                            sender.sendMessage(Colorize("&c&lHARDCOURSE &rTeleported to checkpoint &c"
+                                                    + season + "-" + String.valueOf(level).replace(".0", "") + "&f."));
+                                            return Command.SINGLE_SUCCESS;
+                                        })
+                                        .then(Commands.argument("player", StringArgumentType.word())
+                                                .suggests(CheckpointCommand::playerSuggestions)
+                                                .requires(source -> source.getSender().isOp())
+                                                .executes(ctx -> {
+                                                    CommandSender sender = ctx.getSource().getSender();
+
+                                                    Player target = Bukkit.getPlayer(StringArgumentType.getString(ctx, "player"));
+                                                    if (target == null) {
+                                                        sender.sendMessage(Colorize("&c&lHARDCOURSE &rPlayer not found."));
+                                                        return Command.SINGLE_SUCCESS;
+                                                    }
+
+                                                    double level = DoubleArgumentType.getDouble(ctx, "level");
+                                                    int season = IntegerArgumentType.getInteger(ctx, "season");
+
+                                                    Location loc = database.getCheckpointLocation(season, level);
+                                                    if (loc == null) {
+                                                        sender.sendMessage(Colorize("&c&lHARDCOURSE &rNo checkpoint location set for &c"
+                                                                + season + "-" + String.valueOf(level).replace(".0", "") + "&f."));
+                                                        return Command.SINGLE_SUCCESS;
+                                                    }
+
+                                                    target.teleport(loc);
+                                                    sender.sendMessage(Colorize("&c&lHARDCOURSE &rTeleported &c"
+                                                            + target.getName() + " &rto checkpoint &c"
+                                                            + season + "-" + String.valueOf(level).replace(".0", "") + "&f."));
+                                                    return Command.SINGLE_SUCCESS;
+                                                })
+                                                .then(Commands.argument("setCheckpoint", BoolArgumentType.bool())
+                                                        .executes(ctx -> {
+                                                            CommandSender sender = ctx.getSource().getSender();
+
+                                                            Player target = Bukkit.getPlayer(StringArgumentType.getString(ctx, "player"));
+                                                            if (target == null) {
+                                                                sender.sendMessage(Colorize("&c&lHARDCOURSE &rPlayer not found."));
+                                                                return Command.SINGLE_SUCCESS;
+                                                            }
+
+                                                            double level = DoubleArgumentType.getDouble(ctx, "level");
+                                                            int season = IntegerArgumentType.getInteger(ctx, "season");
+                                                            boolean setCheckpoint = BoolArgumentType.getBool(ctx, "setCheckpoint");
+
+                                                            Location loc = database.getCheckpointLocation(season, level);
+                                                            if (loc == null) {
+                                                                sender.sendMessage(Colorize("&c&lHARDCOURSE &rNo checkpoint location set for &c"
+                                                                        + season + "-" + String.valueOf(level).replace(".0", "") + "&f."));
+                                                                return Command.SINGLE_SUCCESS;
+                                                            }
+
+                                                            if (setCheckpoint) {
+                                                                database.setLevel(target.getUniqueId(), level);
+                                                                database.setSeason(target.getUniqueId(), season);
+                                                                if(isDiscordEnabled()) {
+                                                                    ThreadChannel channel = jda.getThreadChannelById("1454207642854756362");
+                                                                    if (channel != null) {
+                                                                        final SimpleDateFormat f = new SimpleDateFormat("HH:mm:ss z");
+                                                                        f.setTimeZone(TimeZone.getTimeZone("UTC"));
+                                                                        channel.sendMessage("`[" + f.format(new Date()) + "] " + target.getName() + " was set to level " + season + "-" + String.valueOf(level).replace(".0", "") + " by " + (sender instanceof Player ? sender.getName() + "`" : "CONSOLE`")).queue();
+                                                                    }
+                                                                }
+                                                            }
+
+                                                            target.teleport(loc);
+
+                                                            sender.sendMessage(Colorize("&c&lHARDCOURSE &rTeleported &c" + target.getName() + (setCheckpoint ? " &rand set checkpoint to &c" : " &rto checkpoint &c") + season + "-" + String.valueOf(level).replace(".0", "") + "&f."));
+                                                            return Command.SINGLE_SUCCESS;
+                                                        }))
+                                        ))))
+
+                        .build();
     }
     private static CompletableFuture<Suggestions> playerSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
         String input = builder.getRemaining().toLowerCase();

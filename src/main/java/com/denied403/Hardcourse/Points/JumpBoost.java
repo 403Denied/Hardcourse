@@ -31,7 +31,6 @@ public class JumpBoost implements Listener {
         Player player = event.getPlayer();
         event.setCancelled(true);
 
-        // Remove the item
         item.setAmount(item.getAmount() - 1);
         player.getInventory().setItemInMainHand(item.getAmount() > 0 ? item : null);
 

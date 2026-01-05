@@ -1,11 +1,13 @@
 package com.denied403.Hardcourse.Discord.Commands;
 
 import com.denied403.Hardcourse.Hardcourse;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
+
+import java.awt.*;
+import java.time.Instant;
 
 public class Console {
     private final Hardcourse plugin;
@@ -26,12 +28,12 @@ public class Console {
             ConsoleCommandSender console = Bukkit.getServer().getConsoleSender();
             Bukkit.dispatchCommand(console, command);
         });
-
-        event.reply("✅ Ran command: `" + command + "`").setEphemeral(true).queue();
-    }
-    public static OptionData toRunCommandOption() {
-        return new OptionData(OptionType.STRING, "command", "The command to run on the server console")
-                .setRequired(true);
+        EmbedBuilder embed = new EmbedBuilder();
+        embed.setColor(Color.GREEN);
+        embed.setDescription("✅ Executed console command: `/" + command + "`");
+        embed.setTimestamp(Instant.now());
+        embed.setFooter("Hardcourse", event.getGuild().getIconUrl());
+        event.replyEmbeds(embed.build()).setEphemeral(true).queue();
     }
 }
 

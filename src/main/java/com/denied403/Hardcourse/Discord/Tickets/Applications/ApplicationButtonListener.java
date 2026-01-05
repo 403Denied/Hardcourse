@@ -144,8 +144,7 @@ public class ApplicationButtonListener extends ListenerAdapter {
 
             case "application:edit" -> {
                 if (!PanelButtonListener.applicationAnswers.containsKey(userId)) { event.reply("⚠️ You no longer have an active application.").setEphemeral(true).queue(); return;}
-                event.reply("✏️ Please type `edit <question number>` to re-answer a specific question.\n" +
-                                "For example: `edit 2` to re-answer question 2.").setEphemeral(true).queue();
+                event.reply("✏️ Please type `edit <question number>` to re-answer a specific question.\nFor example: `edit 2` to re-answer question 2.").setEphemeral(true).queue();
                 event.getMessage().editMessageComponents(
                         ActionRow.of(
                                 Button.success("application:submit", "✅ Submit").asDisabled(),

@@ -28,10 +28,8 @@ public class ChatReactions implements Listener {
     private static final Random random = new Random();
     private static String currentWord;
     public static boolean gameActive = false;
-    private static Plugin plugin;
 
-    public ChatReactions(Plugin plugin) {
-        ChatReactions.plugin = plugin;
+    public ChatReactions() {
         File wordFile = new File(plugin.getDataFolder(), "words.yml");
         wordConfig = YamlConfiguration.loadConfiguration(wordFile);
 
@@ -98,7 +96,7 @@ public class ChatReactions implements Listener {
                 Player p = event.getPlayer();
                 if (isDev()) {
                     int points = 5 + random.nextInt(11);
-                    PointsManager pointsManager = ((Hardcourse) plugin).getPointsManager();
+                    PointsManager pointsManager = plugin.getPointsManager();
                     pointsManager.addPoints(p.getUniqueId(), points);
                     Bukkit.broadcast(Colorize("&c&lHARDCOURSE &r&c" + stripAllColors(p.getName()) + "&r successfully unscrambled the word and earned &c" + points + "&f points! It was &c" + currentWord));
                 } else {

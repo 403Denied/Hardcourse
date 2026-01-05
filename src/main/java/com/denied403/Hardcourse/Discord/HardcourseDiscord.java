@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
@@ -39,10 +40,10 @@ public class HardcourseDiscord {
     public static JDA jda;
     public static TextChannel chatChannel;
     public static TextChannel staffChatChannel;
-    public static TextChannel hacksChannel;
-    public static TextChannel logsChannel;
-    public static TextChannel punishmentChannel;
-    public static TextChannel reportChannel;
+    public static ThreadChannel hacksChannel;
+    public static ThreadChannel logsChannel;
+    public static ThreadChannel punishmentChannel;
+    public static ThreadChannel reportChannel;
 
     public HardcourseDiscord(JavaPlugin plugin) {
         this.plugin = plugin;
@@ -76,7 +77,7 @@ public class HardcourseDiscord {
                                 new DiscordListener(),
                                 new CommandManager((Hardcourse) plugin),
                                 new DiscordButtonListener(),
-                                new PanelButtonListener((Hardcourse) plugin),
+                                new PanelButtonListener(),
                                 new ApplicationMessageListener((Hardcourse) plugin),
                                 new ApplicationButtonListener((Hardcourse) plugin),
                                 new BanListener()
@@ -101,19 +102,19 @@ public class HardcourseDiscord {
 
             String hacksChannelId = plugin.getConfig().getString("Anticheat-Channel-Id");
             if (hacksChannelId != null) {
-                hacksChannel = jda.getTextChannelById(hacksChannelId);
+                hacksChannel = jda.getThreadChannelById(hacksChannelId);
             }
             String logsChannelId = plugin.getConfig().getString("Logs-Channel-Id");
             if (logsChannelId != null) {
-                logsChannel = jda.getTextChannelById(logsChannelId);
+                logsChannel = jda.getThreadChannelById(logsChannelId);
             }
             String punishmentChannelId = plugin.getConfig().getString("Punishment-Channel-Id");
             if (punishmentChannelId != null) {
-                punishmentChannel = jda.getTextChannelById(punishmentChannelId);
+                punishmentChannel = jda.getThreadChannelById(punishmentChannelId);
             }
             String reportChannelId = plugin.getConfig().getString("Reports-Channel-Id");
             if (reportChannelId != null) {
-                reportChannel = jda.getTextChannelById(reportChannelId);
+                reportChannel = jda.getThreadChannelById(reportChannelId);
             }
         }
     }
@@ -194,6 +195,12 @@ public class HardcourseDiscord {
             }
             if(extra1.equals("quit")){
                 logsChannel.sendMessage("`[" + f.format(new Date()) + "] " + stripAllColors(player.getName()) + " quit`").queue();
+            }
+            if(extra1.equals("vanished")){
+                logsChannel.sendMessage((extra2.equals("silent") ? "`[SILENT] " : "`") + "[" + f.format(new Date()) + "] " + stripAllColors(player.getName()) + " vanished`").queue();
+            }
+            if(extra1.equals("unvanished")){
+                logsChannel.sendMessage((extra2.equals("silent") ? "`[SILENT] " : "`") + "[" + f.format(new Date()) + "] " + stripAllColors(player.getName()) + " unvanished`").queue();
             }
         }
     }

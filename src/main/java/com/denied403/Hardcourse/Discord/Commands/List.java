@@ -1,5 +1,6 @@
 package com.denied403.Hardcourse.Discord.Commands;
 
+import com.transfemme.dev.core403.Core403;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.bukkit.Bukkit;
@@ -8,6 +9,7 @@ import org.bukkit.entity.Player;
 import java.awt.*;
 import java.util.ArrayList;
 
+import static com.denied403.Hardcourse.Hardcourse.isDev;
 import static com.denied403.Hardcourse.Utils.ColorUtil.stripAllColors;
 
 public class List {
@@ -16,11 +18,13 @@ public class List {
         java.util.List<String> staffMembers = new ArrayList<>();
 
         for (Player player : Bukkit.getOnlinePlayers()) {
-            String name = "`" + stripAllColors(player.displayName()) + "`";
-            if (player.hasPermission("hardcourse.jrmod")) {
-                staffMembers.add(name);
-            } else {
-                onlinePlayers.add(name);
+            if(!Core403.getVanishedPlayers().contains(player.getUniqueId())) {
+                String name = "`" + stripAllColors(player.displayName()) + "`";
+                if (player.hasPermission("hardcourse.jrmod")) {
+                    staffMembers.add(name);
+                } else {
+                    onlinePlayers.add(name);
+                }
             }
         }
 
@@ -29,11 +33,11 @@ public class List {
 
         EmbedBuilder serverEmbed = new EmbedBuilder();
         serverEmbed.setThumbnail(event.getGuild().getIconUrl());
-        serverEmbed.setTitle("Player list");
-        serverEmbed.addField("Server IP", "- Hardcourse.minehut.gg", true);
+        serverEmbed.setTitle("Player List");
+        serverEmbed.addField("Server IP", isDev() ? "hardcourse.dev.falixsrv.me" : "hardcourse.minehut.gg", true);
         serverEmbed.addField("Staff online (" + staffMembers.size() + ")", staffList, false);
         serverEmbed.addField("Players online (" + onlinePlayers.size() + ")", playersList, false);
-        serverEmbed.setFooter("Requested by " + event.getUser().getAsTag());
+        serverEmbed.setFooter("Requested by " + event.getUser().getName(), event.getUser().getAvatarUrl());
         serverEmbed.setColor(Color.blue);
         event.replyEmbeds(serverEmbed.build()).queue();
     }

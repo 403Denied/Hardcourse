@@ -21,7 +21,6 @@ public class DiscordButtonListener extends ListenerAdapter {
     private static CheckpointDatabase database;
     public static void initialize(CheckpointDatabase db) {database = db;}
 
-
     @Override
     public void onButtonInteraction(ButtonInteractionEvent event) {
         if(isDiscordEnabled()) {

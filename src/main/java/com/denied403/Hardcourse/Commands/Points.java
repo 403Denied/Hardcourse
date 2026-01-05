@@ -22,6 +22,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import static com.denied403.Hardcourse.Hardcourse.plugin;
 import static com.denied403.Hardcourse.Utils.ColorUtil.Colorize;
 
 public class Points {
@@ -30,7 +31,7 @@ public class Points {
         database = db;
     }
 
-    public static LiteralCommandNode<CommandSourceStack> createCommand(Hardcourse plugin, PointsManager pointsManager, String commandName) {
+    public static LiteralCommandNode<CommandSourceStack> createCommand(PointsManager pointsManager, String commandName) {
         return Commands.literal(commandName)
                 .requires(source -> source.getSender().hasPermission("hardcourse.points.manage"))
 
@@ -61,7 +62,7 @@ public class Points {
                         )
                 )
 
-                .then(Commands.literal("view")
+                .then(Commands.literal("get")
                         .then(Commands.argument("player", StringArgumentType.word())
                                 .suggests(Points::onlinePlayerSuggestions)
                                 .executes(ctx -> {
