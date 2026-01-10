@@ -81,7 +81,7 @@ public final class DiscordListener extends ListenerAdapter {
             Bukkit.broadcast(finalMessage);
             final SimpleDateFormat f = new SimpleDateFormat("HH:mm:ss z");
             f.setTimeZone(TimeZone.getTimeZone("UTC"));
-            logsChannel.sendMessage("`[DISCORD] [" + f.format(new Date()) + "] " + name + ": " + message.replace("`", "'") + "`").queue();
+            logsChannel.sendMessage("`[DISCORD] [" + f.format(new Date()) + "] " + name + ": " + message.replaceAll("`", "'") + "`").queue();
         }
     }
 

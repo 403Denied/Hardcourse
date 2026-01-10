@@ -29,7 +29,7 @@ public class onJoin implements Listener {
 
     public static void initialize(CheckpointDatabase db) {database = db;}
     @EventHandler
-    public void onJoin(org.bukkit.event.player.PlayerJoinEvent event) {
+    public void onJoinEvent(org.bukkit.event.player.PlayerJoinEvent event) {
         org.bukkit.entity.Player player = event.getPlayer();
 
         if (isDiscordEnabled()) {
@@ -41,7 +41,7 @@ public class onJoin implements Listener {
             sendMessage(player, null, "logs", "join", null);
         }
         if(!player.hasPlayedBefore()) {
-            database.setCheckpointData(player.getUniqueId(), 1, 1, 0);
+            database.setCheckpointData(player.getUniqueId(), 1, 0, 0);
         }
         if(database.getCheckpointData(player.getUniqueId()) == null) {
             int season;
@@ -67,7 +67,7 @@ public class onJoin implements Listener {
                 player.sendMessage(Colorize("&c&lHARDCOURSE &rYour checkpoint data has successfully been migrated from legacy storage to the new system. Level: &c" + String.valueOf(level).replace(".0", "") + "&r Season: &c" + season + "&r. If you believe there is an error with these numbers, please contact an administrator."));
                 database.setCheckpointData(player.getUniqueId(), season, level, 0);
             } else {
-                database.setCheckpointData(player.getUniqueId(), 1, 1, 0);
+                database.setCheckpointData(player.getUniqueId(), 1, 0, 0);
                 player.teleport(player.getWorld().getSpawnLocation());
                 player.setRespawnLocation(player.getLocation());
             }
@@ -113,7 +113,7 @@ public class onJoin implements Listener {
             Location spawnLocation = targetWorld.getSpawnLocation();
             player.teleport(spawnLocation);
             player.updateCommands();
-            player.sendMessage(Colorize("&c&lHARDCOURSE &rWelcome to hardcourse. This server contains over 1000 levels that will test your patience (and your will to live). Think it's worth it? &cYou may begin&r."));
+            player.sendMessage(Colorize("&c&lHARDCOURSE &rWelcome to hardcourse. This parkour server contains over 1000 levels that will test your patience (and your will to live). Think it's worth it? &cYou may begin&r."));
         }
 
         ItemStack torch = new ItemStack(Material.TORCH);

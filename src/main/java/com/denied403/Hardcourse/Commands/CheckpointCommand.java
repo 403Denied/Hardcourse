@@ -30,8 +30,6 @@ import static com.denied403.Hardcourse.Discord.HardcourseDiscord.jda;
 import static com.denied403.Hardcourse.Hardcourse.*;
 import static com.denied403.Hardcourse.Utils.ColorUtil.Colorize;
 import static com.denied403.Hardcourse.Utils.ColorUtil.stripAllColors;
-import static org.bukkit.Bukkit.getConsoleSender;
-import static org.bukkit.Bukkit.getServer;
 
 public class CheckpointCommand {
 
@@ -63,13 +61,11 @@ public class CheckpointCommand {
                                             int season = database.getSeason(uuid);
                                             String formattedLevel = (level % 1 == 0) ? String.valueOf((int) level) : String.valueOf(level);
 
-                                            sender.sendMessage(Colorize("&c&lHARDCOURSE &rThe level of &c" + playerName +
-                                                    "&f has been set to &c" + season + "-" + formattedLevel + "&f!"));
+                                            sender.sendMessage(Colorize("&c&lHARDCOURSE &rThe level of &c" + playerName + "&f has been set to &c" + season + "-" + formattedLevel + "&f!"));
 
 
                                             if (offlinePlayer.isOnline() && offlinePlayer != sender) {
-                                                ((Player) offlinePlayer).sendMessage(Colorize("&c&lHARDCOURSE &rYour level has been set to &c" +
-                                                        season + "-" + formattedLevel + "&f!"));
+                                                ((Player) offlinePlayer).sendMessage(Colorize("&c&lHARDCOURSE &rYour level has been set to &c" + season + "-" + formattedLevel + "&f!"));
                                             }
                                             if(isDiscordEnabled()) {
                                                 ThreadChannel channel = jda.getThreadChannelById("1454207642854756362");
@@ -97,12 +93,10 @@ public class CheckpointCommand {
 
                                                     String formattedLevel = (level % 1 == 0) ? String.valueOf((int) level) : String.valueOf(level);
 
-                                                    sender.sendMessage(Colorize("&c&lHARDCOURSE &rThe level of &c" + playerName +
-                                                            "&f has been set to &c" + season + "-" + formattedLevel + "&f!"));
+                                                    sender.sendMessage(Colorize("&c&lHARDCOURSE &rThe level of &c" + playerName + "&f has been set to &c" + season + "-" + formattedLevel + "&f!"));
 
                                                     if (offlinePlayer.isOnline() && offlinePlayer != sender) {
-                                                        ((Player) offlinePlayer).sendMessage(Colorize("&c&lHARDCOURSE &rYour level has been set to &c" +
-                                                                season + "-" + formattedLevel + "&f!"));
+                                                        ((Player) offlinePlayer).sendMessage(Colorize("&c&lHARDCOURSE &rYour level has been set to &c" + season + "-" + formattedLevel + "&f!"));
                                                     }
                                                     if(isDiscordEnabled()) {
                                                         ThreadChannel channel = jda.getThreadChannelById("1454207642854756362");
@@ -280,7 +274,7 @@ public class CheckpointCommand {
                                             "&c&lHARDCOURSE &rCheckpoint Info for level &c1-" +
                                                     String.valueOf(level).replace(".0", "") +
                                                     "&f: " + locationString +
-                                                    "&f\nDifficulty: &c" + difficulty
+                                                    "&f\nDifficulty: &c" + stripAllColors(difficulty)
                                     ));
                                     return Command.SINGLE_SUCCESS;
                                 })
@@ -309,7 +303,7 @@ public class CheckpointCommand {
                                                             season + "-" +
                                                             String.valueOf(level).replace(".0", "") +
                                                             "&f: " + locationString +
-                                                            "&f\nDifficulty: &c" + difficulty
+                                                            "&f\nDifficulty: &c" + stripAllColors(difficulty)
                                             ));
                                             return Command.SINGLE_SUCCESS;
                                         }))))

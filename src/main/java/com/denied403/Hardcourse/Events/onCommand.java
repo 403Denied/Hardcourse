@@ -15,7 +15,7 @@ import static com.denied403.Hardcourse.Utils.ColorUtil.Colorize;
 
 public class onCommand implements Listener {
     @EventHandler
-    public void onCommand(PlayerCommandPreprocessEvent e) {
+    public void onCommandEvent(PlayerCommandPreprocessEvent e) {
         String command = e.getMessage().toLowerCase();
         if (command.equalsIgnoreCase("/suicide") || command.equalsIgnoreCase("/die") || command.equalsIgnoreCase("/stuck")) {
             e.getPlayer().sendMessage(Colorize("<click:run_command:'/clock'>&c&lHARDCOURSE </bold><white>Hey! Try using your &cclock&f instead. Lost it? Click here, or run &c/clock"));

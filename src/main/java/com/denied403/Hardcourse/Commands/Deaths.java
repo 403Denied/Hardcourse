@@ -63,10 +63,10 @@ public class Deaths {
                                 .executes(ctx -> {
                                     CommandSender sender = ctx.getSource().getSender();
                                     String playerName = StringArgumentType.getString(ctx, "player");
-                                    Player target = Bukkit.getPlayerExact(playerName);
+                                    OfflinePlayer target = Bukkit.getPlayerExact(playerName);
 
-                                    if (target == null) {
-                                        sender.sendMessage(Colorize("&c&lHARDCOURSE &rPlayer '&c" + playerName + "&r' not found or not online."));
+                                    if (target == null || !target.hasPlayedBefore()) {
+                                        sender.sendMessage(Colorize("&c&lHARDCOURSE &rPlayer &c" + playerName + "&r not found."));
                                         return 0;
                                     }
 

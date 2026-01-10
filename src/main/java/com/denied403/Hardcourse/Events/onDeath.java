@@ -5,7 +5,6 @@ import org.bukkit.Statistic;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 
 import java.text.SimpleDateFormat;
@@ -17,7 +16,7 @@ import static com.denied403.Hardcourse.Hardcourse.isDiscordEnabled;
 
 public class onDeath implements Listener {
     @EventHandler
-    public void onDeath(PlayerRespawnEvent e) {
+    public void onDeathEvent(PlayerRespawnEvent e) {
         Player player = e.getPlayer();
         if(isDiscordEnabled()){
             ThreadChannel channel = jda.getThreadChannelById("1457271269413228574");

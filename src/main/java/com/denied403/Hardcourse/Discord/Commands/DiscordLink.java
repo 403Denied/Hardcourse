@@ -1,6 +1,5 @@
 package com.denied403.Hardcourse.Discord.Commands;
 
-import com.denied403.Hardcourse.Hardcourse;
 import com.denied403.Hardcourse.Points.PointsManager;
 import com.denied403.Hardcourse.Utils.CheckpointDatabase;
 import com.denied403.Hardcourse.Utils.LinkManager;
@@ -26,7 +25,7 @@ public class DiscordLink extends ListenerAdapter {
     private static LinkManager linkManager;
     private static CheckpointDatabase database;
 
-    public static void initalize(LinkManager mgr, CheckpointDatabase db) {
+    public static void initialize(LinkManager mgr, CheckpointDatabase db) {
         linkManager = mgr;
         database = db;
     }
@@ -49,6 +48,7 @@ public class DiscordLink extends ListenerAdapter {
         } else {
             role = event.getGuild().getRoleById("1443756921487364159");
         }
+        assert role != null;
         event.getGuild().addRoleToMember(UserSnowflake.fromId(event.getUser().getIdLong()), role)
                 .queue(
                         success -> {},

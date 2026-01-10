@@ -4,6 +4,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -12,7 +13,7 @@ import static com.denied403.Hardcourse.Utils.ColorUtil.Colorize;
 
 public class onClick implements Listener {
     @EventHandler
-    public void onClick(org.bukkit.event.player.PlayerInteractEvent event) {
+    public void onClickEvent(PlayerInteractEvent event) {
         if(event.getItem() == null) {
             return;
         } if(event.getItem().getItemMeta().itemName().equals(Colorize("&c&lStuck").decoration(TextDecoration.ITALIC, false)) && event.getItem().getType() == Material.CLOCK){

@@ -9,7 +9,7 @@ import static com.denied403.Hardcourse.Discord.HardcourseDiscord.sendMessage;
 
 public class onVanish implements Listener {
     @EventHandler
-    public void onVanish(VanishEvent event){
+    public void onVanishEvent(VanishEvent event){
         Player player = event.getPlayer();
         if(event.getAction().equalsIgnoreCase("vanished")){
             if(!event.isSilent()) {

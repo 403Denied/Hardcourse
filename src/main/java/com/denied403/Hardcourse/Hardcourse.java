@@ -45,7 +45,7 @@ public final class Hardcourse extends JavaPlugin implements Listener {
         CheckpointDatabase checkpointDatabase = new CheckpointDatabase();
         PunishmentDatabase punishmentDatabase = Core403.getPunishmentDatabase();
         LinkManager linkManager = new LinkManager();
-        loadConfigValues(this);
+        loadConfigValues();
 
         if(isDev) {
             if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
@@ -54,7 +54,7 @@ public final class Hardcourse extends JavaPlugin implements Listener {
             PointsManager.initialize(checkpointDatabase);
             Points.initialize(checkpointDatabase);
         }
-        onWalk.initalize(checkpointDatabase);
+        onWalk.initialize(checkpointDatabase);
         CheckpointCommand.initialize(checkpointDatabase);
         onChat.initialize(checkpointDatabase);
         onJoin.initialize(checkpointDatabase);
@@ -62,11 +62,8 @@ public final class Hardcourse extends JavaPlugin implements Listener {
         onSneak.initialize(checkpointDatabase);
         Placeholders.initialize(checkpointDatabase);
 
-        CosmeticsShop cosmeticsShop = new CosmeticsShop();
-        PointsShop pointsShop = new PointsShop(this, cosmeticsShop);
-
         if(DiscordEnabled) {
-            HardcourseDiscord discordBot = new HardcourseDiscord(this);
+            HardcourseDiscord discordBot = new HardcourseDiscord();
             try {
                 discordBot.InitJDA();
             } catch (Exception e) {
@@ -75,7 +72,7 @@ public final class Hardcourse extends JavaPlugin implements Listener {
             LinkManager.initialize(checkpointDatabase);
             Link.initialize(linkManager, checkpointDatabase);
             Unlink.initialize(linkManager, checkpointDatabase, jda);
-            DiscordLink.initalize(linkManager, checkpointDatabase);
+            DiscordLink.initialize(linkManager, checkpointDatabase);
             DiscordListener.initialize(checkpointDatabase);
             HardcourseDiscord.initialize(checkpointDatabase);
             Info.initialize(checkpointDatabase);
@@ -107,7 +104,6 @@ public final class Hardcourse extends JavaPlugin implements Listener {
             getServer().getPluginManager().registerEvents(new OminousTrail(this), this);
             getServer().getPluginManager().registerEvents(new onPortalEnter(), this);
             getServer().getPluginManager().registerEvents(new EndTrail(this), this);
-            getServer().getPluginManager().registerEvents(pointsShop, this);
             getServer().getPluginManager().registerEvents(new JumpBoost(), this);
             getServer().getPluginManager().registerEvents(new DoubleJump(), this);
             getServer().getPluginManager().registerEvents(new TempCheckpoint(), this);
@@ -123,10 +119,10 @@ public final class Hardcourse extends JavaPlugin implements Listener {
             cmd.registrar().register(EndChatGame.createCommand("ecg"));
             cmd.registrar().register(RunChatGame.createCommand("runchatgame"));
             cmd.registrar().register(RunChatGame.createCommand("rcg"));
-            cmd.registrar().register(RestartForUpdate.createCommand(this, "restartforupdate"));
-            cmd.registrar().register(RestartForUpdate.createCommand(this, "restartforupdates"));
-            cmd.registrar().register(ReloadHardcourse.createCommand(this, "reloadhardcourse"));
-            cmd.registrar().register(ReloadHardcourse.createCommand(this, "hardcoursereload"));
+            cmd.registrar().register(RestartForUpdate.createCommand("restartforupdate"));
+            cmd.registrar().register(RestartForUpdate.createCommand("restartforupdates"));
+            cmd.registrar().register(ReloadHardcourse.createCommand("reloadhardcourse"));
+            cmd.registrar().register(ReloadHardcourse.createCommand("hardcoursereload"));
             cmd.registrar().register(WinnerTP.createCommand("winnertp"));
             cmd.registrar().register(WinnerTP.createCommand("wtp"));
             cmd.registrar().register(ToggleDiabolicalUnscrambles.createCommand("togglediabolicalunscrambles"));
@@ -201,7 +197,7 @@ public final class Hardcourse extends JavaPlugin implements Listener {
     private static List<String> exemptions;
     private final Random random = new Random();
 
-    public static void loadConfigValues(Hardcourse plugin) {
+    public static void loadConfigValues() {
         FileConfiguration config = plugin.getConfig();
         DiscordEnabled = config.getBoolean("discord-enabled");
         BroadcastEnabled = config.getBoolean("broadcast-enabled");

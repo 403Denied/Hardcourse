@@ -9,7 +9,7 @@ import static com.denied403.Hardcourse.Utils.ColorUtil.Colorize;
 
 public class onDrop implements Listener {
     @EventHandler
-    public void onDrop(org.bukkit.event.player.PlayerDropItemEvent event) {
+    public void onDropEvent(org.bukkit.event.player.PlayerDropItemEvent event) {
         if(event.getItemDrop().getItemStack().getType() == Material.CLOCK && event.getItemDrop().getItemStack().getItemMeta().displayName().equals(Colorize("&c&lStuck"))){
             event.setCancelled(true);
         }

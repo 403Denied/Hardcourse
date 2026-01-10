@@ -2,6 +2,7 @@ package com.denied403.Hardcourse.Events;
 
 import com.denied403.Hardcourse.Utils.CheckpointDatabase;
 import com.denied403.Hardcourse.Points.PointsManager;
+import com.transfemme.dev.core403.Core403;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.kyori.adventure.title.Title;
 import org.bukkit.*;
@@ -24,7 +25,7 @@ import static com.denied403.Hardcourse.Discord.HardcourseDiscord.jda;
 import static com.denied403.Hardcourse.Discord.HardcourseDiscord.sendMessage;
 import static com.denied403.Hardcourse.Hardcourse.*;
 import static com.denied403.Hardcourse.Utils.ColorUtil.Colorize;
-import static org.bukkit.Bukkit.getServer;
+import static com.denied403.Hardcourse.Utils.Luckperms.addRank;
 
 public class onWalk implements Listener {
     private final PointsManager pointsManager;
@@ -34,10 +35,10 @@ public class onWalk implements Listener {
     public onWalk() {
         this.pointsManager = new PointsManager();
     }
-    public static void initalize(CheckpointDatabase db) {database = db;}
+    public static void initialize(CheckpointDatabase db) {database = db;}
 
     @EventHandler
-    public void onWalk(PlayerMoveEvent event) {
+    public void onWalkEvent(PlayerMoveEvent event) {
         Player p = event.getPlayer();
         Location loc = p.getLocation();
         if (p.getLocation().subtract(0, 1, 0).getBlock().getType() == Material.JUKEBOX && p.getLocation().getBlock().getType() == Material.OAK_SIGN) {
@@ -127,6 +128,7 @@ public class onWalk implements Listener {
                     p.sendMessage(Colorize("&c&lHARDCOURSE&r You can't set a checkpoint here! Please refrain from making any more progress, and contact an administrator to fix the issue!"));
                     return;
                 }
+                if(Core403.getVanishedPlayers().contains(p.getUniqueId())) {return;}
                 p.playSound(loc, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
                 if(isDev()) {
                     int pointsToAdd = 10 + random.nextInt(11);
@@ -163,7 +165,7 @@ public class onWalk implements Listener {
                         }
                         if (isDiscordEnabled()) sendMessage(p, null, "winning", "3", null);
                         p.sendMessage(Colorize("&aCongratulations! You have completed Season 3! There is currently no Season 4, so you have reached the end of the Hardcourse for now."));
-                        getServer().dispatchCommand(Bukkit.getConsoleSender(), "lp user " + p.getName() + " parent add winner");
+                        addRank(p.getUniqueId(), "winner");
                     } else if (!p.hasPermission("hardcourse.staff")) {
                         p.sendMessage(Colorize("&c&lHARDCOURSE &rYou have reached the end. However, we have reason to believe you are &4cheating&f. If you are not, please contact a staff member to verify your progress."));
                     }
@@ -178,15 +180,7 @@ public class onWalk implements Listener {
         p.setGameMode(GameMode.ADVENTURE);
         p.setRespawnLocation(p.getLocation().add(0, 1, 0), true);
         database.setCheckpointData(p.getUniqueId(), nextSeason, 1, database.getPoints(p.getUniqueId()));
-        getServer().dispatchCommand(getServer().getConsoleSender(), "lp user " + p.getName() + " parent add " + nextSeason);
+        addRank(p.getUniqueId(), String.valueOf(nextSeason));
         p.sendMessage(Colorize("&aYou have been teleported to the next season. You can now continue your journey!"));
-    }
-    private void sendPointsSubtitle(Player player, String pointsMessage) {
-        Title title = Title.title(
-                Colorize(""),
-                Colorize(pointsMessage),
-                Title.Times.times(Duration.ofMillis(250), Duration.ofSeconds(2), Duration.ofMillis(250))
-        );
-        player.showTitle(title);
     }
 }

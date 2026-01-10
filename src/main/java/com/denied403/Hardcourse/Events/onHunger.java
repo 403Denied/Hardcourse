@@ -5,7 +5,7 @@ import org.bukkit.event.Listener;
 
 public class onHunger implements Listener {
     @EventHandler
-    public void onHunger(org.bukkit.event.entity.FoodLevelChangeEvent event) {
+    public void onHungerEvent(org.bukkit.event.entity.FoodLevelChangeEvent event) {
         if (event.getFoodLevel() < 20) {
             event.setCancelled(true);
         }

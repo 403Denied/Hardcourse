@@ -1,6 +1,5 @@
 package com.denied403.Hardcourse.Points;
 
-import com.denied403.Hardcourse.Hardcourse;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
@@ -20,12 +19,11 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.denied403.Hardcourse.Hardcourse.plugin;
 import static com.denied403.Hardcourse.Utils.ColorUtil.Colorize;
 import static com.denied403.Hardcourse.Utils.ColorUtil.stripAllColors;
 
 public class PointsShop implements Listener {
-
-    private final Hardcourse plugin;
 
     private boolean isPointsShopPaper(ItemStack item) {
         if (item == null || item.getType() != Material.PAPER || !item.hasItemMeta()) return false;
@@ -174,13 +172,6 @@ public class PointsShop implements Listener {
         }
     }
 
-    private final CosmeticsShop cosmeticsShop;
-
-    public PointsShop(Hardcourse plugin, CosmeticsShop cosmeticsShop) {
-        this.plugin = plugin;
-        this.cosmeticsShop = cosmeticsShop;
-    }
-
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         if (!(event.getWhoClicked() instanceof Player player)) return;
@@ -261,7 +252,7 @@ public class PointsShop implements Listener {
         } else if (name.equalsIgnoreCase("Cosmetics")) {
             player.closeInventory();
 
-            Bukkit.getScheduler().runTaskLater(plugin, () -> cosmeticsShop.openCosmeticsShop(player), 2L);
+            Bukkit.getScheduler().runTaskLater(plugin, () -> openCosmeticsShop(player), 2L);
         }
     }
     public static void givePointsShopChest(Player player, Boolean inSpot) {
@@ -276,5 +267,10 @@ public class PointsShop implements Listener {
         } else {
             player.getInventory().addItem(paper);
         }
+    }
+
+    public void openCosmeticsShop(Player player){
+        Inventory gui = Bukkit.createInventory(null, 36, Colorize("Cosmetics Shop"));
+        player.openInventory(gui);
     }
 }

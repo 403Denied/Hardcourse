@@ -5,7 +5,6 @@ import com.denied403.Hardcourse.Discord.Tickets.Applications.ApplicationButtonLi
 import com.denied403.Hardcourse.Discord.Tickets.Applications.ApplicationMessageListener;
 import com.denied403.Hardcourse.Discord.Tickets.PanelButtonListener;
 import com.denied403.Hardcourse.Events.BanListener;
-import com.denied403.Hardcourse.Hardcourse;
 import com.denied403.Hardcourse.Utils.CheckpointDatabase;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -22,7 +21,6 @@ import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.bukkit.Bukkit;
 import org.bukkit.Statistic;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -31,12 +29,12 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import static com.denied403.Hardcourse.Hardcourse.isDiscordEnabled;
+import static com.denied403.Hardcourse.Hardcourse.plugin;
 import static com.denied403.Hardcourse.Utils.ColorUtil.stripAllColors;
 import static com.denied403.Hardcourse.Utils.Playtime.getPlaytime;
+import static com.transfemme.dev.core403.Core403.getVanishedPlayers;
 
 public class HardcourseDiscord {
-
-    private final JavaPlugin plugin;
     public static JDA jda;
     public static TextChannel chatChannel;
     public static TextChannel staffChatChannel;
@@ -44,10 +42,6 @@ public class HardcourseDiscord {
     public static ThreadChannel logsChannel;
     public static ThreadChannel punishmentChannel;
     public static ThreadChannel reportChannel;
-
-    public HardcourseDiscord(JavaPlugin plugin) {
-        this.plugin = plugin;
-    }
     private static final Map<String, Message> lastHackAlert = new HashMap<>();
     private static CheckpointDatabase database;
     public static void initialize(CheckpointDatabase db) {
@@ -75,11 +69,11 @@ public class HardcourseDiscord {
                         .enableCache(CacheFlag.ONLINE_STATUS)
                         .addEventListeners(
                                 new DiscordListener(),
-                                new CommandManager((Hardcourse) plugin),
+                                new CommandManager(plugin),
                                 new DiscordButtonListener(),
                                 new PanelButtonListener(),
-                                new ApplicationMessageListener((Hardcourse) plugin),
-                                new ApplicationButtonListener((Hardcourse) plugin),
+                                new ApplicationMessageListener(plugin),
+                                new ApplicationButtonListener(plugin),
                                 new BanListener()
 
                         ).build().awaitReady();
@@ -120,6 +114,8 @@ public class HardcourseDiscord {
     }
 
     public static void sendMessage(Player player, String content, String type, String extra1, String extra2) {
+        final SimpleDateFormat f = new SimpleDateFormat("HH:mm:ss z");
+        f.setTimeZone(TimeZone.getTimeZone("UTC"));
         if (chatChannel == null) {
             player.sendMessage("Chat channel not found!");
             return;
@@ -144,6 +140,7 @@ public class HardcourseDiscord {
             chatChannel.sendMessage(":inbox_tray: **`" + stripAllColors(player.displayName()) + "`** joined the server for the first time _[#" + Bukkit.getOfflinePlayers().length + "]_").queue();
         }
         if (type.equals("leave")) {
+            if(getVanishedPlayers().contains(player.getUniqueId())){return;}
             chatChannel.sendMessage(":outbox_tray: **`" + stripAllColors(player.displayName()) + "`** left the server").queue();
         }
         if (type.equals("hacks")) {
@@ -156,24 +153,22 @@ public class HardcourseDiscord {
             }
             if (lastHackAlert.containsKey(playerName)) {
                 Message oldMessage = lastHackAlert.get(playerName);
-                oldMessage.editMessage(oldMessage.getContentRaw())
-                        .setComponents()
-                        .queue();
+                oldMessage.editMessage(oldMessage.getContentRaw()).setComponents().queue();
             }
             if(player.getStatistic(Statistic.PLAY_ONE_MINUTE) >= 72000){
                 hacksChannel.sendMessage(messageContent).queue(sentMessage -> lastHackAlert.put(playerName, sentMessage));
             }
             else {
-                hacksChannel.sendMessage(messageContent)
-                        .setActionRow(Button.danger("ban:" + playerName, "Ban"))
-                        .queue(sentMessage -> lastHackAlert.put(playerName, sentMessage));
+                hacksChannel.sendMessage(messageContent).setActionRow(Button.danger("ban:" + playerName, "Ban")).queue(sentMessage -> lastHackAlert.put(playerName, sentMessage));
             }
         }
         if (type.equals("starting")){
             chatChannel.sendMessage(":white_check_mark: **The server has started up!**").queue();
+            logsChannel.sendMessage("`[" + f.format(new Date()) + "] Server started up`").queue();
         }
         if (type.equals("stopping")){
             chatChannel.sendMessage(":octagonal_sign: **The server has shut down!**").queue();
+            logsChannel.sendMessage("`[" + f.format(new Date()) + "] Server shut down`").queue();
         }
         if (type.equals("winning")){
             if(!(extra1.equals("3"))) {
@@ -183,18 +178,16 @@ public class HardcourseDiscord {
             }
         }
         if(type.equals("logs")){
-            final SimpleDateFormat f = new SimpleDateFormat("HH:mm:ss z");
-            f.setTimeZone(TimeZone.getTimeZone("UTC"));
             if(extra1.equals("true")){
                 logsChannel.sendMessage("`[FILTERED] [" + f.format(new Date()) + "] " + stripAllColors(player.getName()) + ": " + content.replaceAll("`", "'") + "`").queue();
             } if(extra1.equals("false")){
                 logsChannel.sendMessage("`[" + f.format(new Date()) + "] " + stripAllColors(player.getName()) + ": " + content.replaceAll("`", "'") + "`").queue();
             }
             if(extra1.equals("join")){
-                logsChannel.sendMessage("`[" + f.format(new Date()) + "] " + stripAllColors(player.getName()) + " joined`").queue();
+                logsChannel.sendMessage("`[" + f.format(new Date()) + "] " + stripAllColors(player.getName()) + " joined" + (!player.hasPlayedBefore() ? " for the first time`" : "`")).queue();
             }
             if(extra1.equals("quit")){
-                logsChannel.sendMessage("`[" + f.format(new Date()) + "] " + stripAllColors(player.getName()) + " quit`").queue();
+                logsChannel.sendMessage((getVanishedPlayers().contains(player.getUniqueId()) ? "`[SILENT] " : "`") + "[" + f.format(new Date()) + "] " + stripAllColors(player.getName()) + " quit" + (getVanishedPlayers().contains(player.getUniqueId()) ? " while vanished`" : "`")).queue();
             }
             if(extra1.equals("vanished")){
                 logsChannel.sendMessage((extra2.equals("silent") ? "`[SILENT] " : "`") + "[" + f.format(new Date()) + "] " + stripAllColors(player.getName()) + " vanished`").queue();
