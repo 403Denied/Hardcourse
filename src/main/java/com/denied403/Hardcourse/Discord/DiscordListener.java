@@ -1,6 +1,5 @@
 package com.denied403.Hardcourse.Discord;
 
-import com.denied403.Hardcourse.Utils.CheckpointDatabase;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -15,18 +14,16 @@ import java.util.TimeZone;
 import java.util.UUID;
 
 import static com.denied403.Hardcourse.Discord.HardcourseDiscord.*;
-import static com.denied403.Hardcourse.Hardcourse.isDiscordEnabled;
-import static com.denied403.Hardcourse.Utils.ColorUtil.Colorize;
+import static com.denied403.Hardcourse.Hardcourse.DiscordEnabled;
+import static com.denied403.Hardcourse.Hardcourse.checkpointDatabase;
 import static com.denied403.Hardcourse.Utils.Luckperms.getLuckPermsPrefix;
 import static com.denied403.Hardcourse.Utils.Luckperms.hasLuckPermsPermission;
+import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
 
 public final class DiscordListener extends ListenerAdapter {
-    private static CheckpointDatabase database;
-    public static void initialize(CheckpointDatabase db) {database = db;}
-
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
-        if (!isDiscordEnabled()) return;
+        if (!DiscordEnabled) return;
 
         Member member = event.getMember();
         if (member == null || member.getUser().isBot()) return;
@@ -37,7 +34,7 @@ public final class DiscordListener extends ListenerAdapter {
         if (!staffChat && !event.getChannel().equals(chatChannel)) return;
 
         String discordId = member.getId();
-        String linkedUuidString = database.getUUIDFromDiscord(discordId);
+        String linkedUuidString = checkpointDatabase.getUUIDFromDiscord(discordId);
         UUID linkedUUID;
         if (linkedUuidString != null) {
             linkedUUID = UUID.fromString(linkedUuidString);

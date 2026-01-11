@@ -1,10 +1,16 @@
 DISCORD_TOKEN: TOKEN_HERE
+Guild-Id: GUILD_ID_HERE
 Chat-Channel-Id: CHANNEL_ID_HERE
 Staff-Chat-Channel-Id: CHANNEL_ID_HERE
 Anticheat-Channel-Id: CHANNEL_ID_HERE
 Logs-Channel-Id: CHANNEL_ID_HERE
 Punishment-Channel-Id: CHANNEL_ID_HERE
 Reports-Channel-Id: CHANNEL_ID_HERE
+Commands-Channel-Id: CHANNEL_ID_HERE
+Checkpoints-Channel-Id: CHANNEL_ID_HERE
+Deaths-Channel-Id: CHANNEL_ID_HERE
+Links-Channel-Id: CHANNEL_ID_HERE
+Linked-Role-Id: ROLE_ID_HERE
 
 discord-enabled: true/false
 broadcast-enabled: true/false

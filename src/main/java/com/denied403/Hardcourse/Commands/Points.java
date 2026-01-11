@@ -22,15 +22,11 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import static com.denied403.Hardcourse.Hardcourse.checkpointDatabase;
 import static com.denied403.Hardcourse.Hardcourse.plugin;
-import static com.denied403.Hardcourse.Utils.ColorUtil.Colorize;
+import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
 
 public class Points {
-    private static CheckpointDatabase database;
-    public static void initialize(CheckpointDatabase db) {
-        database = db;
-    }
-
     public static LiteralCommandNode<CommandSourceStack> createCommand(PointsManager pointsManager, String commandName) {
         return Commands.literal(commandName)
                 .requires(source -> source.getSender().hasPermission("hardcourse.points.manage"))
@@ -154,7 +150,7 @@ public class Points {
 
 
     private static int executeLeaderboard(Hardcourse plugin, CommandSender sender, int page) {
-        List<CheckpointDatabase.CheckpointData> all = database.getAllSortedByPoints();
+        List<CheckpointDatabase.CheckpointData> all = checkpointDatabase.getAllSortedByPoints();
 
         if (page == 1) {
             sender.sendMessage(Colorize("&c&lHARDCOURSE &rSorting &c" + all.size() + "&f players..."));
@@ -167,7 +163,7 @@ public class Points {
     private static int sendLeaderboard(CommandSender sender, int page, List<CheckpointDatabase.CheckpointData> all) {
         List<CheckpointDatabase.CheckpointData> filtered = all.stream().filter(data -> {
             OfflinePlayer p = Bukkit.getOfflinePlayer(data.uuid());
-            return !p.isOp() && !(database.getPoints(p.getUniqueId()) == 0);
+            return !p.isOp() && !(checkpointDatabase.getPoints(p.getUniqueId()) == 0);
         }).toList();
 
         int totalEntries = filtered.size();

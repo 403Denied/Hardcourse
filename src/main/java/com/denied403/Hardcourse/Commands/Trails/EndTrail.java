@@ -20,7 +20,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import static com.denied403.Hardcourse.Utils.ColorUtil.Colorize;
+import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
 
 public class EndTrail implements Listener {
 

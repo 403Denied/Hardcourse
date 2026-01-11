@@ -5,7 +5,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
 import static com.denied403.Hardcourse.Hardcourse.isDev;
-import static com.denied403.Hardcourse.Utils.ColorUtil.Colorize;
+import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
 
 public class onDrop implements Listener {
     @EventHandler
@@ -13,7 +13,7 @@ public class onDrop implements Listener {
         if(event.getItemDrop().getItemStack().getType() == Material.CLOCK && event.getItemDrop().getItemStack().getItemMeta().displayName().equals(Colorize("&c&lStuck"))){
             event.setCancelled(true);
         }
-        if(isDev()) {
+        if(isDev) {
             if (event.getItemDrop().getItemStack().getType() == Material.PAPER && event.getItemDrop().getItemStack().getItemMeta().displayName().equals(Colorize("&c&lPoints Shop"))) {
                 event.setCancelled(true);
             }

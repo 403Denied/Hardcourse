@@ -1,18 +1,14 @@
 package com.denied403.Hardcourse.Events;
 
-import com.denied403.Hardcourse.Utils.CheckpointDatabase;
-import com.transfemme.dev.core403.Core403;
 import com.transfemme.dev.core403.Punishments.Api.CustomEvents.IPBanEvent;
 import com.transfemme.dev.core403.Punishments.Api.CustomEvents.NameBanEvent;
 import com.transfemme.dev.core403.Punishments.Api.CustomEvents.PunishmentEvent;
 import com.transfemme.dev.core403.Punishments.Api.CustomEvents.RevertEvent;
 import com.transfemme.dev.core403.Punishments.Api.CustomEvents.PunishmentEditEvent;
-import com.transfemme.dev.core403.Punishments.Database.PunishmentDatabase;
 import com.transfemme.dev.core403.Punishments.Events.onChatEdit;
 import com.transfemme.dev.core403.Punishments.Utils.PunishmentDurationParser;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -30,29 +26,18 @@ import java.awt.*;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 import static com.denied403.Hardcourse.Discord.HardcourseDiscord.*;
 import static com.denied403.Hardcourse.Hardcourse.*;
-import static com.denied403.Hardcourse.Utils.ColorUtil.Colorize;
 import static com.denied403.Hardcourse.Utils.Luckperms.hasLuckPermsPermission;
+import static com.transfemme.dev.core403.Core403.getPunishmentDatabase;
+import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
 import static org.bukkit.Bukkit.getServer;
 
-public class BanListener extends ListenerAdapter implements Listener {
-    private static CheckpointDatabase database;
-    private static PunishmentDatabase punishmentDatabase;
-
-    public static void initialize(CheckpointDatabase db, PunishmentDatabase pDb) {
-        database = db;
-        punishmentDatabase = pDb;
-    }
-
+public class PunishmentListener extends ListenerAdapter implements Listener {
     public static void runBanCleanup(String playerName) {
-        ThreadChannel channel = jda.getThreadChannelById(Objects.requireNonNull(plugin.getConfig().getString("Anticheat-Channel-Id")));
-        if (channel == null) return;
-
-        channel.getHistory().retrievePast(100).queue(messages -> {
+        hacksChannel.getHistory().retrievePast(100).queue(messages -> {
             for (Message msg : messages) {
                 List<Button> buttons = msg.getButtons();
                 boolean changed = false;
@@ -67,7 +52,7 @@ public class BanListener extends ListenerAdapter implements Listener {
                     }
                 }
                 if (changed) {
-                    channel.editMessageComponentsById(msg.getId(), ActionRow.of(updated)).queue();
+                    hacksChannel.editMessageComponentsById(msg.getId(), ActionRow.of(updated)).queue();
                 }
             }
         });
@@ -85,12 +70,12 @@ public class BanListener extends ListenerAdapter implements Listener {
                         }
                     }
                 }
-                if(isDiscordEnabled()) {
+                if(DiscordEnabled) {
                     runBanCleanup(playerName);
                 }
             }
         }
-        if(isDiscordEnabled()) {
+        if(DiscordEnabled) {
             String punishment = "";
             if(event.getTypeOfPunishment().equalsIgnoreCase("banned")){punishment = "Ban";}
             if(event.getTypeOfPunishment().equalsIgnoreCase("muted")){punishment = "Mute";}
@@ -100,7 +85,7 @@ public class BanListener extends ListenerAdapter implements Listener {
             if(durationMs == -1){durationString = "Never";} else {durationString = "<t:" + (Instant.now().toEpochMilli() + durationMs) / 1000L + ":R>";}
 
             EmbedBuilder punishmentEmbed = new EmbedBuilder()
-                    .setTitle(punishment + " Issued" + (isDev() ? " (Dev)" : ""))
+                    .setTitle(punishment + " Issued")
                     .setDescription("**ID:** " + event.getPunishmentId() + "\n**Staff:** `" + event.getStaff() + "`\n**Target:** `" + playerName + "`\n**Reason:** " + reason + "\n**Expires:** " + durationString + "\n**Note:** " + (event.getNotes() == null ? "None" : event.getNotes()))
                     .setThumbnail("https://mc-heads.net/avatar/" + event.getTargetUUID() + ".png")
                     .setColor(Color.RED);
@@ -114,7 +99,7 @@ public class BanListener extends ListenerAdapter implements Listener {
     @Override
     public void onButtonInteraction(ButtonInteractionEvent event) {
         if(!event.getChannel().getId().equals(plugin.getConfig().getString("Punishment-Channel-Id"))) return;
-        String linkedUuidString = database.getUUIDFromDiscord(event.getMember().getId());
+        String linkedUuidString = checkpointDatabase.getUUIDFromDiscord(event.getMember().getId());
         UUID linkedUUID;
         if (linkedUuidString != null) {
             linkedUUID = UUID.fromString(linkedUuidString);
@@ -187,7 +172,7 @@ public class BanListener extends ListenerAdapter implements Listener {
     }
 
     private boolean checkReverted(ButtonInteractionEvent event, String punishmentId) {
-        if(punishmentDatabase.isReverted(punishmentId)){
+        if(getPunishmentDatabase().isReverted(punishmentId)){
             event.deferEdit().queue();
             event.getMessage().editMessageComponents(
                     ActionRow.of(
@@ -209,7 +194,7 @@ public class BanListener extends ListenerAdapter implements Listener {
                         Button.success("button:disabled2", "Change Duration").asDisabled()
                 )
         ).queue();
-        if(punishmentDatabase.isReverted(punishmentId)){
+        if(getPunishmentDatabase().isReverted(punishmentId)){
             event.deferEdit().queue();
             event.getHook().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription("❌ This punishment has already been reverted!").build()).setEphemeral(true).queue();
             return true;
@@ -223,9 +208,9 @@ public class BanListener extends ListenerAdapter implements Listener {
             String punishmentId = event.getModalId().split(":")[1];
             if (checkRevertedModal(event, punishmentId)) return;
             String note = event.getValue("reason").getAsString();
-            String linkedUuidString = database.getUUIDFromDiscord(event.getMember().getId());
+            String linkedUuidString = checkpointDatabase.getUUIDFromDiscord(event.getMember().getId());
             UUID linkedUUID = UUID.fromString(linkedUuidString);
-            com.transfemme.dev.core403.Punishments.Events.onChatRevert.revertPunishment(punishmentId, linkedUUID, System.currentTimeMillis(), note, Core403.getPunishmentDatabase());
+            com.transfemme.dev.core403.Punishments.Events.onChatRevert.revertPunishment(punishmentId, linkedUUID, System.currentTimeMillis(), note, getPunishmentDatabase());
             EmbedBuilder punishmentEmbed = new EmbedBuilder().setColor(Color.GREEN).setDescription("✅ Punishment `" + punishmentId + "` successfully reverted.");
             event.replyEmbeds(punishmentEmbed.build()).setEphemeral(true).queue();
             return;
@@ -234,10 +219,10 @@ public class BanListener extends ListenerAdapter implements Listener {
             String punishmentId = event.getModalId().split(":")[1];
             if (checkRevertedModal(event, punishmentId)) return;
             String note = event.getValue("note").getAsString();
-            if(!Core403.getPunishmentDatabase().hasNotes(punishmentId)) {
-                Core403.getPunishmentDatabase().addNotes(punishmentId, note);
+            if(!getPunishmentDatabase().hasNotes(punishmentId)) {
+                getPunishmentDatabase().addNotes(punishmentId, note);
             } else {
-                Core403.getPunishmentDatabase().addGeneralNotes(punishmentId, note);
+                getPunishmentDatabase().addGeneralNotes(punishmentId, note);
             }
             EmbedBuilder noteEmbed = new EmbedBuilder().setColor(Color.GREEN).setDescription("✅ Successfully added note to punishment `" + punishmentId + "`.");
             event.replyEmbeds(noteEmbed.build()).setEphemeral(true).queue();
@@ -247,7 +232,7 @@ public class BanListener extends ListenerAdapter implements Listener {
             String punishmentId = event.getModalId().split(":")[1];
             if (checkRevertedModal(event, punishmentId)) return;
             String discordId = event.getMember().getId();
-            UUID linkedUuid = UUID.fromString(database.getUUIDFromDiscord(discordId));
+            UUID linkedUuid = UUID.fromString(checkpointDatabase.getUUIDFromDiscord(discordId));
             String duration =  event.getValue("duration").getAsString();
             try {
                 PunishmentDurationParser.parse(duration);
@@ -257,7 +242,7 @@ public class BanListener extends ListenerAdapter implements Listener {
                 return;
             }
             String reason = event.getValue("reason").getAsString();
-            onChatEdit.editPunishment(punishmentId, linkedUuid, duration, reason, Core403.getPunishmentDatabase());
+            onChatEdit.editPunishment(punishmentId, linkedUuid, duration, reason, getPunishmentDatabase());
             EmbedBuilder noteEmbed = new EmbedBuilder().setColor(Color.GREEN).setDescription("✅ Successfully updated duration of punishment `" + punishmentId + "` to `" +  duration + "`.");
             event.replyEmbeds(noteEmbed.build()).setEphemeral(true).queue();
         }
@@ -269,7 +254,7 @@ public class BanListener extends ListenerAdapter implements Listener {
         String staffName = event.getStaff();
         String reason = event.getReason();
         String punishmentType = event.getType().toLowerCase();
-        if(isDiscordEnabled()) {
+        if(DiscordEnabled) {
             punishmentChannel.sendMessage("`" + staffName + "` reverted a " + punishmentType + " from `" + playerName + "` for `" + reason + "`").queue();
         }
     }
@@ -277,9 +262,9 @@ public class BanListener extends ListenerAdapter implements Listener {
     public void onNameBan(NameBanEvent event) {
         String playerName = Bukkit.getOfflinePlayer(event.getTargetUUID()).getName();
         String staffName = event.getStaff();
-        if(isDiscordEnabled()) {
+        if(DiscordEnabled) {
             EmbedBuilder punishmentEmbed = new EmbedBuilder()
-                    .setTitle("Name Ban Issued" + (isDev() ? " (Dev)" : ""))
+                    .setTitle("Name Ban Issued")
                     .setDescription("**ID:** " + event.getPunishmentId() + "\n**Staff:** " + staffName + "\n**Target:** " + playerName)
                     .setThumbnail("https://mc-heads.net/avatar/" + event.getTargetUUID() + ".png")
                     .setColor(Color.RED);
@@ -290,9 +275,9 @@ public class BanListener extends ListenerAdapter implements Listener {
     public void onIpBan(IPBanEvent event){
         String playerName = Bukkit.getOfflinePlayer(event.getTargetUUID()).getName();
         String staffName = event.getStaff();
-        if(isDiscordEnabled()) {
+        if(DiscordEnabled) {
             EmbedBuilder punishmentEmbed = new EmbedBuilder()
-                    .setTitle("IP Ban Issued" + (isDev() ? " (Dev)" : ""))
+                    .setTitle("IP Ban Issued")
                     .setDescription("**ID:** " + event.getPunishmentId() + "\n**Staff:** " + staffName + "\n**Target:** " + playerName)
                     .setThumbnail("https://mc-heads.net/avatar/" + event.getTargetUUID() + ".png")
                     .setColor(Color.RED);
@@ -307,7 +292,7 @@ public class BanListener extends ListenerAdapter implements Listener {
         String reason = event.getReason();
         String punishmentReason = event.getPunishmentReason();
         String punishmentType = event.getPunishmentType().toLowerCase();
-        if(isDiscordEnabled()) {
+        if(DiscordEnabled) {
             punishmentChannel.sendMessage("`" + staffName + "` edited a " + punishmentType + " from `" + playerName + "` for `" + punishmentReason + "`").queue();
         }
     }

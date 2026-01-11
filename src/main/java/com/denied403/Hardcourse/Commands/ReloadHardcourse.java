@@ -1,15 +1,15 @@
 package com.denied403.Hardcourse.Commands;
 
-import com.denied403.Hardcourse.Discord.HardcourseDiscord;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.command.CommandSender;
 
+import static com.denied403.Hardcourse.Discord.HardcourseDiscord.InitJDA;
 import static com.denied403.Hardcourse.Discord.HardcourseDiscord.jda;
 import static com.denied403.Hardcourse.Hardcourse.*;
-import static com.denied403.Hardcourse.Utils.ColorUtil.Colorize;
+import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
 
 public class ReloadHardcourse {
 
@@ -18,16 +18,21 @@ public class ReloadHardcourse {
                 .requires(source -> source.getSender().hasPermission("hardcourse.admin"))
                 .executes(ctx -> {
                     CommandSender sender = ctx.getSource().getSender();
-
-                    loadConfigValues();
                     plugin.reloadConfig();
-                    plugin.reloadWordsConfig();
-                    HardcourseDiscord hardcourseDiscord = new HardcourseDiscord();
-                    if(isDiscordEnabled()) {
-                        jda.shutdown();
-                        hardcourseDiscord.InitJDA();
+                    loadConfigValues();
+                    boolean wasEnabled = jda != null;
+                    if (DiscordEnabled) {
+                        if (wasEnabled) {
+                            jda.shutdown();
+                        }
+                        InitJDA();
+                    } else {
+                        if (wasEnabled) {
+                            jda.shutdown();
+                            jda = null;
+                        }
                     }
-                    sender.sendMessage(Colorize("&c&lHARDCOURSE &rHardcourse config reloaded."));
+                    sender.sendMessage(Colorize("<prefix>Hardcourse config reloaded."));
                     return Command.SINGLE_SUCCESS;
                 })
                 .build();

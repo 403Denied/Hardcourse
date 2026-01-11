@@ -9,7 +9,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import static com.denied403.Hardcourse.Hardcourse.isDev;
-import static com.denied403.Hardcourse.Utils.ColorUtil.Colorize;
+import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
 
 public class onClick implements Listener {
     @EventHandler
@@ -20,7 +20,7 @@ public class onClick implements Listener {
             event.getPlayer().setHealth(0);
             return;
         } if(event.getItem().getType() == Material.TORCH && event.getItem().getItemMeta().itemName().equals(Colorize("&cHide &rPlayers").decoration(TextDecoration.ITALIC, false))) {
-            if (isDev()){
+            if (isDev){
                 event.getPlayer().performCommand("hideplayers");
                 event.setCancelled(true);
                 ItemStack soulTorch = new ItemStack(Material.SOUL_TORCH, 1);
@@ -32,7 +32,7 @@ public class onClick implements Listener {
                 return;
             }
         } if(event.getItem().getType() == Material.SOUL_TORCH && event.getItem().getItemMeta().itemName().equals(Colorize("&cShow &rPlayers").decoration(TextDecoration.ITALIC, false))){
-            if(isDev()) {
+            if(isDev) {
                 event.setCancelled(true);
                 event.getPlayer().performCommand("hideplayers");
                 ItemStack torch = new ItemStack(Material.TORCH, 1);

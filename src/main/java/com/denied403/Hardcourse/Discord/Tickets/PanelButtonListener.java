@@ -1,6 +1,5 @@
 package com.denied403.Hardcourse.Discord.Tickets;
 
-import com.denied403.Hardcourse.Utils.CheckpointDatabase;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -10,12 +9,10 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 
-import static com.denied403.Hardcourse.Hardcourse.plugin;
+import static com.denied403.Hardcourse.Hardcourse.*;
 import static com.denied403.Hardcourse.Utils.Luckperms.hasLuckPermsPermission;
 
 public class PanelButtonListener extends ListenerAdapter {
-    private static CheckpointDatabase database;
-    public static void initialize(CheckpointDatabase db) {database = db;}
     public static final Map<String, Integer> applicationProgress = new HashMap<>();
     public static final Map<String, List<String>> applicationAnswers = new HashMap<>();
     public static final Set<String> applicationEditing = new HashSet<>();
@@ -25,7 +22,7 @@ public class PanelButtonListener extends ListenerAdapter {
         String id = event.getComponentId();
         String userId = event.getUser().getId();
         if(event.getChannel().getId().equals("720530985191735316")) {
-            String linkedUuidString = database.getUUIDFromDiscord(userId);
+            String linkedUuidString = checkpointDatabase.getUUIDFromDiscord(userId);
             UUID linkedUUID;
             if (linkedUuidString != null) {
                 linkedUUID = UUID.fromString(linkedUuidString);
@@ -77,7 +74,7 @@ public class PanelButtonListener extends ListenerAdapter {
             }
             case "send_application:agree" -> event.getUser().openPrivateChannel().queue(
                     channel -> {
-                        List<String> questions = plugin.getApplicationQuestions();
+                        List<String> questions = applicationQuestions;
 
                         applicationProgress.put(userId, 0);
                         applicationAnswers.put(userId, new ArrayList<>());

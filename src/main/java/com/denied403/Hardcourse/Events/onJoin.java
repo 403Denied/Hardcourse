@@ -1,6 +1,5 @@
 package com.denied403.Hardcourse.Events;
 
-import com.denied403.Hardcourse.Utils.CheckpointDatabase;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
@@ -20,19 +19,15 @@ import java.io.File;
 import static com.denied403.Hardcourse.Discord.HardcourseDiscord.sendMessage;
 import static com.denied403.Hardcourse.Hardcourse.*;
 import static com.denied403.Hardcourse.Points.PointsShop.givePointsShopChest;
-import static com.denied403.Hardcourse.Utils.ColorUtil.Colorize;
-import static com.denied403.Hardcourse.Utils.ColorUtil.stripAllColors;
+import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
+import static com.transfemme.dev.core403.Util.ColorUtil.stripAllColors;
 
 public class onJoin implements Listener {
-
-    private static CheckpointDatabase database;
-
-    public static void initialize(CheckpointDatabase db) {database = db;}
     @EventHandler
     public void onJoinEvent(org.bukkit.event.player.PlayerJoinEvent event) {
         org.bukkit.entity.Player player = event.getPlayer();
 
-        if (isDiscordEnabled()) {
+        if (DiscordEnabled) {
             if (player.hasPlayedBefore()) {
                 sendMessage(player, null, "join", null, null);
             } else {
@@ -41,9 +36,9 @@ public class onJoin implements Listener {
             sendMessage(player, null, "logs", "join", null);
         }
         if(!player.hasPlayedBefore()) {
-            database.setCheckpointData(player.getUniqueId(), 1, 0, 0);
+            checkpointDatabase.setCheckpointData(player.getUniqueId(), 1, 0, 0);
         }
-        if(database.getCheckpointData(player.getUniqueId()) == null) {
+        if(checkpointDatabase.getCheckpointData(player.getUniqueId()) == null) {
             int season;
             double level;
             if(!player.getWorld().getName().startsWith("Season")){
@@ -65,17 +60,17 @@ public class onJoin implements Listener {
                     Bukkit.getLogger().severe("Failed to save checkpoints file: " + e.getMessage());
                 }
                 player.sendMessage(Colorize("&c&lHARDCOURSE &rYour checkpoint data has successfully been migrated from legacy storage to the new system. Level: &c" + String.valueOf(level).replace(".0", "") + "&r Season: &c" + season + "&r. If you believe there is an error with these numbers, please contact an administrator."));
-                database.setCheckpointData(player.getUniqueId(), season, level, 0);
+                checkpointDatabase.setCheckpointData(player.getUniqueId(), season, level, 0);
             } else {
-                database.setCheckpointData(player.getUniqueId(), 1, 0, 0);
+                checkpointDatabase.setCheckpointData(player.getUniqueId(), 1, 0, 0);
                 player.teleport(player.getWorld().getSpawnLocation());
                 player.setRespawnLocation(player.getLocation());
             }
         }
-        if(database.getSeason(player.getUniqueId()) == 0 || database.getSeason(player.getUniqueId()) == null) {
-            database.setSeason(player.getUniqueId(), 1);
+        if(checkpointDatabase.getSeason(player.getUniqueId()) == 0 || checkpointDatabase.getSeason(player.getUniqueId()) == null) {
+            checkpointDatabase.setSeason(player.getUniqueId(), 1);
         }
-        if(isDev()) {
+        if(isDev) {
             boolean hasPointsShop = false;
 
             for (ItemStack item : player.getInventory().getContents()) {
@@ -128,7 +123,7 @@ public class onJoin implements Listener {
         soulTorchMeta.itemName(Colorize("&cShow &rPlayers").decoration(TextDecoration.ITALIC, false));
         soulTorch.setItemMeta(soulTorchMeta);
 
-        if(isDev()) {
+        if(isDev) {
             if (player.getInventory().contains(soulTorch)) {
                 int index = player.getInventory().first(soulTorch);
                 if (index != -1) {

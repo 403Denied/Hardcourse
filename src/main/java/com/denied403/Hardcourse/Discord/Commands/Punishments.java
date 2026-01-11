@@ -1,7 +1,5 @@
 package com.denied403.Hardcourse.Discord.Commands;
 
-import com.denied403.Hardcourse.Utils.CheckpointDatabase;
-import com.transfemme.dev.core403.Punishments.Database.PunishmentDatabase;
 import com.transfemme.dev.core403.Punishments.PunishmentReason;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -15,18 +13,12 @@ import java.sql.ResultSet;
 import java.util.*;
 import java.util.List;
 
+import static com.denied403.Hardcourse.Hardcourse.checkpointDatabase;
 import static com.denied403.Hardcourse.Utils.Luckperms.hasLuckPermsPermission;
+import static com.transfemme.dev.core403.Core403.database;
 import static com.transfemme.dev.core403.Punishments.PunishmentConfigLoader.getReasonById;
 
 public class Punishments {
-    private static CheckpointDatabase checkpointDatabase;
-    private static PunishmentDatabase database;
-
-    public static void initialize(CheckpointDatabase db, PunishmentDatabase pDb) {
-        checkpointDatabase = db;
-        database = pDb;
-    }
-
     public static void run(SlashCommandInteractionEvent event) {
         String linkedUuidString = checkpointDatabase.getUUIDFromDiscord(event.getMember().getId());
         UUID staffUUID;

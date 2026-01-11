@@ -1,22 +1,17 @@
 package com.denied403.Hardcourse.Points;
 
-import com.denied403.Hardcourse.Utils.CheckpointDatabase;
-
 import java.util.UUID;
+
+import static com.denied403.Hardcourse.Hardcourse.checkpointDatabase;
 
 public class PointsManager {
 
-    private static CheckpointDatabase database;
-    public static void initialize(CheckpointDatabase db) {
-        database = db;
-    }
-
     public static int getPoints(UUID playerUUID) {
-        return database.getPoints(playerUUID);
+        return checkpointDatabase.getPoints(playerUUID);
     }
 
     public void setPoints(UUID playerUUID, int points) {
-        database.setPoints(playerUUID, points);
+        checkpointDatabase.setPoints(playerUUID, points);
     }
 
     public void addPoints(UUID playerUUID, int amount) {

@@ -1,6 +1,5 @@
 package com.denied403.Hardcourse.Events;
 
-import com.denied403.Hardcourse.Utils.CheckpointDatabase;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.entity.Player;
@@ -9,21 +8,16 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 import static com.denied403.Hardcourse.Discord.HardcourseDiscord.sendMessage;
-import static com.denied403.Hardcourse.Hardcourse.isDiscordEnabled;
+import static com.denied403.Hardcourse.Hardcourse.DiscordEnabled;
+import static com.denied403.Hardcourse.Hardcourse.checkpointDatabase;
 import com.transfemme.dev.core403.Punishments.Api.CustomEvents.ChatFilterEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
 public class onChat implements Listener {
-
-    private static CheckpointDatabase database;
-
-    public static void initialize(CheckpointDatabase db) {
-        database = db;
-    }
     @EventHandler
     public void onChatFiltered(ChatFilterEvent event){
         String message = event.getMessage();
-        if(isDiscordEnabled()) {
+        if(DiscordEnabled) {
             sendMessage(event.getPlayer(), message, "logs", "true", null);
         }
     }
@@ -31,9 +25,8 @@ public class onChat implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onAsyncChat(AsyncChatEvent event) {
         String content = LegacyComponentSerializer.legacySection().serialize(event.message());
-        if(!isDiscordEnabled()){
-            return;
-        }
+        if(!DiscordEnabled) return;
+
         if (event.isCancelled()){
             return;
         }
@@ -46,7 +39,7 @@ public class onChat implements Listener {
                 .replaceAll("https://", "`https://`")
                 .replaceAll("http://", "`http://`");
 
-        String season = database.getSeason(player.getUniqueId()).toString() + "-";
+        String season = checkpointDatabase.getSeason(player.getUniqueId()).toString() + "-";
         if (content.startsWith("#") && player.hasPermission("core403.staffchat")) {
             sendMessage(player, content.substring(1), "staffchat", null, null);
         } else {
@@ -61,7 +54,7 @@ public class onChat implements Listener {
     public void onCommand(PlayerCommandPreprocessEvent event) {
         String command = event.getMessage();
         Player player = event.getPlayer();
-        if(!player.hasPermission("core403.staffchat") || !isDiscordEnabled()) return;
+        if(!player.hasPermission("core403.staffchat") || !DiscordEnabled) return;
         if (command.startsWith("/sc ") || command.startsWith("/staffchat ")) {
             String message = command.replaceFirst("(?i)^/sc|^/staffchat", "").trim();
             sendMessage(player, message, "staffchat", null, null);

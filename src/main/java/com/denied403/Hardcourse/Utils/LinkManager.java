@@ -5,11 +5,9 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static com.denied403.Hardcourse.Hardcourse.checkpointDatabase;
+
 public class LinkManager {
-    private static CheckpointDatabase database;
-    public static void initialize(CheckpointDatabase db) {
-        database = db;
-    }
     private final SecureRandom random = new SecureRandom();
     private final Map<String, UUID> codeToUUID = new ConcurrentHashMap<>();
     private final Map<UUID, String> UUIDToCode = new ConcurrentHashMap<>();
@@ -19,7 +17,7 @@ public class LinkManager {
         return String.valueOf(num);
     }
     public String createLinkCode(UUID uuid){
-        if(database.isLinked(uuid)) return null;
+        if(checkpointDatabase.isLinked(uuid)) return null;
         if(UUIDToCode.containsKey(uuid)){
             String old = UUIDToCode.remove(uuid);
             codeToUUID.remove(old);

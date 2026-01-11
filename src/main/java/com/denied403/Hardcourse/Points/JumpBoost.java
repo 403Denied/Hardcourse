@@ -10,8 +10,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import static com.denied403.Hardcourse.Utils.ColorUtil.Colorize;
-import static com.denied403.Hardcourse.Utils.ColorUtil.stripAllColors;
+import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
+import static com.transfemme.dev.core403.Util.ColorUtil.stripAllColors;
 
 public class JumpBoost implements Listener {
 

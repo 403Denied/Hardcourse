@@ -1,6 +1,5 @@
 package com.denied403.Hardcourse.Events;
 
-import com.denied403.Hardcourse.Utils.CheckpointDatabase;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -10,13 +9,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 
-import static com.denied403.Hardcourse.Utils.ColorUtil.Colorize;
-import static com.transfemme.dev.core403.Core403.getVanishedPlayers;
+import static com.denied403.Hardcourse.Hardcourse.checkpointDatabase;
+import static com.transfemme.dev.core403.Commands.Moderation.Vanish.Vanished.vanishedPlayers;
+import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
 
 public class onSneak implements Listener {
-    private static CheckpointDatabase database;
-    public static void initialize(CheckpointDatabase db) {database = db;}
-
     @EventHandler
     public void onSneakEvent(PlayerToggleSneakEvent e){
         Player p = e.getPlayer();
@@ -39,10 +36,10 @@ public class onSneak implements Listener {
             } catch (NumberFormatException exception) {
                 return;
             }
-            int playerSeason = database.getSeason(p.getUniqueId()) != null ? database.getSeason(p.getUniqueId()) : 1;
-            double level = database.getLevel(p.getUniqueId());
+            int playerSeason = checkpointDatabase.getSeason(p.getUniqueId()) != null ? checkpointDatabase.getSeason(p.getUniqueId()) : 1;
+            double level = checkpointDatabase.getLevel(p.getUniqueId());
             if(playerSeason == season && level == checkpointNumber){
-                if(getVanishedPlayers().contains(p.getUniqueId())){return;}
+                if(vanishedPlayers.contains(p.getUniqueId())){return;}
                 p.sendActionBar(Colorize("&fReset Orientation: &c" + Double.toString(checkpointNumber).replace(".0", "")));
                 p.playSound(loc, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
                 p.setRespawnLocation(loc.add(0, 1, 0), true);

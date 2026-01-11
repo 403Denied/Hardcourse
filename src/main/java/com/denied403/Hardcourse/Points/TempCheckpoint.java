@@ -12,8 +12,8 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import static com.denied403.Hardcourse.Utils.ColorUtil.Colorize;
-import static com.denied403.Hardcourse.Utils.ColorUtil.stripAllColors;
+import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
+import static com.transfemme.dev.core403.Util.ColorUtil.stripAllColors;
 
 public class TempCheckpoint implements Listener {
 

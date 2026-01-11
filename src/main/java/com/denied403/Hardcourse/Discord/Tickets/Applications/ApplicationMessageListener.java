@@ -1,7 +1,6 @@
 package com.denied403.Hardcourse.Discord.Tickets.Applications;
 
 import com.denied403.Hardcourse.Discord.Tickets.PanelButtonListener;
-import com.denied403.Hardcourse.Hardcourse;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -14,13 +13,9 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.denied403.Hardcourse.Hardcourse.applicationQuestions;
+
 public class ApplicationMessageListener extends ListenerAdapter {
-
-    private final Hardcourse plugin;
-
-    public ApplicationMessageListener(Hardcourse plugin) {
-        this.plugin = plugin;
-    }
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
@@ -30,7 +25,7 @@ public class ApplicationMessageListener extends ListenerAdapter {
         String userId = event.getAuthor().getId();
         if (!PanelButtonListener.applicationProgress.containsKey(userId)) return;
 
-        List<String> questions = plugin.getApplicationQuestions();
+        List<String> questions = applicationQuestions;
         int currentIndex = PanelButtonListener.applicationProgress.get(userId);
         String message = event.getMessage().getContentRaw().trim();
         MessageChannel channel = event.getChannel();
@@ -134,7 +129,7 @@ public class ApplicationMessageListener extends ListenerAdapter {
                     for (int i = 0; i < finalEmbeds.size() - 1; i++) {
                         channel.sendMessageEmbeds(finalEmbeds.get(i)).queue();
                     }
-                    MessageEmbed lastEmbed = finalEmbeds.get(finalEmbeds.size() - 1);
+                    MessageEmbed lastEmbed = finalEmbeds.getLast();
 
                     channel.sendMessageEmbeds(lastEmbed)
                             .setActionRow(

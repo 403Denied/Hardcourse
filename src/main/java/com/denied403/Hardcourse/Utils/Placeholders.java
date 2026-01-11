@@ -4,11 +4,10 @@ import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
 
+import static com.denied403.Hardcourse.Hardcourse.checkpointDatabase;
 import static com.denied403.Hardcourse.Points.PointsManager.getPoints;
 
 public class Placeholders extends PlaceholderExpansion {
-    private static CheckpointDatabase database;
-    public static void initialize(CheckpointDatabase db) {database = db;}
     @Override
     public @NotNull String getIdentifier() {return "hardcourse";}
     @Override
@@ -23,10 +22,10 @@ public class Placeholders extends PlaceholderExpansion {
             return String.valueOf(getPoints(player.getUniqueId()));
         }
         if(params.equalsIgnoreCase("level")){
-            return String.valueOf(database.getLevel(player.getUniqueId())).replace(".0", "");
+            return String.valueOf(checkpointDatabase.getLevel(player.getUniqueId())).replace(".0", "");
         }
         if(params.equalsIgnoreCase("season")){
-            return String.valueOf(database.getSeason(player.getUniqueId()));
+            return String.valueOf(checkpointDatabase.getSeason(player.getUniqueId()));
         }
         return null;
     }

@@ -1,6 +1,5 @@
 package com.denied403.Hardcourse.Discord.Commands;
 
-import com.denied403.Hardcourse.Utils.CheckpointDatabase;
 import com.transfemme.dev.core403.Punishments.Enums.PunishmentType;
 import com.transfemme.dev.core403.Punishments.PunishmentReason;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -12,13 +11,11 @@ import org.bukkit.OfflinePlayer;
 import java.awt.*;
 import java.util.UUID;
 
+import static com.denied403.Hardcourse.Hardcourse.checkpointDatabase;
 import static com.denied403.Hardcourse.Hardcourse.plugin;
 import static com.denied403.Hardcourse.Utils.Luckperms.hasLuckPermsPermission;
 
 public class Punish {
-    private static CheckpointDatabase database;
-    public static void initialize(CheckpointDatabase db) {database = db;}
-
     public static void run(SlashCommandInteractionEvent event) {
         event.deferReply(true).queue();
 
@@ -39,7 +36,7 @@ public class Punish {
 
         String type = reason.getType() == PunishmentType.WARN && isWarn ? "warn" : "confirm";
 
-        String linkedUuidString = database.getUUIDFromDiscord(event.getMember().getId());
+        String linkedUuidString = checkpointDatabase.getUUIDFromDiscord(event.getMember().getId());
         UUID staffUUID;
         if (linkedUuidString != null) {
             staffUUID = UUID.fromString(linkedUuidString);

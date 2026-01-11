@@ -1,29 +1,24 @@
 package com.denied403.Hardcourse.Events;
 
-import com.denied403.Hardcourse.Utils.CheckpointDatabase;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import static com.denied403.Hardcourse.Discord.HardcourseDiscord.sendMessage;
-import static com.denied403.Hardcourse.Hardcourse.isDiscordEnabled;
+import static com.denied403.Hardcourse.Hardcourse.DiscordEnabled;
+import static com.denied403.Hardcourse.Hardcourse.checkpointDatabase;
 
 public class onQuit implements Listener {
-    private static CheckpointDatabase database;
-
-    public static void initialize(CheckpointDatabase db) {
-        database = db;
-    }
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e){
-        if(isDiscordEnabled()) {
+        if(DiscordEnabled) {
             sendMessage(e.getPlayer(), null, "leave", null, null);
             sendMessage(e.getPlayer(), null, "logs", "quit", null);
         }
-        Double highestLevel = database.getLevel(e.getPlayer().getUniqueId());
-        int season = database.getSeason(e.getPlayer().getUniqueId());
+        Double highestLevel = checkpointDatabase.getLevel(e.getPlayer().getUniqueId());
+        int season = checkpointDatabase.getSeason(e.getPlayer().getUniqueId());
         if(highestLevel <= 3 && season == 1){
-            database.deleteSpecific(e.getPlayer().getUniqueId());
+            checkpointDatabase.deleteSpecific(e.getPlayer().getUniqueId());
         }
     }
 }

@@ -1,7 +1,6 @@
 package com.denied403.Hardcourse.Discord.Tickets.Applications;
 
 import com.denied403.Hardcourse.Discord.Tickets.PanelButtonListener;
-import com.denied403.Hardcourse.Hardcourse;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -25,14 +24,11 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.denied403.Hardcourse.Hardcourse.applicationQuestions;
+
 public class ApplicationButtonListener extends ListenerAdapter {
 
-    private final Hardcourse plugin;
     private static final String LOG_CHANNEL_ID = "1443274311652868221";
-
-    public ApplicationButtonListener(Hardcourse plugin) {
-        this.plugin = plugin;
-    }
 
     @Override
     public void onButtonInteraction(ButtonInteractionEvent event) {
@@ -41,7 +37,7 @@ public class ApplicationButtonListener extends ListenerAdapter {
         switch (id) {
             case "application:submit" -> {
                 if (!PanelButtonListener.applicationAnswers.containsKey(userId)) { event.reply("⚠️ You no longer have an active application.").setEphemeral(true).queue(); return;}
-                List<String> questions = plugin.getApplicationQuestions();
+                List<String> questions = applicationQuestions;
                 List<String> answers = PanelButtonListener.applicationAnswers.get(userId);
 
                 List<MessageEmbed> finalEmbeds = new ArrayList<>();

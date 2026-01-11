@@ -4,19 +4,11 @@ import com.denied403.Hardcourse.Commands.*;
 import com.denied403.Hardcourse.Commands.Trails.EndTrail;
 import com.denied403.Hardcourse.Commands.Trails.OminousTrail;
 import com.denied403.Hardcourse.Discord.*;
-import com.denied403.Hardcourse.Discord.Commands.DiscordLink;
-import com.denied403.Hardcourse.Discord.Commands.Info;
-import com.denied403.Hardcourse.Discord.Commands.Punish;
-import com.denied403.Hardcourse.Discord.Commands.Punishments;
-import com.denied403.Hardcourse.Discord.Tickets.PanelButtonListener;
 import com.denied403.Hardcourse.Events.*;
 import com.denied403.Hardcourse.Chat.*;
 import com.denied403.Hardcourse.Points.*;
 import com.denied403.Hardcourse.Utils.*;
-import com.denied403.Hardcourse.Utils.ColorUtil;
 
-import com.transfemme.dev.core403.Core403;
-import com.transfemme.dev.core403.Punishments.Database.PunishmentDatabase;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -30,62 +22,42 @@ import java.io.File;
 import java.util.*;
 
 import static com.denied403.Hardcourse.Discord.HardcourseDiscord.*;
+import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
 
 public final class Hardcourse extends JavaPlugin implements Listener {
 
-    private File wordsFile;
-    private FileConfiguration wordsConfig;
-    private PointsManager pointsManager;
+    private static File wordsFile;
+    private static FileConfiguration wordsConfig;
     public static Hardcourse plugin;
     public static boolean DiabolicalUnscrambles;
+    public static CheckpointDatabase checkpointDatabase;
+    public static LinkManager linkManager;
+    public static PointsManager pointsManager;
 
     @Override
     public void onEnable() {
         plugin = this;
-        CheckpointDatabase checkpointDatabase = new CheckpointDatabase();
-        PunishmentDatabase punishmentDatabase = Core403.getPunishmentDatabase();
-        LinkManager linkManager = new LinkManager();
+        checkpointDatabase = new CheckpointDatabase();
+        linkManager = new LinkManager();
+        pointsManager = new PointsManager();
+        saveDefaultConfig();
+        setupWordsConfig();
         loadConfigValues();
 
         if(isDev) {
             if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
                 new Placeholders().register();
             }
-            PointsManager.initialize(checkpointDatabase);
-            Points.initialize(checkpointDatabase);
         }
-        onWalk.initialize(checkpointDatabase);
-        CheckpointCommand.initialize(checkpointDatabase);
-        onChat.initialize(checkpointDatabase);
-        onJoin.initialize(checkpointDatabase);
-        onQuit.initialize(checkpointDatabase);
-        onSneak.initialize(checkpointDatabase);
-        Placeholders.initialize(checkpointDatabase);
 
         if(DiscordEnabled) {
-            HardcourseDiscord discordBot = new HardcourseDiscord();
             try {
-                discordBot.InitJDA();
+                InitJDA();
             } catch (Exception e) {
                 getLogger().severe("Failed to initialize Discord bot: " + e.getMessage());
             }
-            LinkManager.initialize(checkpointDatabase);
-            Link.initialize(linkManager, checkpointDatabase);
-            Unlink.initialize(linkManager, checkpointDatabase, jda);
-            DiscordLink.initialize(linkManager, checkpointDatabase);
-            DiscordListener.initialize(checkpointDatabase);
-            HardcourseDiscord.initialize(checkpointDatabase);
-            Info.initialize(checkpointDatabase);
-            Punish.initialize(checkpointDatabase);
-            BanListener.initialize(checkpointDatabase, punishmentDatabase);
-            DiscordButtonListener.initialize(checkpointDatabase);
-            PanelButtonListener.initialize(checkpointDatabase);
-            Punishments.initialize(checkpointDatabase, punishmentDatabase);
             sendMessage(null, null, "starting", null, null);
         }
-
-        saveDefaultConfig();
-        pointsManager = new PointsManager();
 
         getServer().getPluginManager().registerEvents(new ChatReactions(), this);
         getServer().getPluginManager().registerEvents(new onJoin(), this);
@@ -94,8 +66,7 @@ public final class Hardcourse extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new onWalk(), this);
         getServer().getPluginManager().registerEvents(new onChat(), this);
         getServer().getPluginManager().registerEvents(new onHunger(), this);
-        getServer().getPluginManager().registerEvents(this, this);
-        getServer().getPluginManager().registerEvents(new BanListener(), this);
+        getServer().getPluginManager().registerEvents(new PunishmentListener(), this);
         getServer().getPluginManager().registerEvents(new onQuit(), this);
         getServer().getPluginManager().registerEvents(new onSneak(), this);
         getServer().getPluginManager().registerEvents(new onVanish(), this);
@@ -107,7 +78,6 @@ public final class Hardcourse extends JavaPlugin implements Listener {
             getServer().getPluginManager().registerEvents(new JumpBoost(), this);
             getServer().getPluginManager().registerEvents(new DoubleJump(), this);
             getServer().getPluginManager().registerEvents(new TempCheckpoint(), this);
-            getServer().getPluginManager().registerEvents(new JumpBoost(), this);
         }
         getServer().getPluginManager().registerEvents(new onCommand(), this);
         getServer().getPluginManager().registerEvents(new ReportListener(), this);
@@ -127,7 +97,7 @@ public final class Hardcourse extends JavaPlugin implements Listener {
             cmd.registrar().register(WinnerTP.createCommand("wtp"));
             cmd.registrar().register(ToggleDiabolicalUnscrambles.createCommand("togglediabolicalunscrambles"));
             cmd.registrar().register(Deaths.createCommand("deaths"));
-            if(isDiscordEnabled()) {
+            if(DiscordEnabled) {
                 cmd.registrar().register(Link.createCommand("link"));
                 cmd.registrar().register(Unlink.createCommand("unlink"));
             }
@@ -140,28 +110,22 @@ public final class Hardcourse extends JavaPlugin implements Listener {
             }
         });
 
-        setupWordsConfig();
-
         Bukkit.getScheduler().runTaskTimer(this, () -> {
-            if(isBroadcastEnabled()){
+            if(BroadcastEnabled){
                 if(Bukkit.getOnlinePlayers().isEmpty()) return;
                 String message = messages.get(random.nextInt(messages.size()));
-                Bukkit.broadcast(ColorUtil.Colorize("\n&c&lHARDCOURSE &r" + message + "\n"));
+                Bukkit.broadcast(Colorize("\n<prefix>" + message + "\n"));
             }}, 0L, 20 * 60 * 5);
 
         new BukkitRunnable() {
             @Override
             public void run() {
-                if(isUnscrambleEnabled()) {
+                if(UnscrambleEnabled) {
                     if(!Bukkit.getOnlinePlayers().isEmpty()) {
                         ChatReactions.runGame(ChatReactions.getRandomWord());
                     }
                 }
             }}.runTaskTimer(this, 0L, 20 * 60 * 4);
-    }
-
-    public PointsManager getPointsManager() {
-        return this.pointsManager;
     }
 
     @Override
@@ -182,19 +146,13 @@ public final class Hardcourse extends JavaPlugin implements Listener {
         wordsConfig = YamlConfiguration.loadConfiguration(wordsFile);
     }
 
-    public static boolean isDiscordEnabled(){return DiscordEnabled;}
-    public static boolean isBroadcastEnabled(){return BroadcastEnabled;}
-    public static boolean isUnscrambleEnabled(){return UnscrambleEnabled;}
-    public static boolean isDev() {return isDev;}
-    public void reloadWordsConfig() {wordsConfig = YamlConfiguration.loadConfiguration(wordsFile);}
-    public List<String> getApplicationQuestions(){return getConfig().getStringList("application-questions");}
-
-    private static List<String> messages = new ArrayList<>();
-    private static boolean DiscordEnabled;
-    private static boolean BroadcastEnabled;
-    private static boolean UnscrambleEnabled;
-    private static boolean isDev;
-    private static List<String> exemptions;
+    public static List<String> messages = new ArrayList<>();
+    public static boolean DiscordEnabled;
+    public static boolean BroadcastEnabled;
+    public static boolean UnscrambleEnabled;
+    public static boolean isDev;
+    public static List<String> exemptions;
+    public static List<String> applicationQuestions;
     private final Random random = new Random();
 
     public static void loadConfigValues() {
@@ -205,6 +163,8 @@ public final class Hardcourse extends JavaPlugin implements Listener {
         isDev = config.getBoolean("is-dev");
         messages = config.getStringList("broadcast-messages");
         exemptions = config.getStringList("skip-alert-exemptions");
+        applicationQuestions = config.getStringList("application-questions");
+        wordsConfig = YamlConfiguration.loadConfiguration(wordsFile);
     }
     public boolean isSkipExempted(int from, int to) {
         for (String entry : exemptions) {

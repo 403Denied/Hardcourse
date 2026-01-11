@@ -14,7 +14,7 @@ import org.bukkit.entity.Player;
 
 import java.util.concurrent.CompletableFuture;
 
-import static com.denied403.Hardcourse.Utils.ColorUtil.Colorize;
+import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
 
 public class WinnerTP {
 
@@ -41,6 +41,11 @@ public class WinnerTP {
 
         if (target == null) {
             player.sendMessage(Colorize("&c&lHARDCOURSE &rPlayer not found or not online!"));
+            return 0;
+        }
+
+        if(target.isOp() || target.hasPermission("hardcourse.staff")) {
+            player.sendMessage(Colorize("&c&lHARDCOURSE &rYou cannot teleport to an operator."));
             return 0;
         }
 

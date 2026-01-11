@@ -4,13 +4,14 @@ import com.denied403.Hardcourse.Discord.Commands.CommandManager;
 import com.denied403.Hardcourse.Discord.Tickets.Applications.ApplicationButtonListener;
 import com.denied403.Hardcourse.Discord.Tickets.Applications.ApplicationMessageListener;
 import com.denied403.Hardcourse.Discord.Tickets.PanelButtonListener;
-import com.denied403.Hardcourse.Events.BanListener;
-import com.denied403.Hardcourse.Utils.CheckpointDatabase;
+import com.denied403.Hardcourse.Events.PunishmentListener;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -28,11 +29,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
 
-import static com.denied403.Hardcourse.Hardcourse.isDiscordEnabled;
-import static com.denied403.Hardcourse.Hardcourse.plugin;
-import static com.denied403.Hardcourse.Utils.ColorUtil.stripAllColors;
+import static com.denied403.Hardcourse.Hardcourse.*;
 import static com.denied403.Hardcourse.Utils.Playtime.getPlaytime;
-import static com.transfemme.dev.core403.Core403.getVanishedPlayers;
+import static com.transfemme.dev.core403.Commands.Moderation.Vanish.Vanished.vanishedPlayers;
+import static com.transfemme.dev.core403.Util.ColorUtil.stripAllColors;
 
 public class HardcourseDiscord {
     public static JDA jda;
@@ -42,14 +42,16 @@ public class HardcourseDiscord {
     public static ThreadChannel logsChannel;
     public static ThreadChannel punishmentChannel;
     public static ThreadChannel reportChannel;
+    public static ThreadChannel deathsChannel;
+    public static ThreadChannel checkpointsChannel;
+    public static ThreadChannel commandsChannel;
+    public static ThreadChannel linksChannel;
+    public static Guild guild;
+    public static Role linkedRole;
     private static final Map<String, Message> lastHackAlert = new HashMap<>();
-    private static CheckpointDatabase database;
-    public static void initialize(CheckpointDatabase db) {
-        database = db;
-    }
 
-    public void InitJDA() {
-        if(isDiscordEnabled()) {
+    public static void InitJDA() {
+        if(DiscordEnabled) {
             String discordToken = plugin.getConfig().getString("DISCORD_TOKEN");
             if (discordToken == null) {
                 plugin.getLogger().severe("Please provide a DISCORD_TOKEN in the config.yml file!");
@@ -69,12 +71,12 @@ public class HardcourseDiscord {
                         .enableCache(CacheFlag.ONLINE_STATUS)
                         .addEventListeners(
                                 new DiscordListener(),
-                                new CommandManager(plugin),
+                                new CommandManager(),
                                 new DiscordButtonListener(),
                                 new PanelButtonListener(),
-                                new ApplicationMessageListener(plugin),
-                                new ApplicationButtonListener(plugin),
-                                new BanListener()
+                                new ApplicationMessageListener(),
+                                new ApplicationButtonListener(),
+                                new PunishmentListener()
 
                         ).build().awaitReady();
             } catch (InterruptedException e) {
@@ -110,6 +112,30 @@ public class HardcourseDiscord {
             if (reportChannelId != null) {
                 reportChannel = jda.getThreadChannelById(reportChannelId);
             }
+            String deathsChannelId = plugin.getConfig().getString("Deaths-Channel-Id");
+            if (deathsChannelId != null) {
+                deathsChannel = jda.getThreadChannelById(deathsChannelId);
+            }
+            String checkpointsChannelId = plugin.getConfig().getString("Checkpoints-Channel-Id");
+            if (checkpointsChannelId != null) {
+                checkpointsChannel = jda.getThreadChannelById(checkpointsChannelId);
+            }
+            String commandsChannelId = plugin.getConfig().getString("Commands-Channel-Id");
+            if (commandsChannelId != null) {
+                commandsChannel = jda.getThreadChannelById(commandsChannelId);
+            }
+            String linksChannelId = plugin.getConfig().getString("Links-Channel-Id");
+            if (linksChannelId != null) {
+                linksChannel = jda.getThreadChannelById(linksChannelId);
+            }
+            String guildId = plugin.getConfig().getString("Guild-Id");
+            if (guildId != null) {
+                guild = jda.getGuildById(guildId);
+            }
+            String linkedRoleId = plugin.getConfig().getString("Linked-Role-Id");
+            if (linkedRoleId != null && guild != null) {
+                linkedRole = guild.getRoleById(linkedRoleId);
+            }
         }
     }
 
@@ -128,10 +154,10 @@ public class HardcourseDiscord {
             staffChatChannel.sendMessage("**`" + stripAllColors(player.displayName()) + "`**: " + content).queue();
         }
         if (type.equals("chat")) {
-            chatChannel.sendMessage("[**" + extra1 + database.getLevel(player.getUniqueId()).toString().replace(".0", "") + "**] `" + stripAllColors(player.displayName()) + "`: " + content).queue();
+            chatChannel.sendMessage("[**" + extra1 + checkpointDatabase.getLevel(player.getUniqueId()).toString().replace(".0", "") + "**] `" + stripAllColors(player.displayName()) + "`: " + content).queue();
         }
         if(type.equals("staffmessage")) {
-            chatChannel.sendMessage("[**" + extra1 + database.getLevel(player.getUniqueId()).toString().replace(".0", "") + "**] **`" + stripAllColors(player.displayName()) + "`**: " + content).queue();
+            chatChannel.sendMessage("[**" + extra1 + checkpointDatabase.getLevel(player.getUniqueId()).toString().replace(".0", "") + "**] **`" + stripAllColors(player.displayName()) + "`**: " + content).queue();
         }
         if (type.equals("join")) {
             chatChannel.sendMessage(":inbox_tray: **`" + stripAllColors(player.displayName()) + "`** joined").queue();
@@ -140,7 +166,7 @@ public class HardcourseDiscord {
             chatChannel.sendMessage(":inbox_tray: **`" + stripAllColors(player.displayName()) + "`** joined the server for the first time _[#" + Bukkit.getOfflinePlayers().length + "]_").queue();
         }
         if (type.equals("leave")) {
-            if(getVanishedPlayers().contains(player.getUniqueId())){return;}
+            if(vanishedPlayers.contains(player.getUniqueId())){return;}
             chatChannel.sendMessage(":outbox_tray: **`" + stripAllColors(player.displayName()) + "`** left the server").queue();
         }
         if (type.equals("hacks")) {
@@ -187,7 +213,7 @@ public class HardcourseDiscord {
                 logsChannel.sendMessage("`[" + f.format(new Date()) + "] " + stripAllColors(player.getName()) + " joined" + (!player.hasPlayedBefore() ? " for the first time`" : "`")).queue();
             }
             if(extra1.equals("quit")){
-                logsChannel.sendMessage((getVanishedPlayers().contains(player.getUniqueId()) ? "`[SILENT] " : "`") + "[" + f.format(new Date()) + "] " + stripAllColors(player.getName()) + " quit" + (getVanishedPlayers().contains(player.getUniqueId()) ? " while vanished`" : "`")).queue();
+                logsChannel.sendMessage((vanishedPlayers.contains(player.getUniqueId()) ? "`[SILENT] " : "`") + "[" + f.format(new Date()) + "] " + stripAllColors(player.getName()) + " quit" + (vanishedPlayers.contains(player.getUniqueId()) ? " while vanished`" : "`")).queue();
             }
             if(extra1.equals("vanished")){
                 logsChannel.sendMessage((extra2.equals("silent") ? "`[SILENT] " : "`") + "[" + f.format(new Date()) + "] " + stripAllColors(player.getName()) + " vanished`").queue();

@@ -1,6 +1,5 @@
 package com.denied403.Hardcourse.Discord.Commands;
 
-import com.denied403.Hardcourse.Hardcourse;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -16,21 +15,21 @@ import com.transfemme.dev.core403.Punishments.PunishmentReason;
 
 import java.util.ArrayList;
 
-import static com.denied403.Hardcourse.Hardcourse.isDiscordEnabled;
+import static com.denied403.Hardcourse.Hardcourse.DiscordEnabled;
 
 public class CommandManager extends ListenerAdapter {
 
     private final Console consoleCommand;
     private final SendTicketPanel setupTicketsCommand;
 
-    public CommandManager(Hardcourse plugin) {
-        this.consoleCommand = new Console(plugin);
+    public CommandManager() {
+        this.consoleCommand = new Console();
         this.setupTicketsCommand = new SendTicketPanel();
     }
 
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event){
-        if (isDiscordEnabled()) {
+        if (DiscordEnabled) {
             String command = event.getName();
             switch (command.toLowerCase()) {
                 case "list" -> List.run(event);
@@ -46,7 +45,7 @@ public class CommandManager extends ListenerAdapter {
 
     @Override
     public void onGuildReady(@NotNull GuildReadyEvent event){
-        if (isDiscordEnabled()) {
+        if (DiscordEnabled) {
             ArrayList<CommandData> commandData = new ArrayList<>();
             commandData.add(Commands.slash("list", "Get a list of online players"));
             commandData.add(Commands.slash("info", "Get server or player info")

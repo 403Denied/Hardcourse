@@ -17,8 +17,8 @@ import java.util.List;
 import java.util.Random;
 
 import static com.denied403.Hardcourse.Hardcourse.*;
-import static com.denied403.Hardcourse.Utils.ColorUtil.Colorize;
-import static com.denied403.Hardcourse.Utils.ColorUtil.stripAllColors;
+import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
+import static com.transfemme.dev.core403.Util.ColorUtil.stripAllColors;
 
 public class ChatReactions implements Listener {
 
@@ -31,7 +31,7 @@ public class ChatReactions implements Listener {
         File wordFile = new File(plugin.getDataFolder(), "words.yml");
         wordConfig = YamlConfiguration.loadConfiguration(wordFile);
 
-        if (isUnscrambleEnabled() && !wordFile.exists()) {
+        if (UnscrambleEnabled && !wordFile.exists()) {
             try {
                 wordFile.createNewFile();
                 wordConfig.set("words", List.of("Word 1", "Word 2"));
@@ -92,9 +92,8 @@ public class ChatReactions implements Listener {
         if (gameActive) {
             if ((!DiabolicalUnscrambles && message.equalsIgnoreCase(currentWord)) || (DiabolicalUnscrambles && message.equals(currentWord))) {
                 Player p = event.getPlayer();
-                if (isDev()) {
+                if (isDev) {
                     int points = 5 + random.nextInt(11);
-                    PointsManager pointsManager = plugin.getPointsManager();
                     pointsManager.addPoints(p.getUniqueId(), points);
                     Bukkit.broadcast(Colorize("&c&lHARDCOURSE &r&c" + stripAllColors(p.getName()) + "&r successfully unscrambled the word and earned &c" + points + "&f points! It was &c" + currentWord));
                 } else {

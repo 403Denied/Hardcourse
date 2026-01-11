@@ -1,6 +1,5 @@
 package com.denied403.Hardcourse.Discord.Commands;
 
-import com.denied403.Hardcourse.Hardcourse;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.bukkit.Bukkit;
@@ -9,13 +8,9 @@ import org.bukkit.command.ConsoleCommandSender;
 import java.awt.*;
 import java.time.Instant;
 
+import static com.denied403.Hardcourse.Hardcourse.plugin;
+
 public class Console {
-    private final Hardcourse plugin;
-
-    public Console(Hardcourse plugin) {
-        this.plugin = plugin;
-    }
-
     public void run(SlashCommandInteractionEvent event) {
         if (!event.getUser().getId().equals("401582030506295308")) {
             event.reply("❌ You are not authorized to use this command.").setEphemeral(true).queue();

@@ -21,9 +21,10 @@ import java.util.Date;
 import java.util.TimeZone;
 import java.util.concurrent.CompletableFuture;
 
+import static com.denied403.Hardcourse.Discord.HardcourseDiscord.deathsChannel;
 import static com.denied403.Hardcourse.Discord.HardcourseDiscord.jda;
-import static com.denied403.Hardcourse.Hardcourse.isDiscordEnabled;
-import static com.denied403.Hardcourse.Utils.ColorUtil.Colorize;
+import static com.denied403.Hardcourse.Hardcourse.DiscordEnabled;
+import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
 
 public class Deaths {
     public static LiteralCommandNode<CommandSourceStack> createCommand(String commandName) {
@@ -63,7 +64,7 @@ public class Deaths {
                                 .executes(ctx -> {
                                     CommandSender sender = ctx.getSource().getSender();
                                     String playerName = StringArgumentType.getString(ctx, "player");
-                                    OfflinePlayer target = Bukkit.getPlayerExact(playerName);
+                                    OfflinePlayer target = Bukkit.getOfflinePlayer(playerName);
 
                                     if (target == null || !target.hasPlayedBefore()) {
                                         sender.sendMessage(Colorize("&c&lHARDCOURSE &rPlayer &c" + playerName + "&r not found."));
@@ -75,7 +76,7 @@ public class Deaths {
                                     if (sender.equals(target)) {
                                         sender.sendMessage(Colorize("&c&lHARDCOURSE &rYou have &c" + currentDeaths + "&r deaths."));
                                     } else {
-                                        sender.sendMessage(Colorize("&c&lHARDCOURSE &r" + playerName + " has &c" + currentDeaths + "&r deaths."));
+                                        sender.sendMessage(Colorize("&c&lHARDCOURSE &r&c" + playerName + " &rhas &c" + currentDeaths + "&r deaths."));
                                     }
                                     return Command.SINGLE_SUCCESS;
                                 })
@@ -123,12 +124,10 @@ public class Deaths {
                 }
             }
         }
-        if(isDiscordEnabled()){
-            ThreadChannel channel = jda.getThreadChannelById("1457271269413228574");
-            if(channel == null) return -1;
+        if(DiscordEnabled){
             final SimpleDateFormat f = new SimpleDateFormat("HH:mm:ss z");
             f.setTimeZone(TimeZone.getTimeZone("UTC"));
-            channel.sendMessage("`[" + f.format(new Date()) + "] " + target.getName() + " had their deaths set to " + target.getStatistic(Statistic.DEATHS) + " by " + sender.getName() + "`").queue();
+            deathsChannel.sendMessage("`[" + f.format(new Date()) + "] " + target.getName() + " had their deaths set to " + target.getStatistic(Statistic.DEATHS) + " by " + sender.getName() + "`").queue();
         }
 
         return Command.SINGLE_SUCCESS;

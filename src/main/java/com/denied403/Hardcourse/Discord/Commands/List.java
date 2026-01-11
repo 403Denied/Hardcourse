@@ -10,7 +10,8 @@ import java.awt.*;
 import java.util.ArrayList;
 
 import static com.denied403.Hardcourse.Hardcourse.isDev;
-import static com.denied403.Hardcourse.Utils.ColorUtil.stripAllColors;
+import static com.transfemme.dev.core403.Commands.Moderation.Vanish.Vanished.vanishedPlayers;
+import static com.transfemme.dev.core403.Util.ColorUtil.stripAllColors;
 
 public class List {
     public static void run(SlashCommandInteractionEvent event) {
@@ -18,7 +19,7 @@ public class List {
         java.util.List<String> staffMembers = new ArrayList<>();
 
         for (Player player : Bukkit.getOnlinePlayers()) {
-            if(!Core403.getVanishedPlayers().contains(player.getUniqueId())) {
+            if(!vanishedPlayers.contains(player.getUniqueId())) {
                 String name = "`" + stripAllColors(player.displayName()) + "`";
                 if (player.hasPermission("hardcourse.jrmod")) {
                     staffMembers.add(name);
@@ -34,7 +35,7 @@ public class List {
         EmbedBuilder serverEmbed = new EmbedBuilder();
         serverEmbed.setThumbnail(event.getGuild().getIconUrl());
         serverEmbed.setTitle("Player List");
-        serverEmbed.addField("Server IP", isDev() ? "hardcourse.dev.falixsrv.me" : "hardcourse.minehut.gg", true);
+        serverEmbed.addField("Server IP", isDev ? "hardcourse.dev.falixsrv.me" : "hardcourse.minehut.gg", true);
         serverEmbed.addField("Staff online (" + staffMembers.size() + ")", staffList, false);
         serverEmbed.addField("Players online (" + onlinePlayers.size() + ")", playersList, false);
         serverEmbed.setFooter("Requested by " + event.getUser().getName(), event.getUser().getAvatarUrl());

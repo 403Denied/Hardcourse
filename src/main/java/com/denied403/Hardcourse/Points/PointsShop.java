@@ -20,8 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.denied403.Hardcourse.Hardcourse.plugin;
-import static com.denied403.Hardcourse.Utils.ColorUtil.Colorize;
-import static com.denied403.Hardcourse.Utils.ColorUtil.stripAllColors;
+import static com.denied403.Hardcourse.Hardcourse.pointsManager;
+import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
+import static com.transfemme.dev.core403.Util.ColorUtil.stripAllColors;
 
 public class PointsShop implements Listener {
 
@@ -190,7 +191,6 @@ public class PointsShop implements Listener {
         if (clicked == null || !clicked.hasItemMeta()) return;
 
         String name = stripAllColors(clicked.getItemMeta().displayName());
-        PointsManager pointsManager = plugin.getPointsManager();
 
         if (name.equalsIgnoreCase("Jump Boost")) {
             int cost = 1500;

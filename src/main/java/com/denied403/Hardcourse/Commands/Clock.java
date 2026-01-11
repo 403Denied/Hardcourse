@@ -17,7 +17,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import static com.denied403.Hardcourse.Hardcourse.isDev;
 import static com.denied403.Hardcourse.Points.PointsShop.givePointsShopChest;
-import static com.denied403.Hardcourse.Utils.ColorUtil.Colorize;
+import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
 
 public class Clock {
     public static LiteralCommandNode<CommandSourceStack> createCommand(final String commandName) {
@@ -56,7 +56,7 @@ public class Clock {
         killItemStack.setItemMeta(killItemMeta);
 
         player.getInventory().setItem(8, killItemStack);
-        if(isDev()) {
+        if(isDev) {
             givePointsShopChest(player, true);
 
             ItemStack torch = new ItemStack(Material.TORCH);

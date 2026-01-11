@@ -1,6 +1,5 @@
 package com.denied403.Hardcourse.Discord.Commands;
 
-import com.denied403.Hardcourse.Utils.CheckpointDatabase;
 import com.denied403.Hardcourse.Utils.Playtime;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -18,15 +17,10 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.UUID;
 
+import static com.denied403.Hardcourse.Hardcourse.checkpointDatabase;
 import static com.denied403.Hardcourse.Hardcourse.isDev;
 
 public class Info {
-    private static CheckpointDatabase database;
-
-    public static void initialize(CheckpointDatabase db) {
-        database = db;
-    }
-
     static OptionMapping typeOption;
     public static OptionData infoType = new OptionData(OptionType.STRING, "info_type", "Type of information").addChoices(
             new Command.Choice("Server", "server"),
@@ -65,7 +59,7 @@ public class Info {
                 EmbedBuilder serverEmbed = new EmbedBuilder();
                 serverEmbed.setThumbnail(Objects.requireNonNull(Objects.requireNonNull(event.getGuild()).getIconUrl()));
                 serverEmbed.setTitle("Server Info • Hardcourse");
-                serverEmbed.addField("Server IP", isDev() ? "hardcourse.dev.falixsrv.me" : "hardcourse.minehut.gg", false);
+                serverEmbed.addField("Server IP", isDev ? "hardcourse.dev.falixsrv.me" : "hardcourse.minehut.gg", false);
                 serverEmbed.addField("Server Version", Bukkit.getVersion(), false);
                 serverEmbed.addField("Online Since", getUptime(), false);
                 serverEmbed.addField("Server TPS", String.format("%.2f", Bukkit.getTPS()[0]), false);
@@ -89,7 +83,7 @@ public class Info {
         OfflinePlayer offlinePlayer = (onlineTarget != null) ? onlineTarget : Bukkit.getOfflinePlayer(name);
         UUID uuid = offlinePlayer.getUniqueId();
         String linkedDiscord = null;
-        String linkedUuidString = database.getDiscordId(uuid);
+        String linkedUuidString = checkpointDatabase.getDiscordId(uuid);
         if (linkedUuidString != null) {
             linkedDiscord = "<@" + linkedUuidString + ">";
         }
@@ -100,21 +94,21 @@ public class Info {
         EmbedBuilder playerEmbed = new EmbedBuilder();
         playerEmbed.setThumbnail("https://mc-heads.net/avatar/" + uuid + ".png");
         String fullLevelString;
-        Double level = database.getLevel(uuid);
+        Double level = checkpointDatabase.getLevel(uuid);
 
         if (level == null) {
             fullLevelString = "Not Migrated";
         } else {
             String levelString = String.valueOf(level).replace(".0", "");
-            Integer season = database.getSeason(uuid);
+            Integer season = checkpointDatabase.getSeason(uuid);
             fullLevelString = (season != null ? season + "-" : "") + levelString;
         }
 
         try {
             playerEmbed.setTitle(offlinePlayer.getName());
             playerEmbed.addField("Level", fullLevelString, false);
-            if(isDev()) {
-                playerEmbed.addField("Points", String.valueOf(database.getPoints(uuid)), false);
+            if(isDev) {
+                playerEmbed.addField("Points", String.valueOf(checkpointDatabase.getPoints(uuid)), false);
             }
             playerEmbed.addBlankField(false);
             playerEmbed.addField("First Joined", "<t:" + offlinePlayer.getFirstPlayed() / 1000L + ":F>", false);

@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 
 import static com.denied403.Hardcourse.Chat.ChatReactions.gameActive;
 import static com.denied403.Hardcourse.Chat.ChatReactions.runGame;
-import static com.denied403.Hardcourse.Utils.ColorUtil.Colorize;
+import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
 
 public class RunChatGame {
     public static LiteralCommandNode<CommandSourceStack> createCommand(String commandName) {
