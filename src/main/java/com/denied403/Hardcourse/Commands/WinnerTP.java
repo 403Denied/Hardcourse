@@ -32,7 +32,7 @@ public class WinnerTP {
         CommandSender sender = context.getSource().getSender();
 
         if (!(sender instanceof Player player)) {
-            sender.sendMessage(Colorize("&c&lHARDCOURSE &rThis command can only be used by players."));
+            sender.sendMessage(Colorize("<prefix>his command can only be used by players."));
             return 0;
         }
 
@@ -40,17 +40,17 @@ public class WinnerTP {
         Player target = Bukkit.getPlayerExact(targetName);
 
         if (target == null) {
-            player.sendMessage(Colorize("&c&lHARDCOURSE &rPlayer not found or not online!"));
+            player.sendMessage(Colorize("<prefix>Player not found or not online!"));
             return 0;
         }
 
         if(target.isOp() || target.hasPermission("hardcourse.staff")) {
-            player.sendMessage(Colorize("&c&lHARDCOURSE &rYou cannot teleport to an operator."));
+            player.sendMessage(Colorize("<prefix>You cannot teleport to an operator."));
             return 0;
         }
 
         player.teleport(target);
-        player.sendMessage(Colorize("&c&lHARDCOURSE &rTeleported to &c" + targetName));
+        player.sendMessage(Colorize("<prefix>Teleported to <accent>" + targetName));
         return Command.SINGLE_SUCCESS;
     }
 

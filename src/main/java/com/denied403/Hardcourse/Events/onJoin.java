@@ -18,7 +18,7 @@ import java.io.File;
 
 import static com.denied403.Hardcourse.Discord.HardcourseDiscord.sendMessage;
 import static com.denied403.Hardcourse.Hardcourse.*;
-import static com.denied403.Hardcourse.Points.PointsShop.givePointsShopChest;
+import static com.denied403.Hardcourse.Points.Shop.PointsShop.givePointsShopPaper;
 import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
 import static com.transfemme.dev.core403.Util.ColorUtil.stripAllColors;
 
@@ -59,7 +59,7 @@ public class onJoin implements Listener {
                 } catch (Exception e) {
                     Bukkit.getLogger().severe("Failed to save checkpoints file: " + e.getMessage());
                 }
-                player.sendMessage(Colorize("&c&lHARDCOURSE &rYour checkpoint data has successfully been migrated from legacy storage to the new system. Level: &c" + String.valueOf(level).replace(".0", "") + "&r Season: &c" + season + "&r. If you believe there is an error with these numbers, please contact an administrator."));
+                player.sendMessage(Colorize("<prefix>Your checkpoint data has successfully been migrated from legacy storage to the new system. Level: <accent>" + String.valueOf(level).replace(".0", "") + "<main> Season: <accent>" + season + "<main>. If you believe there is an error with these numbers, please contact an administrator."));
                 checkpointDatabase.setCheckpointData(player.getUniqueId(), season, level, 0);
             } else {
                 checkpointDatabase.setCheckpointData(player.getUniqueId(), 1, 0, 0);
@@ -83,7 +83,7 @@ public class onJoin implements Listener {
                 }
             }
             if (!hasPointsShop) {
-                givePointsShopChest(player, true);
+                givePointsShopPaper(player, true);
             }
         }
         Material killItem = Material.CLOCK;
@@ -108,7 +108,7 @@ public class onJoin implements Listener {
             Location spawnLocation = targetWorld.getSpawnLocation();
             player.teleport(spawnLocation);
             player.updateCommands();
-            player.sendMessage(Colorize("&c&lHARDCOURSE &rWelcome to hardcourse. This parkour server contains over 1000 levels that will test your patience (and your will to live). Think it's worth it? &cYou may begin&r."));
+            player.sendMessage(Colorize("<prefix>Welcome to hardcourse. This parkour server contains over 1000 levels that will test your patience (and your will to live). To die you may click the <accent>clock<main> in your 9th hotbar slot. Think it's worth it? <accent>You may begin<main>."));
         }
 
         ItemStack torch = new ItemStack(Material.TORCH);

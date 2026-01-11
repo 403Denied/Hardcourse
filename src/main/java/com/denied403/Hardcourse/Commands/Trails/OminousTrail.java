@@ -84,11 +84,11 @@ public class OminousTrail implements Listener {
                     if (activeTrails.contains(uuid)) {
                         activeTrails.remove(uuid);
                         rotationAngles.remove(uuid);
-                        player.sendMessage(Colorize("&c&lHARDCOURSE &rOminous trail &cdisabled&r."));
+                        player.sendMessage(Colorize("<prefix>Ominous trail <accent>disabled<main>!"));
                     } else {
                         activeTrails.add(uuid);
                         rotationAngles.put(uuid, 0.0);
-                        player.sendMessage(Colorize("&c&lHARDCOURSE &rOminous trail &cenabled&r!"));
+                        player.sendMessage(Colorize("<prefix>Ominous trail <accent>enabled<main>!"));
                     }
                     return Command.SINGLE_SUCCESS;
                 })

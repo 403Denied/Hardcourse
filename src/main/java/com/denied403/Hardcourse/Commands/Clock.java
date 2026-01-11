@@ -16,7 +16,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import static com.denied403.Hardcourse.Hardcourse.isDev;
-import static com.denied403.Hardcourse.Points.PointsShop.givePointsShopChest;
+import static com.denied403.Hardcourse.Points.Shop.PointsShop.givePointsShopPaper;
 import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
 
 public class Clock {
@@ -26,16 +26,16 @@ public class Clock {
                     CommandSender sender = ctx.getSource().getSender();
                     Entity executor = ctx.getSource().getExecutor();
                     if(!(executor instanceof Player player)) {
-                        sender.sendMessage(Colorize("&c&lHARDCOURSE &rThis command can only be used by players."));
+                        sender.sendMessage(Colorize("<prefix>This command can only be used by players."));
                         return Command.SINGLE_SUCCESS;
                     }
                     player.getInventory().clear();
                     giveItems(player);
                     if(executor == sender){
-                        player.sendMessage(Colorize("&c&lHARDCOURSE &rYou have been given your items!"));
+                        player.sendMessage(Colorize("<prefix>You have been given your items!"));
                         return 1;
                     }
-                    sender.sendMessage(Colorize("&c&lHARDCOURSE &rYou have given items to &c" + player.getName() + "&f!"));
+                    sender.sendMessage(Colorize("<prefix>You have given items to <accent>" + player.getName() + "<main>!"));
                     return Command.SINGLE_SUCCESS;
                 }).build();
     }
@@ -57,7 +57,7 @@ public class Clock {
 
         player.getInventory().setItem(8, killItemStack);
         if(isDev) {
-            givePointsShopChest(player, true);
+            givePointsShopPaper(player, true);
 
             ItemStack torch = new ItemStack(Material.TORCH);
             ItemMeta torchMeta = torch.getItemMeta();

@@ -64,19 +64,19 @@ public class Points {
                                 .executes(ctx -> {
                                     CommandSender sender = ctx.getSource().getSender();
                                     String playerName = StringArgumentType.getString(ctx, "player");
-                                    Player target = Bukkit.getPlayerExact(playerName);
+                                    OfflinePlayer target = Bukkit.getOfflinePlayer(playerName);
 
-                                    if (target == null) {
-                                        sender.sendMessage(Colorize("&c&lHARDCOURSE &rPlayer '&c" + playerName + "&r' not found or not online."));
+                                    if (!target.hasPlayedBefore()) {
+                                        sender.sendMessage(Colorize("<prefix>Player <accent>" + playerName + "<main> not found."));
                                         return 0;
                                     }
 
                                     int currentPoints = PointsManager.getPoints(target.getUniqueId());
 
                                     if (sender.equals(target)) {
-                                        sender.sendMessage(Colorize("&c&lHARDCOURSE &rYou have &c" + currentPoints + "&r points."));
+                                        sender.sendMessage(Colorize("<prefix>You have <accent>" + currentPoints + "<main> points."));
                                     } else {
-                                        sender.sendMessage(Colorize("&c&lHARDCOURSE &r" + playerName + " has &c" + currentPoints + "&r points."));
+                                        sender.sendMessage(Colorize("<prefix><accent>" + playerName + "<main> has <accent>" + currentPoints + "&r points."));
                                     }
                                     return Command.SINGLE_SUCCESS;
                                 })
@@ -101,7 +101,7 @@ public class Points {
 
         OfflinePlayer target = Bukkit.getOfflinePlayer(targetName);
         if (!target.hasPlayedBefore()) {
-            sender.sendMessage(Colorize("&c&lHARDCOURSE &rPlayer '&c" + targetName + "&r' not found or not online."));
+            sender.sendMessage(Colorize("<prefix>Player <accent>" + targetName + "<main> not found."));
             return 0;
         }
 
@@ -110,26 +110,26 @@ public class Points {
         switch (action) {
             case "set" -> {
                 pointsManager.setPoints(uuid, amount);
-                sender.sendMessage(Colorize("&c&lHARDCOURSE &rSet &c" + targetName + "&r's points to &c" + amount + "&r."));
+                sender.sendMessage(Colorize("<prefix>Set <accent>" + targetName + "<main>'s points to <accent>" + amount + "<main>."));
                 if(target.isOnline() && sender != target) {
                     Player onlineTarget = target.getPlayer();
-                    onlineTarget.sendMessage(Colorize("&c&lHARDCOURSE &rYour points have been set to &c" + amount + "&r by &c" + sender.getName() + "&r."));
+                    onlineTarget.sendMessage(Colorize("<prefix>Your points have been set to <accent>" + amount + "<main> by <accent>" + sender.getName() + "<main>."));
                 }
             }
             case "give" -> {
                 pointsManager.addPoints(uuid, amount);
-                sender.sendMessage(Colorize("&c&lHARDCOURSE &rGave &c" + amount + "&r points to &c" + targetName + "&r."));
+                sender.sendMessage(Colorize("<prefix>Gave <accent>" + amount + "<main> points to <accent>" + targetName + "<main>."));
                 if(target.isOnline() && sender != target) {
                     Player onlineTarget = target.getPlayer();
-                    onlineTarget.sendMessage(Colorize("&c&lHARDCOURSE &rYou received &c" + amount + "&r points from &c" + sender.getName() + "&r."));
+                    onlineTarget.sendMessage(Colorize("<prefix>You received <accent>" + amount + "<main> points from <accent>" + sender.getName() + "<main>."));
                 }
             }
             case "remove" -> {
                 pointsManager.removePoints(uuid, amount);
-                sender.sendMessage(Colorize("&c&lHARDCOURSE &rRemoved &c" + amount + "&r points from &c" + targetName + "&r."));
+                sender.sendMessage(Colorize("<accent>Removed <accent>" + amount + "<main> points from <accent>" + targetName + "<main>."));
                 if(target.isOnline() && sender != target) {
                     Player onlineTarget = target.getPlayer();
-                    onlineTarget.sendMessage(Colorize("&c&lHARDCOURSE &r&c" + amount + "&r points were removed by &c" + sender.getName() + "&r."));
+                    onlineTarget.sendMessage(Colorize("<prefix><accent>" + amount + "<main> points were removed by <accent>" + sender.getName() + "<main>."));
                 }
             }
         }
@@ -153,7 +153,7 @@ public class Points {
         List<CheckpointDatabase.CheckpointData> all = checkpointDatabase.getAllSortedByPoints();
 
         if (page == 1) {
-            sender.sendMessage(Colorize("&c&lHARDCOURSE &rSorting &c" + all.size() + "&f players..."));
+            sender.sendMessage(Colorize("<prefix>Sorting <accent>" + all.size() + "<main> players..."));
             Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> sendLeaderboard(sender, page, all));
             return 0;
         }
@@ -174,11 +174,11 @@ public class Points {
         int end = Math.min(start + entriesPerPage, totalEntries);
 
         if (start >= totalEntries) {
-            sender.sendMessage(Colorize("&c&lHARDCOURSE &rNo points entries on this page."));
+            sender.sendMessage(Colorize("<prefix>No points entries on this page."));
             return start;
         }
 
-        sender.sendMessage(Colorize("&c&lHARDCOURSE&r Points Leaderboard &c(Page " + page + " of " + totalPages + ")"));
+        sender.sendMessage(Colorize("<prefix>Points Leaderboard <accent>(Page " + page + " of " + totalPages + ")"));
 
         for (int i = start; i < end; i++) {
             var entry = filtered.get(i);
@@ -189,10 +189,10 @@ public class Points {
 
         String nav = "";
         if (page > 1) {
-            nav += "<click:run_command:/points leaderboard " + (page - 1) + "><red>[← Previous]</red></click> ";
+            nav += "<click:run_command:/points leaderboard " + (page - 1) + "><accent>[← Previous]</click> ";
         }
         if (page < totalPages) {
-            nav += "<click:run_command:/points leaderboard " + (page + 1) + "><red>[Next →]</red></click>";
+            nav += "<click:run_command:/points leaderboard " + (page + 1) + "><accent>[Next →]</click>";
         }
         if (!nav.isEmpty()) {
             sender.sendMessage(Colorize(nav));

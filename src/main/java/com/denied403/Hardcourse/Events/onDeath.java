@@ -1,6 +1,5 @@
 package com.denied403.Hardcourse.Events;
 
-import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import org.bukkit.Statistic;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

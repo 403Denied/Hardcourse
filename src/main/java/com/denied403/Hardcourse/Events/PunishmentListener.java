@@ -66,7 +66,7 @@ public class PunishmentListener extends ListenerAdapter implements Listener {
                 if(!(event.getStaff().equals("CONSOLE"))) {
                     if (Bukkit.getOfflinePlayer(event.getTargetUUID()).getStatistic(Statistic.PLAY_ONE_MINUTE) >= 72000) {
                         if(Bukkit.getOfflinePlayer(event.getStaff()).isOnline()) {
-                            getServer().getPlayer(event.getStaff()).sendMessage(Colorize("&c&lHARDCOURSE &rThis player has more than 1 hour of playtime. Remember to provide evidence in &c#punishment-proof&f."));
+                            getServer().getPlayer(event.getStaff()).sendMessage(Colorize("<prefix>This player has more than 1 hour of playtime. Remember to provide evidence in &c#punishment-proof&f."));
                         }
                     }
                 }

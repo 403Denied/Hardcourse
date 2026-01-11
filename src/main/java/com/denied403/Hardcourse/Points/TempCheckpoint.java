@@ -38,7 +38,7 @@ public class TempCheckpoint implements Listener {
         Block blockBelow = belowPlayer.getBlock();
 
         if (blockBelow.getType() == Material.AIR) {
-            player.sendMessage(Colorize("&cYou can't place a temporary checkpoint here!"));
+            player.sendMessage(Colorize("<prefix>You can't place a temporary checkpoint here!"));
             event.setCancelled(true);
             return;
         }
@@ -49,7 +49,7 @@ public class TempCheckpoint implements Listener {
         Block blockAbove3 = blockAbove2.getRelative(BlockFace.UP);
 
         if (!blockAbove1.isPassable() || !blockAbove2.isPassable() || !blockAbove3.isPassable()) {
-            player.sendMessage(Colorize("&cYou can't place a temporary checkpoint here!"));
+            player.sendMessage(Colorize("<prefix>You can't place a temporary checkpoint here!"));
             event.setCancelled(true);
             return;
         }
@@ -63,7 +63,7 @@ public class TempCheckpoint implements Listener {
             player.getInventory().setItemInMainHand(null);
         }
 
-        player.sendMessage(Colorize("&c&lHARDCOURSE &rTemporary checkpoint set!"));
+        player.sendMessage(Colorize("<prefix>Temporary checkpoint set!"));
         event.setCancelled(true);
     }
 

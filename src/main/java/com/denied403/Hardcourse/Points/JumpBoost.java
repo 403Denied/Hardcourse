@@ -35,7 +35,7 @@ public class JumpBoost implements Listener {
         player.getInventory().setItemInMainHand(item.getAmount() > 0 ? item : null);
 
         player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP_BOOST, 100, 0));
-        player.sendMessage(Colorize("&c&lHARDCOURSE &rYou have used jump boost!"));
+        player.sendMessage(Colorize("<prefix>You have used <accent>jump boost<main>!"));
         player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1.2f);
     }
 }

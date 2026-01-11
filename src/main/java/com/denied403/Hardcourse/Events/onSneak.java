@@ -40,7 +40,7 @@ public class onSneak implements Listener {
             double level = checkpointDatabase.getLevel(p.getUniqueId());
             if(playerSeason == season && level == checkpointNumber){
                 if(vanishedPlayers.contains(p.getUniqueId())){return;}
-                p.sendActionBar(Colorize("&fReset Orientation: &c" + Double.toString(checkpointNumber).replace(".0", "")));
+                p.sendActionBar(Colorize("<main>Reset Orientation: <accent>" + Double.toString(checkpointNumber).replace(".0", "")));
                 p.playSound(loc, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
                 p.setRespawnLocation(loc.add(0, 1, 0), true);
             }

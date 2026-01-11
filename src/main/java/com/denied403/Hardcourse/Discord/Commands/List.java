@@ -1,6 +1,5 @@
 package com.denied403.Hardcourse.Discord.Commands;
 
-import com.transfemme.dev.core403.Core403;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.bukkit.Bukkit;

@@ -14,7 +14,7 @@ public class ToggleDiabolicalUnscrambles {
                 .requires(source -> source.getSender().hasPermission("hardcourse.admin"))
                 .executes(ctx -> {
                     CommandSourceStack source = ctx.getSource();
-                    source.getSender().sendMessage(Colorize("<red><bold>HARDCOURSE <reset>Diabolical Unscrambles are now <red>" + (Hardcourse.DiabolicalUnscrambles ? "disabled" : "enabled") + "<white>."));
+                    source.getSender().sendMessage(Colorize("<prefix>Diabolical Unscrambles are now <accent>" + (Hardcourse.DiabolicalUnscrambles ? "disabled" : "enabled") + "<main>."));
                     Hardcourse.DiabolicalUnscrambles = !Hardcourse.DiabolicalUnscrambles;
                     return Command.SINGLE_SUCCESS;
                 }).build();

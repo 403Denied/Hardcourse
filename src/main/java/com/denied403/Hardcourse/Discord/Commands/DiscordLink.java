@@ -39,12 +39,12 @@ public class DiscordLink extends ListenerAdapter {
         event.reply("✅ Successfully linked your Discord account to `" + player.getName() + "`!").setEphemeral(true).queue();
         Bukkit.getScheduler().runTask(plugin, () -> {
             if(player.isOnline()){
-                player.sendMessage(Colorize("&c&lHARDCOURSE &rSuccessfully linked your Minecraft account to &c" + event.getUser().getName()));
+                player.sendMessage(Colorize("<prefix>Successfully linked your Minecraft account to <accent>" + event.getUser().getName()));
             }
             if(isDev){
                 pointsManager.addPoints(player.getUniqueId(), 500);
             }
-            Bukkit.broadcast(Colorize("&c&lHARDCOURSE &r&c" + player.getName() + " &rjust linked their Discord account and gained access to the Minecraft <-> Discord chat" + (isDev ? " and &c500&r points!" : "!")));
+            Bukkit.broadcast(Colorize("<prefix><accent>" + player.getName() + " <main>just linked their Discord account and gained access to the Minecraft <-> Discord chat" + (isDev ? " and <accent>500<main> points!" : "!")));
         });
         final SimpleDateFormat f = new SimpleDateFormat("HH:mm:ss z");
         f.setTimeZone(TimeZone.getTimeZone("UTC"));

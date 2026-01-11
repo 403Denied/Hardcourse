@@ -21,7 +21,7 @@ public class Unlink {
                     CommandSender sender = ctx.getSource().getSender();
                     if(!(sender instanceof Player player)) return 0;
                     if(!checkpointDatabase.isLinked(player.getUniqueId())){
-                        player.sendMessage(Colorize("&c&lHARDCOURSE &rYou are not linked to a discord account."));
+                        player.sendMessage(Colorize("<prefix>You are not linked to a discord account."));
                         return Command.SINGLE_SUCCESS;
                     }
                     if(!DiscordEnabled){
@@ -38,7 +38,7 @@ public class Unlink {
                     }
                     checkpointDatabase.unlinkDiscord(player.getUniqueId());
                     linkManager.clearCode(player.getUniqueId());
-                    player.sendMessage(Colorize("&c&lHARDCOURSE &rYour account has been &cunlinked&r successfully."));
+                    player.sendMessage(Colorize("<prefix>Your account has been <accent>unlinked<main> successfully."));
                     return Command.SINGLE_SUCCESS;
                 }).build();
     }

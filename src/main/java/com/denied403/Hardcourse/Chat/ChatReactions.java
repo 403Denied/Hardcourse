@@ -1,6 +1,5 @@
 package com.denied403.Hardcourse.Chat;
 
-import com.denied403.Hardcourse.Points.PointsManager;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
@@ -69,8 +68,8 @@ public class ChatReactions implements Listener {
                 currentWord = randomizeCapitalization(currentWord);
             }
             String scrambledWord = Shuffler.shuffleWord(currentWord);
-            Bukkit.broadcast(Colorize("&c&lHARDCOURSE&r <hover:show_text:'" + scrambledWord + "'>Hover here for a word to unscramble."));
-            Bukkit.getConsoleSender().sendMessage(Colorize("&c&lHARDCOURSE &r&cUnscramble: &f" + scrambledWord + " &c(" + currentWord + ")"));
+            Bukkit.broadcast(Colorize("<prefix><hover:show_text:'" + scrambledWord + "'>Hover here for a word to unscramble."));
+            Bukkit.getConsoleSender().sendMessage(Colorize("<prefix>Unscramble: <accent>" + scrambledWord + " <main>(<accent>" + currentWord + "<main>)"));
 
             gameActive = true;
 
@@ -78,7 +77,7 @@ public class ChatReactions implements Listener {
                 @Override
                 public void run() {
                     if (gameActive) {
-                        Bukkit.broadcast(Colorize("&c&lHARDCOURSE &rTime's Up! The correct word was &c" + currentWord));
+                        Bukkit.broadcast(Colorize("<prefix>Time's Up! The correct word was <accent>" + currentWord));
                         gameActive = false;
                     }
                 }
@@ -95,9 +94,9 @@ public class ChatReactions implements Listener {
                 if (isDev) {
                     int points = 5 + random.nextInt(11);
                     pointsManager.addPoints(p.getUniqueId(), points);
-                    Bukkit.broadcast(Colorize("&c&lHARDCOURSE &r&c" + stripAllColors(p.getName()) + "&r successfully unscrambled the word and earned &c" + points + "&f points! It was &c" + currentWord));
+                    Bukkit.broadcast(Colorize("<prefix><accent>" + stripAllColors(p.getName()) + "<main> successfully unscrambled the word and earned <accent>" + points + "<main> points! It was <accent>" + currentWord));
                 } else {
-                    Bukkit.broadcast(Colorize("&c&lHARDCOURSE &r&c" + stripAllColors(p.getName()) + "&r successfully unscrambled the word! It was &c" + currentWord));
+                    Bukkit.broadcast(Colorize("<prefix><accent>" + stripAllColors(p.getName()) + "<main> successfully unscrambled the word! It was <accent>" + currentWord));
                 }
                 event.setCancelled(true);
                 gameActive = false;

@@ -9,7 +9,6 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Statistic;
@@ -22,7 +21,6 @@ import java.util.TimeZone;
 import java.util.concurrent.CompletableFuture;
 
 import static com.denied403.Hardcourse.Discord.HardcourseDiscord.deathsChannel;
-import static com.denied403.Hardcourse.Discord.HardcourseDiscord.jda;
 import static com.denied403.Hardcourse.Hardcourse.DiscordEnabled;
 import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
 
@@ -66,17 +64,17 @@ public class Deaths {
                                     String playerName = StringArgumentType.getString(ctx, "player");
                                     OfflinePlayer target = Bukkit.getOfflinePlayer(playerName);
 
-                                    if (target == null || !target.hasPlayedBefore()) {
-                                        sender.sendMessage(Colorize("&c&lHARDCOURSE &rPlayer &c" + playerName + "&r not found."));
+                                    if (!target.hasPlayedBefore()) {
+                                        sender.sendMessage(Colorize("<prefix>Player <accent>" + playerName + "<main> not found."));
                                         return 0;
                                     }
 
                                     int currentDeaths = target.getStatistic(Statistic.DEATHS);
 
                                     if (sender.equals(target)) {
-                                        sender.sendMessage(Colorize("&c&lHARDCOURSE &rYou have &c" + currentDeaths + "&r deaths."));
+                                        sender.sendMessage(Colorize("<prefix>You have <accent>" + currentDeaths + "<main> deaths."));
                                     } else {
-                                        sender.sendMessage(Colorize("&c&lHARDCOURSE &r&c" + playerName + " &rhas &c" + currentDeaths + "&r deaths."));
+                                        sender.sendMessage(Colorize("<prefix><accent>" + playerName + " <main>has <accent>" + currentDeaths + "<main> deaths."));
                                     }
                                     return Command.SINGLE_SUCCESS;
                                 })
@@ -92,7 +90,7 @@ public class Deaths {
 
         OfflinePlayer target = Bukkit.getOfflinePlayer(targetName);
         if (!target.hasPlayedBefore()) {
-            sender.sendMessage(Colorize("&c&lHARDCOURSE &rPlayer '&c" + targetName + "&r' not found or not online."));
+            sender.sendMessage(Colorize("<prefix>Player <accent>" + targetName + "<main> not found."));
             return 0;
         }
 
@@ -101,26 +99,26 @@ public class Deaths {
         switch (action) {
             case "set" -> {
                 target.setStatistic(Statistic.DEATHS, amount);
-                sender.sendMessage(Colorize("&c&lHARDCOURSE &rSet &c" + targetName + "&r's deaths to &c" + amount + "&r."));
+                sender.sendMessage(Colorize("<prefix>Set <accent>" + targetName + "<main>'s deaths to <accent>" + amount + "<main>."));
                 if(target.isOnline() && sender != target) {
                     Player onlineTarget = target.getPlayer();
-                    onlineTarget.sendMessage(Colorize("&c&lHARDCOURSE &rYour deaths have been set to &c" + amount + "&r by &c" + sender.getName() + "&r."));
+                    onlineTarget.sendMessage(Colorize("<prefix>Your deaths have been set to <accent>" + amount + "<main> by <accent>" + sender.getName() + "<main>."));
                 }
             }
             case "give" -> {
                 target.setStatistic(Statistic.DEATHS, currentDeaths + amount);
-                sender.sendMessage(Colorize("&c&lHARDCOURSE &rGave &c" + amount + "&r deaths to &c" + targetName + "&r."));
+                sender.sendMessage(Colorize("<prefix>Gave <accent>" + amount + "<main> deaths to <accent>" + targetName + "<main>."));
                 if(target.isOnline() && sender != target) {
                     Player onlineTarget = target.getPlayer();
-                    onlineTarget.sendMessage(Colorize("&c&lHARDCOURSE &rYou received &c" + amount + "&r deaths from &c" + sender.getName() + "&r."));
+                    onlineTarget.sendMessage(Colorize("<prefix>You received <accent>" + amount + "<main> deaths from <accent>" + sender.getName() + "<main>."));
                 }
             }
             case "remove" -> {
                 target.setStatistic(Statistic.DEATHS, currentDeaths - amount);
-                sender.sendMessage(Colorize("&c&lHARDCOURSE &rRemoved &c" + amount + "&r deaths from &c" + targetName + "&r."));
+                sender.sendMessage(Colorize("<prefix>Removed <accent>" + amount + "<main> deaths from <accent>" + targetName + "<main>."));
                 if(target.isOnline() && sender != target) {
                     Player onlineTarget = target.getPlayer();
-                    onlineTarget.sendMessage(Colorize("&c&lHARDCOURSE &r&c" + amount + "&r deaths were removed by &c" + sender.getName() + "&r."));
+                    onlineTarget.sendMessage(Colorize("<prefix><accent>" + amount + "<main> deaths were removed by <accent>" + sender.getName() + "<main>."));
                 }
             }
         }

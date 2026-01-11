@@ -7,6 +7,7 @@ import com.denied403.Hardcourse.Discord.*;
 import com.denied403.Hardcourse.Events.*;
 import com.denied403.Hardcourse.Chat.*;
 import com.denied403.Hardcourse.Points.*;
+import com.denied403.Hardcourse.Points.Shop.PointsShop;
 import com.denied403.Hardcourse.Utils.*;
 
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
@@ -72,6 +73,7 @@ public final class Hardcourse extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new onVanish(), this);
         getServer().getPluginManager().registerEvents(new onDeath(), this);
         if(isDev) {
+            getServer().getPluginManager().registerEvents(new PointsShop(), this);
             getServer().getPluginManager().registerEvents(new OminousTrail(this), this);
             getServer().getPluginManager().registerEvents(new onPortalEnter(), this);
             getServer().getPluginManager().registerEvents(new EndTrail(this), this);

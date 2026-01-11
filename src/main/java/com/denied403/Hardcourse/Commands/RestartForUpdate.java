@@ -17,7 +17,7 @@ public class RestartForUpdate {
                 .requires(source -> source.getSender().hasPermission("hardcourse.admin"))
                 .executes(ctx -> {
 
-                    Bukkit.broadcast(Colorize("&c&lHARDCOURSE &rThe server will be restarting to apply updates in &c30 seconds&f. Please find a safe stopping point."));
+                    Bukkit.broadcast(Colorize("<prefix>The server will be restarting to apply updates in <accent>30 seconds<main>. Please find a safe stopping point."));
 
                     new BukkitRunnable() {
                         int timeLeft = 30;
@@ -25,11 +25,11 @@ public class RestartForUpdate {
                         @Override
                         public void run() {
                             if (timeLeft == 15 || (timeLeft <= 5 && timeLeft > 0)) {
-                                Bukkit.broadcast(Colorize("&c&lHARDCOURSE &rRestarting in &c" + timeLeft + " second" + (timeLeft == 1 ? "" : "s") + "&f..."));
+                                Bukkit.broadcast(Colorize("<prefix>Restarting in <accent>" + timeLeft + " second" + (timeLeft == 1 ? "" : "s") + "<main>..."));
                             }
 
                             if (timeLeft == 0) {
-                                Bukkit.broadcast(Colorize("&c&lHARDCOURSE &rRestarting now... The server will be back online shortly."));
+                                Bukkit.broadcast(Colorize("<prefix>Restarting now... The server will be back online shortly."));
                                 cancel();
                                 return;
                             }

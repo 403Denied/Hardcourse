@@ -25,20 +25,20 @@ public class RunChatGame {
                             String phrase = StringArgumentType.getString(ctx, "phrase").trim();
 
                             if (phrase.length() < 2) {
-                                sender.sendMessage(Colorize("&c&lHARDCOURSE &rThat string is too short. Please try again with a longer term."));
+                                sender.sendMessage(Colorize("<prefix>That string is too short. Please try again with a longer term."));
                                 return Command.SINGLE_SUCCESS;
                             }
 
                             if (!gameActive) {
                                 runGame(phrase);
                             } else {
-                                sender.sendMessage(Colorize("&c&lHARDCOURSE &rA game is currently running. Please wait."));
+                                sender.sendMessage(Colorize("<prefix>A game is currently running. Please wait or click <accent><click:run_command:'/ecg'>here<reset><main> to end it."));
                             }
 
                             return Command.SINGLE_SUCCESS;
                         }))
                 .executes(ctx -> {
-                    ctx.getSource().getSender().sendMessage(Colorize("&c&lHARDCOURSE &rPlease enter a phrase to start the game."));
+                    ctx.getSource().getSender().sendMessage(Colorize("<prefix>Please enter a phrase to start the game."));
                     return Command.SINGLE_SUCCESS;
                 })
                 .build();

@@ -17,7 +17,7 @@ public class Link {
                     CommandSender sender = ctx.getSource().getSender();
                     if(!(sender instanceof Player player)) return 0;
                     if(checkpointDatabase.isLinked(player.getUniqueId())) {
-                        player.sendMessage(Colorize("&c&lHARDCOURSE &rYou're already linked! Use &c/unlink&f if you want to unlink your account."));
+                        player.sendMessage(Colorize("<prefix>You're already linked! Use <accent>/unlink<main> if you want to unlink your account."));
                         return 1;
                     }
                     if(!DiscordEnabled){
@@ -25,7 +25,7 @@ public class Link {
                         return 1;
                     }
                     String code = linkManager.createLinkCode(player.getUniqueId());
-                    player.sendMessage(Colorize("&c&lHARDCOURSE &rYour link code is: &c<click:copy_to_clipboard:'" + code + "'>&c" + code + "</click>&7 (click to copy)&r\nUse the &c/link&f command on Discord to link your account."));
+                    player.sendMessage(Colorize("<prefix>Your link code is: <accent><click:copy_to_clipboard:'" + code + "'><accent>" + code + "<other> (click to copy)<reset>\nUse the <accent>/link<main> command on Discord to link your account."));
                     return Command.SINGLE_SUCCESS;
                 }).build();
     }

@@ -24,9 +24,9 @@ public class EndChatGame {
 
                     if (gameActive) {
                         gameActive = false;
-                        Bukkit.broadcast(Colorize("&c&lHARDCOURSE &rThe chat game has been ended early. The word was &c" + getCurrentWord()));
+                        Bukkit.broadcast(Colorize("<prefix>The chat game has been ended early. The word was <accent>" + getCurrentWord()));
                     } else {
-                        sender.sendMessage(Colorize("&c&lHARDCOURSE &rThere is no game running currently."));
+                        sender.sendMessage(Colorize("<prefix>There is no game running currently."));
                     }
 
                     return Command.SINGLE_SUCCESS;

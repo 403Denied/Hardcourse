@@ -108,10 +108,10 @@ public class EndTrail implements Listener {
 
                     if (activeWings.contains(uuid)) {
                         activeWings.remove(uuid);
-                        player.sendMessage(Colorize("&c&lHARDCOURSE &rPetal wings &cdisabled&r."));
+                        player.sendMessage(Colorize("<prefix>Petal wings <accent>disabled<main>!"));
                     } else {
                         activeWings.add(uuid);
-                        player.sendMessage(Colorize("&c&lHARDCOURSE &rPetal wings &cenabled&r!"));
+                        player.sendMessage(Colorize("<prefix>Petal wings <accent>enabled<main>!"));
                     }
 
                     return Command.SINGLE_SUCCESS;
