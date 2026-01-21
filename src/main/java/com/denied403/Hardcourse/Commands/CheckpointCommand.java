@@ -28,7 +28,6 @@ import java.util.concurrent.CompletableFuture;
 import static com.denied403.Hardcourse.Discord.HardcourseDiscord.checkpointsChannel;
 import static com.denied403.Hardcourse.Hardcourse.*;
 import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
-import static com.transfemme.dev.core403.Util.ColorUtil.stripAllColors;
 
 public class CheckpointCommand {
     private static final Set<UUID> restartCancelled = new HashSet<>();
@@ -127,12 +126,12 @@ public class CheckpointCommand {
                         )
                 )
 
-                .then(Commands.literal("resetall")
+                .then(Commands.literal("resetAll")
                         .requires(source -> source.getSender().isOp())
                         .executes(ctx -> {
                             CommandSender sender = ctx.getSource().getSender();
                             sender.sendMessage(Colorize("<prefix>This will erase &4ALL<main> checkpoint data."));
-                            sender.sendMessage(Colorize("<main>Run <accent>/checkpoint resetall confirm <main>to confirm."));
+                            sender.sendMessage(Colorize("<main>Run <accent>/checkpoint resetAll confirm <main>to confirm."));
                             return Command.SINGLE_SUCCESS;
                         })
                         .then(Commands.literal("confirm")
@@ -209,6 +208,7 @@ public class CheckpointCommand {
                                 if (!restartCancelled.contains(player.getUniqueId())) {
                                     checkpointDatabase.setCheckpointData(uuid, 1, 0, 0);
                                     player.performCommand("spawn");
+                                    player.performCommand("clock");
                                     player.setRespawnLocation(player.getWorld().getSpawnLocation());
                                     player.sendMessage(Colorize("<prefix>You have been reset to the beginning."));
                                     Luckperms.removeRank(player.getUniqueId());
@@ -258,7 +258,7 @@ public class CheckpointCommand {
                                             "<prefix>Checkpoint Info for level <accent>1-" +
                                                     String.valueOf(level).replace(".0", "") +
                                                     "<main>: " + locationString +
-                                                    "<main>\nDifficulty: <accent>" + stripAllColors(difficulty)
+                                                    "<main>\nDifficulty: <accent>" + difficulty.replaceAll("§", "&")
                                     ));
                                     return Command.SINGLE_SUCCESS;
                                 })
@@ -287,11 +287,11 @@ public class CheckpointCommand {
                                                             season + "-" +
                                                             String.valueOf(level).replace(".0", "") +
                                                             "<main>: " + locationString +
-                                                            "<main>\nDifficulty: <accent>" + stripAllColors(difficulty)
+                                                            "<main>\nDifficulty: <accent>" + difficulty.replaceAll("§", "&")
                                             ));
                                             return Command.SINGLE_SUCCESS;
                                         }))))
-                .then(Commands.literal("removedata")
+                .then(Commands.literal("removeData")
                         .requires(source -> source.getSender().isOp())
                         .then(Commands.argument("level", DoubleArgumentType.doubleArg(0))
                                 .executes(ctx -> {
@@ -313,6 +313,32 @@ public class CheckpointCommand {
                                             sender.sendMessage(Colorize("<prefix>Checkpoint data for <accent>" + season + "-" + String.valueOf(level).replace(".0", "") + "<main> has been removed from the database."));
                                             return Command.SINGLE_SUCCESS;
                                         }))))
+                .then(Commands.literal("listPlayers")
+                        .then(Commands.argument("level", DoubleArgumentType.doubleArg(0))
+                                .executes(ctx -> executeListPlayers(
+                                        ctx.getSource().getSender(),
+                                        DoubleArgumentType.getDouble(ctx, "level"),
+                                        1,
+                                        1
+                                ))
+                                .then(Commands.argument("season", IntegerArgumentType.integer(1, 3))
+                                        .executes(ctx -> executeListPlayers(
+                                                ctx.getSource().getSender(),
+                                                DoubleArgumentType.getDouble(ctx, "level"),
+                                                IntegerArgumentType.getInteger(ctx, "season"),
+                                                1
+                                        ))
+                                        .then(Commands.argument("page", IntegerArgumentType.integer(1))
+                                                .executes(ctx -> executeListPlayers(
+                                                        ctx.getSource().getSender(),
+                                                        DoubleArgumentType.getDouble(ctx, "level"),
+                                                        IntegerArgumentType.getInteger(ctx, "season"),
+                                                        IntegerArgumentType.getInteger(ctx, "page")
+                                                ))
+                                        )
+                                )
+                        )
+                )
                 .then(Commands.literal("tp")
                         .requires(source -> source.getSender().isOp() || source.getSender().hasPermission("hardcourse.winner"))
                         .then(Commands.argument("level", DoubleArgumentType.doubleArg(0))
@@ -491,5 +517,82 @@ public class CheckpointCommand {
 
         return start;
     }
+    private static int executeListPlayers(CommandSender sender, double level, int season, int page) {
 
+        //if (season == 1 && level <= 3) {
+        //    sender.sendMessage(Colorize(
+        //            "<prefix>Player data is not available for checkpoints at or below <accent>1-3<main>."
+        //    ));
+        //    return 2;
+        //}
+
+        List<UUID> uuids = checkpointDatabase.getPlayersAtCheckpoint(season, level);
+
+        if (uuids == null || uuids.isEmpty()) {
+            sender.sendMessage(Colorize(
+                    "<prefix>No player data found for <accent>" +
+                            season + "-" + String.valueOf(level).replace(".0", "") +
+                            "<main>."
+            ));
+            return 2;
+        }
+
+        int entriesPerPage = 10;
+        int totalEntries = uuids.size();
+        int totalPages = (totalEntries + entriesPerPage - 1) / entriesPerPage;
+
+        int start = (page - 1) * entriesPerPage;
+        int end = Math.min(start + entriesPerPage, totalEntries);
+
+        if (start >= totalEntries) {
+            sender.sendMessage(Colorize("<prefix>No players on this page."));
+            return 2;
+        }
+
+        sender.sendMessage(Colorize(
+                "<prefix><accent>" + totalEntries + "<main> Players on <accent>" +
+                        season + "-" + String.valueOf(level).replace(".0", "") +
+                        "<main> (Page " + page + " of " + totalPages + "):"
+        ));
+
+        boolean isOp = sender.isOp();
+
+        for (int i = start; i < end; i++) {
+            OfflinePlayer p = Bukkit.getOfflinePlayer(uuids.get(i));
+            String name = (p.getName() != null) ? p.getName() : "Unknown";
+
+            if (isOp && !name.equals("Unknown")) {
+                if(p.isOnline()) {
+                    sender.sendMessage(Colorize(
+                            "<click:run_command:/tp " + name + "><accent>- <main>" + name + "</click>"
+                    ));
+                } else {
+                    sender.sendMessage(Colorize(
+                            "<click:run_command:/tpo " + name + "><accent>- <main>" + name + "</click>"
+                    ));
+                }
+            } else {
+                sender.sendMessage(Colorize("<accent>- <main>" + name));
+            }
+        }
+
+        String nav = "";
+        if (page > 1) {
+            nav += "<click:run_command:/checkpoint listPlayers "
+                    + String.valueOf(level).replace(".0", "") + " "
+                    + season + " " + (page - 1) +
+                    "><accent>[← Previous]</click> ";
+        }
+        if (page < totalPages) {
+            nav += "<click:run_command:/checkpoint listPlayers "
+                    + String.valueOf(level).replace(".0", "") + " "
+                    + season + " " + (page + 1) +
+                    "><accent>[Next →]</click>";
+        }
+
+        if (!nav.isEmpty()) {
+            sender.sendMessage(Colorize(nav));
+        }
+        return 1;
+    }
 }

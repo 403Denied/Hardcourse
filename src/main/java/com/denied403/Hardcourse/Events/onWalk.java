@@ -1,7 +1,6 @@
 package com.denied403.Hardcourse.Events;
 
 import com.denied403.Hardcourse.Points.PointsManager;
-import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -20,7 +19,7 @@ import java.util.UUID;
 import static com.denied403.Hardcourse.Discord.HardcourseDiscord.*;
 import static com.denied403.Hardcourse.Hardcourse.*;
 import static com.denied403.Hardcourse.Utils.Luckperms.addRank;
-import static com.transfemme.dev.core403.Commands.Moderation.Vanish.Vanished.vanishedPlayers;
+import static com.transfemme.dev.core403.Commands.Moderation.Vanish.Vanish.vanishedPlayers;
 import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
 
 public class onWalk implements Listener {
@@ -79,7 +78,7 @@ public class onWalk implements Listener {
                         checkpointsChannel.sendMessage("`[" + f.format(new Date()) + "] " + p.getName() + ": " + String.valueOf(season).replace(".0", "") + "-" + String.valueOf(previousLevel).replace(".0", "") + " -> " + String.valueOf(season).replace(".0", "") + "-" + String.valueOf(checkpointNumber).replace(".0", "") + "`").queue();
                     }
                 }
-                if (checkpointNumber > previousLevel + 10 && !plugin.isSkipExempted((int) previousLevel, (int) checkpointNumber) && !p.hasPermission("hardcourse.staff")) {
+                if (checkpointNumber > previousLevel + 10 && isSkipExempted((int) previousLevel, (int) checkpointNumber) && !p.hasPermission("hardcourse.staff")) {
                     if (DiscordEnabled) {
                         if(playerSeason > 1) {
                             sendMessage(p, null, "hacks",
@@ -103,7 +102,7 @@ public class onWalk implements Listener {
                     }
                 }
                 if (!p.hasPermission("hardcourse.staff") && checkpointNumber > previousLevel + 1) {
-                    if (!plugin.isSkipExempted((int) previousLevel, (int) checkpointNumber)) {
+                    if (isSkipExempted((int) previousLevel, (int) checkpointNumber)) {
                         Location respawnLocation = p.getRespawnLocation();
                         if (respawnLocation != null){ p.teleport(respawnLocation);} else {p.teleport(p.getWorld().getSpawnLocation());}
                         p.sendMessage(Colorize("<prefix>Checkpoint skipped! You have been returned to your previous checkpoint. Please try to complete all levels."));

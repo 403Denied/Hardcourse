@@ -19,6 +19,7 @@ import java.util.UUID;
 
 import static com.denied403.Hardcourse.Hardcourse.checkpointDatabase;
 import static com.denied403.Hardcourse.Hardcourse.isDev;
+import static com.transfemme.dev.core403.Commands.Moderation.Vanish.Vanish.vanishedPlayers;
 
 public class Info {
     static OptionMapping typeOption;
@@ -47,7 +48,9 @@ public class Info {
         if(type.equals("server")) {
             ArrayList<String> playerNames = new ArrayList<>();
             for (Player player : Bukkit.getOnlinePlayers()) {
-                playerNames.add(player.getName());
+                if(!vanishedPlayers.contains(player.getUniqueId())) {
+                    playerNames.add(player.getName());
+                }
             }
             String playersList;
             if(playerNames.isEmpty()){
@@ -64,7 +67,7 @@ public class Info {
                 serverEmbed.addField("Online Since", getUptime(), false);
                 serverEmbed.addField("Server TPS", String.format("%.2f", Bukkit.getTPS()[0]), false);
                 serverEmbed.addField("Server Memory", getUsedMemory() + "MB", false);
-                serverEmbed.addField("Players", Bukkit.getOnlinePlayers().size() + "/" + Bukkit.getMaxPlayers(), false);
+                serverEmbed.addField("Players", (Bukkit.getOnlinePlayers().size() - vanishedPlayers.size()) + "/" + Bukkit.getMaxPlayers(), false);
                 serverEmbed.addField("Online Players", playersList, false);
                 event.replyEmbeds(serverEmbed.build()).setEphemeral(true).queue();
                 return;

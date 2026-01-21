@@ -94,21 +94,21 @@ public class PointsShop implements Listener {
         int points = PointsManager.getPoints(player.getUniqueId());
         if (points < cost) {
             player.sendMessage(Colorize("<prefix>You don't have enough points!"));
-            return false;
+            return true;
         }
         pointsManager.removePoints(player.getUniqueId(), cost);
-        return true;
+        return false;
     }
 
     private void buyJumpBoots(Player player) {
-        if (!tryPurchase(player, ShopItem.JUMP_BOOTS.cost())) return;
+        if (tryPurchase(player, ShopItem.JUMP_BOOTS.cost())) return;
         player.getInventory().addItem(createJumpBoots());
         player.sendMessage(Colorize("<prefix>You purchased <accent>Jump Boost Boots<main>!"));
         player.closeInventory();
     }
 
     private void buyDoubleJump(Player player) {
-        if (!tryPurchase(player, ShopItem.DOUBLE_JUMP.cost())) return;
+        if (tryPurchase(player, ShopItem.DOUBLE_JUMP.cost())) return;
         player.getInventory().addItem(createDoubleJump());
         player.sendMessage(Colorize("<prefix>You purchased <accent>Double Jump<main>!"));
         player.closeInventory();
@@ -116,7 +116,7 @@ public class PointsShop implements Listener {
 
     private void buyJumpBoostAll(Player player) {
         int totalCost = ShopItem.JUMP_BOOST_ALL.cost() * Bukkit.getOnlinePlayers().size();
-        if (!tryPurchase(player, totalCost)) return;
+        if (tryPurchase(player, totalCost)) return;
 
         ItemStack boots = createJumpBoots();
 
@@ -133,7 +133,7 @@ public class PointsShop implements Listener {
     }
 
     private void buyCheckpoint(Player player) {
-        if (!tryPurchase(player, ShopItem.TEMP_CHECKPOINT.cost())) return;
+        if (tryPurchase(player, ShopItem.TEMP_CHECKPOINT.cost())) return;
         player.getInventory().addItem(createCheckpointBook());
         player.sendMessage(Colorize("<prefix>You purchased a <accent>Temporary Checkpoint Book<main>!"));
         player.closeInventory();

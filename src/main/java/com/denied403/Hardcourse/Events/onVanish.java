@@ -11,17 +11,8 @@ public class onVanish implements Listener {
     @EventHandler
     public void onVanishEvent(VanishEvent event){
         Player player = event.getPlayer();
-        if(event.getAction().equalsIgnoreCase("vanished")){
-            if(!event.isSilent()) {
-                sendMessage(player, null, "leave", null, null);
-            }
-            sendMessage(player, null, "logs", "vanished", (event.isSilent() ? "silent" : ""));
-        } else if(event.getAction().equalsIgnoreCase("unvanished")){
-            if(!event.isSilent()) {
-                sendMessage(player, null, "join", null, null);
-            }
-            sendMessage(player, null, "logs", "unvanished", (event.isSilent() ? "silent" : ""));
-        }
+        if(event.getAction().equalsIgnoreCase("vanished")){sendMessage(player, null, "logs", "vanished", (event.isSilent() ? "silent" : ""));}
+        else if(event.getAction().equalsIgnoreCase("unvanished")){sendMessage(player, null, "logs", "unvanished", (event.isSilent() ? "silent" : ""));}
     }
 
 }

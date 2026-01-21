@@ -10,7 +10,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 
 import static com.denied403.Hardcourse.Hardcourse.checkpointDatabase;
-import static com.transfemme.dev.core403.Commands.Moderation.Vanish.Vanished.vanishedPlayers;
+import static com.transfemme.dev.core403.Commands.Moderation.Vanish.Vanish.vanishedPlayers;
 import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
 
 public class onSneak implements Listener {

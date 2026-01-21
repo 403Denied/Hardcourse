@@ -6,6 +6,7 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 
+import static com.denied403.Hardcourse.Hardcourse.diabolicalUnscrambles;
 import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
 
 public class ToggleDiabolicalUnscrambles {
@@ -14,8 +15,8 @@ public class ToggleDiabolicalUnscrambles {
                 .requires(source -> source.getSender().hasPermission("hardcourse.admin"))
                 .executes(ctx -> {
                     CommandSourceStack source = ctx.getSource();
-                    source.getSender().sendMessage(Colorize("<prefix>Diabolical Unscrambles are now <accent>" + (Hardcourse.DiabolicalUnscrambles ? "disabled" : "enabled") + "<main>."));
-                    Hardcourse.DiabolicalUnscrambles = !Hardcourse.DiabolicalUnscrambles;
+                    source.getSender().sendMessage(Colorize("<prefix>Diabolical Unscrambles are now <accent>" + (diabolicalUnscrambles ? "disabled" : "enabled") + "<main>."));
+                    diabolicalUnscrambles = !diabolicalUnscrambles;
                     return Command.SINGLE_SUCCESS;
                 }).build();
     }
