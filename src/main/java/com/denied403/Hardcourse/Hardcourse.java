@@ -13,13 +13,10 @@ import com.denied403.Hardcourse.Utils.*;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 
-import java.io.File;
 import java.util.*;
 
 import static com.denied403.Hardcourse.Discord.HardcourseDiscord.*;
@@ -27,10 +24,8 @@ import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
 
 public final class Hardcourse extends JavaPlugin implements Listener {
 
-    private static File wordsFile;
-    private static FileConfiguration wordsConfig;
     public static Hardcourse plugin;
-    public static boolean DiabolicalUnscrambles;
+    public static boolean diabolicalUnscrambles;
     public static CheckpointDatabase checkpointDatabase;
     public static LinkManager linkManager;
     public static PointsManager pointsManager;
@@ -42,13 +37,10 @@ public final class Hardcourse extends JavaPlugin implements Listener {
         linkManager = new LinkManager();
         pointsManager = new PointsManager();
         saveDefaultConfig();
-        setupWordsConfig();
         loadConfigValues();
 
-        if(isDev) {
-            if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
-                new Placeholders().register();
-            }
+        if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            new Placeholders().register();
         }
 
         if(DiscordEnabled) {
@@ -87,17 +79,17 @@ public final class Hardcourse extends JavaPlugin implements Listener {
             cmd.registrar().register(Clock.createCommand("clock"));
             cmd.registrar().register(CheckpointCommand.createCommand("checkpoint"));
             cmd.registrar().register(CheckpointCommand.createCommand("checkpoints"));
-            cmd.registrar().register(EndChatGame.createCommand("endchatgame"));
+            cmd.registrar().register(EndChatGame.createCommand("endChatGame"));
             cmd.registrar().register(EndChatGame.createCommand("ecg"));
-            cmd.registrar().register(RunChatGame.createCommand("runchatgame"));
+            cmd.registrar().register(RunChatGame.createCommand("runChatGame"));
             cmd.registrar().register(RunChatGame.createCommand("rcg"));
-            cmd.registrar().register(RestartForUpdate.createCommand("restartforupdate"));
-            cmd.registrar().register(RestartForUpdate.createCommand("restartforupdates"));
-            cmd.registrar().register(ReloadHardcourse.createCommand("reloadhardcourse"));
-            cmd.registrar().register(ReloadHardcourse.createCommand("hardcoursereload"));
-            cmd.registrar().register(WinnerTP.createCommand("winnertp"));
+            cmd.registrar().register(RestartForUpdate.createCommand("restartForUpdate"));
+            cmd.registrar().register(RestartForUpdate.createCommand("restartForUpdates"));
+            cmd.registrar().register(ReloadHardcourse.createCommand("reloadHardcourse"));
+            cmd.registrar().register(ReloadHardcourse.createCommand("hardcourseReload"));
+            cmd.registrar().register(WinnerTP.createCommand("winnerTp"));
             cmd.registrar().register(WinnerTP.createCommand("wtp"));
-            cmd.registrar().register(ToggleDiabolicalUnscrambles.createCommand("togglediabolicalunscrambles"));
+            cmd.registrar().register(ToggleDiabolicalUnscrambles.createCommand("toggleDiabolicalUnscrambles"));
             cmd.registrar().register(Deaths.createCommand("deaths"));
             if(DiscordEnabled) {
                 cmd.registrar().register(Link.createCommand("link"));
@@ -107,27 +99,22 @@ public final class Hardcourse extends JavaPlugin implements Listener {
                 cmd.registrar().register(Clock.createCommand("shop"));
                 cmd.registrar().register(Points.createCommand(pointsManager, "points"));
                 cmd.registrar().register(Points.createCommand(pointsManager, "pts"));
-                cmd.registrar().register(EndTrail.createCommand("endtrail"));
-                cmd.registrar().register(OminousTrail.createCommand("ominoustrail"));
+                cmd.registrar().register(EndTrail.createCommand("endTrail"));
+                cmd.registrar().register(OminousTrail.createCommand("ominousTrail"));
             }
         });
 
         Bukkit.getScheduler().runTaskTimer(this, () -> {
             if(BroadcastEnabled){
                 if(Bukkit.getOnlinePlayers().isEmpty()) return;
-                String message = messages.get(random.nextInt(messages.size()));
-                Bukkit.broadcast(Colorize("\n<prefix>" + message + "\n"));
-            }}, 0L, 20 * 60 * 5);
-
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if(UnscrambleEnabled) {
-                    if(!Bukkit.getOnlinePlayers().isEmpty()) {
-                        ChatReactions.runGame(ChatReactions.getRandomWord());
-                    }
-                }
-            }}.runTaskTimer(this, 0L, 20 * 60 * 4);
+                Bukkit.broadcast(Colorize("\n<prefix>" + messages.get(random.nextInt(messages.size())) + "\n"));
+            }}, 0L, 6000);
+        Bukkit.getScheduler().runTaskTimer(this, () -> {
+            if(UnscrambleEnabled) {
+                if(Bukkit.getOnlinePlayers().isEmpty()) return;
+                ChatReactions.runGame(ChatReactions.getRandomWord());
+            }
+        }, 0L, 4800);
     }
 
     @Override
@@ -138,14 +125,6 @@ public final class Hardcourse extends JavaPlugin implements Listener {
                 jda.shutdown();
             }
         }
-    }
-
-    public void setupWordsConfig() {
-        wordsFile = new File(getDataFolder(), "words.yml");
-        if (!wordsFile.exists()) {
-            saveResource("words.yml", false);
-        }
-        wordsConfig = YamlConfiguration.loadConfiguration(wordsFile);
     }
 
     public static List<String> messages = new ArrayList<>();
@@ -166,9 +145,8 @@ public final class Hardcourse extends JavaPlugin implements Listener {
         messages = config.getStringList("broadcast-messages");
         exemptions = config.getStringList("skip-alert-exemptions");
         applicationQuestions = config.getStringList("application-questions");
-        wordsConfig = YamlConfiguration.loadConfiguration(wordsFile);
     }
-    public boolean isSkipExempted(int from, int to) {
+    public static boolean isSkipExempted(int from, int to) {
         for (String entry : exemptions) {
             String[] parts = entry.split("-");
             if (parts.length != 2) continue;
@@ -180,9 +158,9 @@ public final class Hardcourse extends JavaPlugin implements Listener {
             boolean toMatches = rawTo.equals("*") || Integer.toString(to).equals(rawTo);
 
             if (fromMatches && toMatches) {
-                return true;
+                return false;
             }
         }
-        return false;
+        return true;
     }
 }

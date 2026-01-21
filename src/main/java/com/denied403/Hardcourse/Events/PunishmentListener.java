@@ -90,7 +90,7 @@ public class PunishmentListener extends ListenerAdapter implements Listener {
                     .setThumbnail("https://mc-heads.net/avatar/" + event.getTargetUUID() + ".png")
                     .setColor(Color.RED);
             Button revert = Button.danger("punishment_revert:" + event.getPunishmentId(), "Revert");
-            Button note = Button.primary("punishment_addnote:" + event.getPunishmentId(), "Add Note");
+            Button note = Button.primary("punishment_addNote:" + event.getPunishmentId(), "Add Note");
             Button duration = Button.success("punishment_modify:" + event.getPunishmentId(), "Change Duration");
             punishmentChannel.sendMessageEmbeds(punishmentEmbed.build()).setActionRow(revert, note, duration).queue();
         }
@@ -127,7 +127,7 @@ public class PunishmentListener extends ListenerAdapter implements Listener {
 
             event.replyModal(modal).queue();
         }
-        if(event.getButton().getId().startsWith("punishment_addnote:")) {
+        if(event.getButton().getId().startsWith("punishment_addNote:")) {
             String punishmentId = event.getButton().getId().split(":")[1];
 
             if(!hasLuckPermsPermission(linkedUUID, "core403.punish.use")){

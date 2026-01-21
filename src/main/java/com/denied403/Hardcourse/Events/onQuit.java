@@ -18,7 +18,9 @@ public class onQuit implements Listener {
         Double highestLevel = checkpointDatabase.getLevel(e.getPlayer().getUniqueId());
         int season = checkpointDatabase.getSeason(e.getPlayer().getUniqueId());
         if(highestLevel <= 3 && season == 1){
-            checkpointDatabase.deleteSpecific(e.getPlayer().getUniqueId());
+            if(!e.getPlayer().isOp() || !e.getPlayer().hasPermission("hardcourse.staff") || checkpointDatabase.isLinked(e.getPlayer().getUniqueId())) {
+                checkpointDatabase.deleteSpecific(e.getPlayer().getUniqueId());
+            }
         }
     }
 }

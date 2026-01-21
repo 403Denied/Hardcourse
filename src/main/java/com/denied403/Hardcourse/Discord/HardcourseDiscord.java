@@ -31,7 +31,7 @@ import java.util.TimeZone;
 
 import static com.denied403.Hardcourse.Hardcourse.*;
 import static com.denied403.Hardcourse.Utils.Playtime.getPlaytime;
-import static com.transfemme.dev.core403.Commands.Moderation.Vanish.Vanished.vanishedPlayers;
+import static com.transfemme.dev.core403.Commands.Moderation.Vanish.Vanish.vanishedPlayers;
 import static com.transfemme.dev.core403.Util.ColorUtil.stripAllColors;
 
 public class HardcourseDiscord {
@@ -166,7 +166,7 @@ public class HardcourseDiscord {
             chatChannel.sendMessage(":inbox_tray: **`" + stripAllColors(player.displayName()) + "`** joined the server for the first time _[#" + Bukkit.getOfflinePlayers().length + "]_").queue();
         }
         if (type.equals("leave")) {
-            if(vanishedPlayers.contains(player.getUniqueId())){return;}
+            if(vanishedPlayers.contains(player.getUniqueId())) return;
             chatChannel.sendMessage(":outbox_tray: **`" + stripAllColors(player.displayName()) + "`** left the server").queue();
         }
         if (type.equals("hacks")) {
@@ -217,9 +217,15 @@ public class HardcourseDiscord {
             }
             if(extra1.equals("vanished")){
                 logsChannel.sendMessage((extra2.equals("silent") ? "`[SILENT] " : "`") + "[" + f.format(new Date()) + "] " + stripAllColors(player.getName()) + " vanished`").queue();
+                if(!extra2.equals("silent")){
+                    chatChannel.sendMessage(":outbox_tray: **`" + stripAllColors(player.displayName()) + "`** left the server").queue();
+                }
             }
             if(extra1.equals("unvanished")){
                 logsChannel.sendMessage((extra2.equals("silent") ? "`[SILENT] " : "`") + "[" + f.format(new Date()) + "] " + stripAllColors(player.getName()) + " unvanished`").queue();
+                if(!extra2.equals("silent")){
+                    chatChannel.sendMessage(":inbox_tray: **`" + stripAllColors(player.displayName()) + "`** joined").queue();
+                }
             }
         }
     }

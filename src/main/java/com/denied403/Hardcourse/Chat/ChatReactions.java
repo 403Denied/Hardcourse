@@ -64,7 +64,7 @@ public class ChatReactions implements Listener {
     public static void runGame(String word) {
         if(!gameActive) {
             currentWord = word;
-            if(DiabolicalUnscrambles) {
+            if(diabolicalUnscrambles) {
                 currentWord = randomizeCapitalization(currentWord);
             }
             String scrambledWord = Shuffler.shuffleWord(currentWord);
@@ -89,7 +89,7 @@ public class ChatReactions implements Listener {
     public void onPlayerChat(AsyncChatEvent event) {
         String message = LegacyComponentSerializer.legacySection().serialize(event.message());
         if (gameActive) {
-            if ((!DiabolicalUnscrambles && message.equalsIgnoreCase(currentWord)) || (DiabolicalUnscrambles && message.equals(currentWord))) {
+            if ((!diabolicalUnscrambles && message.equalsIgnoreCase(currentWord)) || (diabolicalUnscrambles && message.equals(currentWord))) {
                 Player p = event.getPlayer();
                 if (isDev) {
                     int points = 5 + random.nextInt(11);
