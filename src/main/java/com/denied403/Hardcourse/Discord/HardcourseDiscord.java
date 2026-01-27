@@ -166,8 +166,9 @@ public class HardcourseDiscord {
             chatChannel.sendMessage(":inbox_tray: **`" + stripAllColors(player.displayName()) + "`** joined the server for the first time _[#" + Bukkit.getOfflinePlayers().length + "]_").queue();
         }
         if (type.equals("leave")) {
-            if(vanishedPlayers.contains(player.getUniqueId())) return;
-            chatChannel.sendMessage(":outbox_tray: **`" + stripAllColors(player.displayName()) + "`** left the server").queue();
+            if(!vanishedPlayers.contains(player.getUniqueId())) {
+                chatChannel.sendMessage(":outbox_tray: **`" + stripAllColors(player.displayName()) + "`** left the server").queue();
+            }
         }
         if (type.equals("hacks")) {
             String playerName = stripAllColors(player.displayName());

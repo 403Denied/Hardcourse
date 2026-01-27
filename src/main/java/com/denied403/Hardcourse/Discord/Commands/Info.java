@@ -48,7 +48,7 @@ public class Info {
         if(type.equals("server")) {
             ArrayList<String> playerNames = new ArrayList<>();
             for (Player player : Bukkit.getOnlinePlayers()) {
-                if(!vanishedPlayers.contains(player.getUniqueId())) {
+                if(!player.hasMetadata("vanished")) {
                     playerNames.add(player.getName());
                 }
             }

@@ -31,7 +31,6 @@ import java.util.UUID;
 import static com.denied403.Hardcourse.Discord.HardcourseDiscord.*;
 import static com.denied403.Hardcourse.Hardcourse.*;
 import static com.denied403.Hardcourse.Utils.Luckperms.hasLuckPermsPermission;
-import static com.transfemme.dev.core403.Core403.getPunishmentDatabase;
 import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
 import static org.bukkit.Bukkit.getServer;
 
@@ -172,7 +171,7 @@ public class PunishmentListener extends ListenerAdapter implements Listener {
     }
 
     private boolean checkReverted(ButtonInteractionEvent event, String punishmentId) {
-        if(getPunishmentDatabase().isReverted(punishmentId)){
+        if(punishmentDatabase.isReverted(punishmentId)){
             event.deferEdit().queue();
             event.getMessage().editMessageComponents(
                     ActionRow.of(
@@ -194,7 +193,7 @@ public class PunishmentListener extends ListenerAdapter implements Listener {
                         Button.success("button:disabled2", "Change Duration").asDisabled()
                 )
         ).queue();
-        if(getPunishmentDatabase().isReverted(punishmentId)){
+        if(punishmentDatabase.isReverted(punishmentId)){
             event.deferEdit().queue();
             event.getHook().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription("❌ This punishment has already been reverted!").build()).setEphemeral(true).queue();
             return true;
@@ -210,7 +209,7 @@ public class PunishmentListener extends ListenerAdapter implements Listener {
             String note = event.getValue("reason").getAsString();
             String linkedUuidString = checkpointDatabase.getUUIDFromDiscord(event.getMember().getId());
             UUID linkedUUID = UUID.fromString(linkedUuidString);
-            com.transfemme.dev.core403.Punishments.Events.onChatRevert.revertPunishment(punishmentId, linkedUUID, System.currentTimeMillis(), note, getPunishmentDatabase());
+            com.transfemme.dev.core403.Punishments.Events.onChatRevert.revertPunishment(punishmentId, linkedUUID, System.currentTimeMillis(), note, punishmentDatabase);
             EmbedBuilder punishmentEmbed = new EmbedBuilder().setColor(Color.GREEN).setDescription("✅ Punishment `" + punishmentId + "` successfully reverted.");
             event.replyEmbeds(punishmentEmbed.build()).setEphemeral(true).queue();
             return;
@@ -219,10 +218,10 @@ public class PunishmentListener extends ListenerAdapter implements Listener {
             String punishmentId = event.getModalId().split(":")[1];
             if (checkRevertedModal(event, punishmentId)) return;
             String note = event.getValue("note").getAsString();
-            if(!getPunishmentDatabase().hasNotes(punishmentId)) {
-                getPunishmentDatabase().addNotes(punishmentId, note);
+            if(!punishmentDatabase.hasNotes(punishmentId)) {
+                punishmentDatabase.addNotes(punishmentId, note);
             } else {
-                getPunishmentDatabase().addGeneralNotes(punishmentId, note);
+                punishmentDatabase.addGeneralNotes(punishmentId, note);
             }
             EmbedBuilder noteEmbed = new EmbedBuilder().setColor(Color.GREEN).setDescription("✅ Successfully added note to punishment `" + punishmentId + "`.");
             event.replyEmbeds(noteEmbed.build()).setEphemeral(true).queue();
@@ -242,7 +241,7 @@ public class PunishmentListener extends ListenerAdapter implements Listener {
                 return;
             }
             String reason = event.getValue("reason").getAsString();
-            onChatEdit.editPunishment(punishmentId, linkedUuid, duration, reason, getPunishmentDatabase());
+            onChatEdit.editPunishment(punishmentId, linkedUuid, duration, reason, punishmentDatabase);
             EmbedBuilder noteEmbed = new EmbedBuilder().setColor(Color.GREEN).setDescription("✅ Successfully updated duration of punishment `" + punishmentId + "` to `" +  duration + "`.");
             event.replyEmbeds(noteEmbed.build()).setEphemeral(true).queue();
         }

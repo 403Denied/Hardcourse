@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import static com.denied403.Hardcourse.Hardcourse.checkpointDatabase;
 import static com.denied403.Hardcourse.Hardcourse.isDev;
 import static com.denied403.Hardcourse.Points.PointsManager.getPoints;
+import static com.denied403.Hardcourse.Utils.CheckpointLevelTimer.getCurrentLevelTimeFormatted;
 import static com.transfemme.dev.core403.Core403.*;
 
 public class Placeholders extends PlaceholderExpansion {
@@ -44,6 +45,9 @@ public class Placeholders extends PlaceholderExpansion {
         }
         if(params.equalsIgnoreCase("prefix")){
             return prefix;
+        }
+        if(params.equalsIgnoreCase("level-time")){
+            return getCurrentLevelTimeFormatted(player.getUniqueId());
         }
         return null;
     }

@@ -16,6 +16,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.io.File;
 
+import static com.denied403.Hardcourse.Commands.Clock.giveItems;
 import static com.denied403.Hardcourse.Discord.HardcourseDiscord.sendMessage;
 import static com.denied403.Hardcourse.Hardcourse.*;
 import static com.denied403.Hardcourse.Points.Shop.PointsShop.givePointsShopPaper;
@@ -34,9 +35,6 @@ public class onJoin implements Listener {
                 sendMessage(player, null, "firstjoin", null, null);
             }
             sendMessage(player, null, "logs", "join", null);
-        }
-        if(!player.hasPlayedBefore()) {
-            checkpointDatabase.setCheckpointData(player.getUniqueId(), 1, 0, 0);
         }
         if(checkpointDatabase.getCheckpointData(player.getUniqueId()) == null) {
             int season;
@@ -86,54 +84,16 @@ public class onJoin implements Listener {
                 givePointsShopPaper(player, true);
             }
         }
-        Material killItem = Material.CLOCK;
-        ItemStack killItemStack = new ItemStack(killItem);
-        org.bukkit.inventory.meta.ItemMeta killItemMeta = killItemStack.getItemMeta();
-        killItemMeta.addEnchant(Enchantment.INFINITY, 1, true);
-        killItemMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS);
-        killItemMeta.displayName(Colorize("&c&lStuck").decoration(TextDecoration.ITALIC, false));
-        killItemMeta.itemName(Colorize("&c&lStuck").decoration(TextDecoration.ITALIC, false));
-        java.util.ArrayList<Component> stuckLore = new java.util.ArrayList<>();
-        stuckLore.add(Colorize(" "));
-        stuckLore.add(Colorize("<gray>Click if you're stuck to go back to your level").decoration(TextDecoration.ITALIC, false));
-        killItemMeta.lore(stuckLore);
-        killItemStack.setItemMeta(killItemMeta);
-        if(!player.getInventory().contains(killItemStack)) {
-            player.getInventory().setItem(8, killItemStack);
-        }
-
+        checkpointUpdating.applyPendingUpdates(player);
         if (!player.hasPlayedBefore()) {
             World targetWorld = Bukkit.getServer().getWorld("Season1");
             assert targetWorld != null;
             Location spawnLocation = targetWorld.getSpawnLocation();
             player.teleport(spawnLocation);
             player.updateCommands();
+            checkpointDatabase.setCheckpointData(player.getUniqueId(), 1, 0, 0);
+            giveItems(player);
             player.sendMessage(Colorize("<prefix>Welcome to hardcourse. This parkour server contains over 1000 levels that will test your patience (and your will to live). To die you may click the <accent>clock<main> in your 9th hotbar slot. Think it's worth it? <accent>You may begin<main>."));
-        }
-
-        ItemStack torch = new ItemStack(Material.TORCH);
-        ItemMeta torchMeta = torch.getItemMeta();
-        torchMeta.displayName(Colorize("&cHide &rPlayers").decoration(TextDecoration.ITALIC, false));
-        torchMeta.itemName(Colorize("&cHide &rPlayers").decoration(TextDecoration.ITALIC, false));
-        torch.setItemMeta(torchMeta);
-
-        ItemStack soulTorch = new ItemStack(Material.SOUL_TORCH);
-        ItemMeta soulTorchMeta = soulTorch.getItemMeta();
-        soulTorchMeta.displayName(Colorize("&cShow &rPlayers").decoration(TextDecoration.ITALIC, false));
-        soulTorchMeta.itemName(Colorize("&cShow &rPlayers").decoration(TextDecoration.ITALIC, false));
-        soulTorch.setItemMeta(soulTorchMeta);
-
-        if(isDev) {
-            if (player.getInventory().contains(soulTorch)) {
-                int index = player.getInventory().first(soulTorch);
-                if (index != -1) {
-                    player.getInventory().setItem(index, torch);
-                    player.updateInventory();
-                }
-            }
-            if (!player.getInventory().contains(torch) || !player.getInventory().contains(soulTorch)) {
-                player.getInventory().setItem(0, torch);
-            }
         }
     }
 }

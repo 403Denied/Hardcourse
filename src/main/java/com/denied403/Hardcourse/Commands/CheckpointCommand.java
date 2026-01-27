@@ -25,8 +25,10 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
+import static com.denied403.Hardcourse.Commands.Clock.giveItems;
 import static com.denied403.Hardcourse.Discord.HardcourseDiscord.checkpointsChannel;
 import static com.denied403.Hardcourse.Hardcourse.*;
+import static com.denied403.Hardcourse.Utils.CheckpointLevelTimer.resetForNewLevel;
 import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
 
 public class CheckpointCommand {
@@ -34,7 +36,6 @@ public class CheckpointCommand {
 
     public static LiteralCommandNode<CommandSourceStack> createCommand(String commandName) {
         return Commands.literal(commandName)
-
                 .then(Commands.literal("set")
                         .requires(source -> source.getSender().isOp())
                         .then(Commands.argument("player", StringArgumentType.word())
@@ -48,6 +49,7 @@ public class CheckpointCommand {
                                             OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(playerName);
                                             UUID uuid = offlinePlayer.getUniqueId();
 
+                                            resetForNewLevel(uuid);
                                             checkpointDatabase.setLevel(uuid, level);
 
                                             int season = checkpointDatabase.getSeason(uuid);
@@ -79,6 +81,7 @@ public class CheckpointCommand {
 
                                                     checkpointDatabase.setSeason(uuid, season);
                                                     checkpointDatabase.setLevel(uuid, level);
+                                                    resetForNewLevel(uuid);
 
                                                     String formattedLevel = (level % 1 == 0) ? String.valueOf((int) level) : String.valueOf(level);
 
@@ -208,7 +211,7 @@ public class CheckpointCommand {
                                 if (!restartCancelled.contains(player.getUniqueId())) {
                                     checkpointDatabase.setCheckpointData(uuid, 1, 0, 0);
                                     player.performCommand("spawn");
-                                    player.performCommand("clock");
+                                    giveItems(player);
                                     player.setRespawnLocation(player.getWorld().getSpawnLocation());
                                     player.sendMessage(Colorize("<prefix>You have been reset to the beginning."));
                                     Luckperms.removeRank(player.getUniqueId());
@@ -232,6 +235,42 @@ public class CheckpointCommand {
                             restartCancelled.add(player.getUniqueId());
                             return Command.SINGLE_SUCCESS;
                         })))
+                .then(Commands.literal("update")
+                        .requires(source -> source.getSender().isOp())
+                        .then(Commands.argument("season", IntegerArgumentType.integer(1, 3))
+                                .then(Commands.argument("start", DoubleArgumentType.doubleArg(0))
+                                        .then(Commands.argument("end", DoubleArgumentType.doubleArg(0))
+                                                .then(Commands.argument("resetTo", DoubleArgumentType.doubleArg(0))
+                                                        .executes(ctx -> {
+                                                            CommandSender sender = ctx.getSource().getSender();
+
+                                                            int season = IntegerArgumentType.getInteger(ctx, "season");
+                                                            double start = DoubleArgumentType.getDouble(ctx, "start");
+                                                            double end = DoubleArgumentType.getDouble(ctx, "end");
+                                                            double resetTo = DoubleArgumentType.getDouble(ctx, "resetTo");
+
+                                                            int createdId = checkpointUpdating.addLevelUpdate(season, start, end, resetTo);
+
+                                                            if (createdId == -1) {
+                                                                sender.sendMessage(Colorize("<prefix>Failed to create update."));
+                                                                return Command.SINGLE_SUCCESS;
+                                                            }
+
+                                                            checkpointUpdating.applyUpdatesToAllOnlinePlayers();
+
+                                                            sender.sendMessage(Colorize("<prefix>Update <accent>" + createdId +
+                                                                    "<main> applied for Season <accent>" + season + "<main>, Levels <accent>" +
+                                                                    String.valueOf(start).replace(".0", "") + "<main>-<accent>" +
+                                                                    String.valueOf(end).replace(".0", "") +
+                                                                    "<main>, reset to <accent>" + String.valueOf(resetTo).replace(".0", "")));
+
+                                                            return Command.SINGLE_SUCCESS;
+                                                        })
+                                                )
+                                        )
+                                )
+                        )
+                )
                 .then(Commands.literal("info")
                         .requires(source -> source.getSender().isOp())
                         .then(Commands.argument("level", DoubleArgumentType.doubleArg(0))
@@ -340,7 +379,7 @@ public class CheckpointCommand {
                         )
                 )
                 .then(Commands.literal("tp")
-                        .requires(source -> source.getSender().isOp() || source.getSender().hasPermission("hardcourse.winner"))
+                        .requires(source -> true) // anyone can use
                         .then(Commands.argument("level", DoubleArgumentType.doubleArg(0))
                                 .executes(ctx -> {
                                     CommandSender sender = ctx.getSource().getSender();
@@ -349,21 +388,12 @@ public class CheckpointCommand {
                                         return Command.SINGLE_SUCCESS;
                                     }
 
-                                    double level = DoubleArgumentType.getDouble(ctx, "level");
-                                    int season = checkpointDatabase.getSeason(player.getUniqueId());
+                                    double requestedLevel = DoubleArgumentType.getDouble(ctx, "level");
+                                    int requestedSeason = checkpointDatabase.getSeason(player.getUniqueId()); // default to current season
 
-                                    Location loc = checkpointDatabase.getCheckpointLocation(season, level);
-                                    if (loc == null) {
-                                        sender.sendMessage(Colorize("<prefix>No checkpoint location set for <accent>"
-                                                + season + "-" + String.valueOf(level).replace(".0", "") + "<main>."));
-                                        return Command.SINGLE_SUCCESS;
-                                    }
-
-                                    player.teleport(loc);
-                                    sender.sendMessage(Colorize("<prefix>Teleported to checkpoint <accent>"
-                                            + season + "-" + String.valueOf(level).replace(".0", "") + "<main>."));
-                                    return Command.SINGLE_SUCCESS;
+                                    return handleTeleport(sender, player, requestedSeason, requestedLevel, false);
                                 })
+                                // Optional season argument
                                 .then(Commands.argument("season", IntegerArgumentType.integer(1, 3))
                                         .executes(ctx -> {
                                             CommandSender sender = ctx.getSource().getSender();
@@ -372,88 +402,50 @@ public class CheckpointCommand {
                                                 return Command.SINGLE_SUCCESS;
                                             }
 
-                                            double level = DoubleArgumentType.getDouble(ctx, "level");
-                                            int season = IntegerArgumentType.getInteger(ctx, "season");
+                                            double requestedLevel = DoubleArgumentType.getDouble(ctx, "level");
+                                            int requestedSeason = IntegerArgumentType.getInteger(ctx, "season");
 
-                                            Location loc = checkpointDatabase.getCheckpointLocation(season, level);
-                                            if (loc == null) {
-                                                sender.sendMessage(Colorize("<prefix>No checkpoint location set for <accent>"
-                                                        + season + "-" + String.valueOf(level).replace(".0", "") + "<main>."));
-                                                return Command.SINGLE_SUCCESS;
-                                            }
-
-                                            player.teleport(loc);
-                                            sender.sendMessage(Colorize("<prefix>Teleported to checkpoint <accent>"
-                                                    + season + "-" + String.valueOf(level).replace(".0", "") + "<main>."));
-                                            return Command.SINGLE_SUCCESS;
+                                            return handleTeleport(sender, player, requestedSeason, requestedLevel, false);
                                         })
+                                        // Player argument (only ops)
                                         .then(Commands.argument("player", StringArgumentType.word())
                                                 .suggests(CheckpointCommand::playerSuggestions)
                                                 .requires(source -> source.getSender().isOp())
                                                 .executes(ctx -> {
                                                     CommandSender sender = ctx.getSource().getSender();
-
                                                     Player target = Bukkit.getPlayer(StringArgumentType.getString(ctx, "player"));
                                                     if (target == null) {
                                                         sender.sendMessage(Colorize("<prefix>Player not found."));
                                                         return Command.SINGLE_SUCCESS;
                                                     }
 
-                                                    double level = DoubleArgumentType.getDouble(ctx, "level");
-                                                    int season = IntegerArgumentType.getInteger(ctx, "season");
+                                                    double requestedLevel = DoubleArgumentType.getDouble(ctx, "level");
+                                                    int requestedSeason = IntegerArgumentType.getInteger(ctx, "season");
 
-                                                    Location loc = checkpointDatabase.getCheckpointLocation(season, level);
-                                                    if (loc == null) {
-                                                        sender.sendMessage(Colorize("<prefix>No checkpoint location set for <accent>"
-                                                                + season + "-" + String.valueOf(level).replace(".0", "") + "<main>."));
-                                                        return Command.SINGLE_SUCCESS;
-                                                    }
-
-                                                    target.teleport(loc);
-                                                    sender.sendMessage(Colorize("<prefix>Teleported <accent>"
-                                                            + target.getName() + " <main>to checkpoint <accent>"
-                                                            + season + "-" + String.valueOf(level).replace(".0", "") + "<main>."));
-                                                    return Command.SINGLE_SUCCESS;
+                                                    return handleTeleport(sender, target, requestedSeason, requestedLevel, false);
                                                 })
+                                                // Set checkpoint for player (only ops)
                                                 .then(Commands.argument("setCheckpoint", BoolArgumentType.bool())
                                                         .executes(ctx -> {
                                                             CommandSender sender = ctx.getSource().getSender();
-
                                                             Player target = Bukkit.getPlayer(StringArgumentType.getString(ctx, "player"));
                                                             if (target == null) {
                                                                 sender.sendMessage(Colorize("<prefix>Player not found."));
                                                                 return Command.SINGLE_SUCCESS;
                                                             }
 
-                                                            double level = DoubleArgumentType.getDouble(ctx, "level");
-                                                            int season = IntegerArgumentType.getInteger(ctx, "season");
+                                                            double requestedLevel = DoubleArgumentType.getDouble(ctx, "level");
+                                                            int requestedSeason = IntegerArgumentType.getInteger(ctx, "season");
                                                             boolean setCheckpoint = BoolArgumentType.getBool(ctx, "setCheckpoint");
 
-                                                            Location loc = checkpointDatabase.getCheckpointLocation(season, level);
-                                                            if (loc == null) {
-                                                                sender.sendMessage(Colorize("<prefix>No checkpoint location set for <accent>"
-                                                                        + season + "-" + String.valueOf(level).replace(".0", "") + "<main>."));
-                                                                return Command.SINGLE_SUCCESS;
-                                                            }
-
-                                                            if (setCheckpoint) {
-                                                                checkpointDatabase.setLevel(target.getUniqueId(), level);
-                                                                checkpointDatabase.setSeason(target.getUniqueId(), season);
-                                                                if(DiscordEnabled) {
-                                                                    final SimpleDateFormat f = new SimpleDateFormat("HH:mm:ss z");
-                                                                    f.setTimeZone(TimeZone.getTimeZone("UTC"));
-                                                                    checkpointsChannel.sendMessage("`[" + f.format(new Date()) + "] " + target.getName() + " was set to level " + season + "-" + String.valueOf(level).replace(".0", "") + " by " + (sender instanceof Player ? sender.getName() + "`" : "CONSOLE`")).queue();
-                                                                }
-                                                            }
-
-                                                            target.teleport(loc);
-
-                                                            sender.sendMessage(Colorize("<prefix>Teleported <accent>" + target.getName() + (setCheckpoint ? " <main>and set checkpoint to <accent>" : " <main>to checkpoint <accent>") + season + "-" + String.valueOf(level).replace(".0", "") + "<main>."));
-                                                            return Command.SINGLE_SUCCESS;
-                                                        }))
-                                        ))))
-
-                        .build();
+                                                            return handleTeleport(sender, target, requestedSeason, requestedLevel, setCheckpoint);
+                                                        })
+                                                )
+                                        )
+                                )
+                        )
+                )
+                .build();
     }
     private static CompletableFuture<Suggestions> playerSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
         String input = builder.getRemaining().toLowerCase();
@@ -518,14 +510,6 @@ public class CheckpointCommand {
         return start;
     }
     private static int executeListPlayers(CommandSender sender, double level, int season, int page) {
-
-        //if (season == 1 && level <= 3) {
-        //    sender.sendMessage(Colorize(
-        //            "<prefix>Player data is not available for checkpoints at or below <accent>1-3<main>."
-        //    ));
-        //    return 2;
-        //}
-
         List<UUID> uuids = checkpointDatabase.getPlayersAtCheckpoint(season, level);
 
         if (uuids == null || uuids.isEmpty()) {
@@ -595,4 +579,57 @@ public class CheckpointCommand {
         }
         return 1;
     }
+    private static boolean isHigherCheckpoint(int currentSeason, double currentLevel, int targetSeason, double targetLevel) {
+        return targetSeason > currentSeason || (targetSeason == currentSeason && targetLevel >= currentLevel);
+    }
+    private static int handleTeleport(CommandSender sender, Player target, int season, double level, boolean setCheckpoint) {
+        int currentSeason = checkpointDatabase.getSeason(target.getUniqueId());
+        double currentLevel = checkpointDatabase.getLevel(target.getUniqueId());
+
+        boolean senderBypass = sender.isOp() || (sender instanceof Player && sender.hasPermission("hardcourse.winner"));
+
+        if (!senderBypass) {
+            if (target.equals(sender) && currentSeason == 1 && currentLevel == 9999) {
+                sender.sendMessage(Colorize("<prefix>You cannot teleport while on this level."));
+                return 0;
+            }
+
+            if (isHigherCheckpoint(currentSeason, currentLevel, season, level)) {
+                sender.sendMessage(Colorize("<prefix>You can only teleport to checkpoints below your current one!"));
+                return 0;
+            }
+        }
+
+        Location loc = checkpointDatabase.getCheckpointLocation(season, level);
+        if (loc == null) {
+            sender.sendMessage(Colorize("<prefix>No checkpoint location set for <accent>" + season + "-" + String.valueOf(level).replace(".0", "") + "<main>."));
+            return Command.SINGLE_SUCCESS;
+        }
+
+        if (setCheckpoint) {
+            resetForNewLevel(target.getUniqueId());
+            checkpointDatabase.setLevel(target.getUniqueId(), level);
+            checkpointDatabase.setSeason(target.getUniqueId(), season);
+
+            if (DiscordEnabled) {
+                final SimpleDateFormat f = new SimpleDateFormat("HH:mm:ss z");
+                f.setTimeZone(TimeZone.getTimeZone("UTC"));
+                checkpointsChannel.sendMessage("`[" + f.format(new Date()) + "] " + target.getName() + " was set to level " + season + "-" + String.valueOf(level).replace(".0", "") + " by " + (sender instanceof Player ? sender.getName() + "`" : "CONSOLE`")).queue();
+            }
+        }
+
+        target.teleport(loc);
+
+        if(!target.isOp() || !target.hasPermission("hardcourse.winner")) {
+            giveItems(target);
+        }
+
+        if(!target.getName().equals(sender.getName())) {
+            sender.sendMessage(Colorize("<prefix>Teleported <accent>" + target.getName() + (setCheckpoint ? " <main>and set checkpoint to <accent>" : " <main>to checkpoint <accent>") + season + "-" + String.valueOf(level).replace(".0", "") + "<main>."));
+        } else {
+            sender.sendMessage(Colorize("<prefix>Teleported to checkpoint <accent>" + season + "-" + String.valueOf(level).replace(".0", "") + "<main>."));
+        }
+        return Command.SINGLE_SUCCESS;
+    }
+
 }
