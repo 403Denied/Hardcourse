@@ -1,5 +1,6 @@
 package com.denied403.Hardcourse.Events;
 
+import org.bukkit.Material;
 import org.bukkit.Statistic;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -21,6 +22,11 @@ public class onDeath implements Listener {
             final SimpleDateFormat f = new SimpleDateFormat("HH:mm:ss z");
             f.setTimeZone(TimeZone.getTimeZone("UTC"));
             deathsChannel.sendMessage("`[" + f.format(new Date()) + "] " + player.getName() + " died [#" + player.getStatistic(Statistic.DEATHS) + "]`").queue();
+        }
+        if(!player.isOp() || !player.hasPermission("hardcourse.staff")){
+            if(player.getInventory().contains(Material.ELYTRA)) {
+                player.getInventory().remove(Material.ELYTRA);
+            }
         }
     }
 }

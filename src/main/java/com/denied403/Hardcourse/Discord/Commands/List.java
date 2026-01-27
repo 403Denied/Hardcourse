@@ -18,7 +18,7 @@ public class List {
         java.util.List<String> staffMembers = new ArrayList<>();
 
         for (Player player : Bukkit.getOnlinePlayers()) {
-            if(!vanishedPlayers.contains(player.getUniqueId())) {
+            if(!player.hasMetadata("vanished")) {
                 String name = "`" + stripAllColors(player.displayName()) + "`";
                 if (player.hasPermission("hardcourse.jrmod")) {
                     staffMembers.add(name);

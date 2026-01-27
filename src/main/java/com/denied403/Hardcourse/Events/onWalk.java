@@ -18,6 +18,8 @@ import java.util.UUID;
 
 import static com.denied403.Hardcourse.Discord.HardcourseDiscord.*;
 import static com.denied403.Hardcourse.Hardcourse.*;
+import static com.denied403.Hardcourse.Utils.CheckpointLevelTimer.getCurrentLevelTimeFormatted;
+import static com.denied403.Hardcourse.Utils.CheckpointLevelTimer.resetForNewLevel;
 import static com.denied403.Hardcourse.Utils.Luckperms.addRank;
 import static com.transfemme.dev.core403.Commands.Moderation.Vanish.Vanish.vanishedPlayers;
 import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
@@ -73,9 +75,9 @@ public class onWalk implements Listener {
                     final SimpleDateFormat f = new SimpleDateFormat("HH:mm:ss z");
                     f.setTimeZone(TimeZone.getTimeZone("UTC"));
                     if (season == 1) {
-                        checkpointsChannel.sendMessage("`[" + f.format(new Date()) + "] " + p.getName() + ": " + String.valueOf(previousLevel).replace(".0", "") + " -> " + String.valueOf(checkpointNumber).replace(".0", "") + "`").queue();
+                        checkpointsChannel.sendMessage("`[" + f.format(new Date()) + "] " + p.getName() + ": " + String.valueOf(previousLevel).replace(".0", "") + " -> " + String.valueOf(checkpointNumber).replace(".0", "") + " [" + getCurrentLevelTimeFormatted(uuid) + "]`").queue();
                     } else {
-                        checkpointsChannel.sendMessage("`[" + f.format(new Date()) + "] " + p.getName() + ": " + String.valueOf(season).replace(".0", "") + "-" + String.valueOf(previousLevel).replace(".0", "") + " -> " + String.valueOf(season).replace(".0", "") + "-" + String.valueOf(checkpointNumber).replace(".0", "") + "`").queue();
+                        checkpointsChannel.sendMessage("`[" + f.format(new Date()) + "] " + p.getName() + ": " + String.valueOf(season).replace(".0", "") + "-" + String.valueOf(previousLevel).replace(".0", "") + " -> " + String.valueOf(season).replace(".0", "") + "-" + String.valueOf(checkpointNumber).replace(".0", "") + " [" + getCurrentLevelTimeFormatted(uuid) + "]`").queue();
                     }
                 }
                 if (checkpointNumber > previousLevel + 10 && isSkipExempted((int) previousLevel, (int) checkpointNumber) && !p.hasPermission("hardcourse.staff")) {
@@ -123,12 +125,13 @@ public class onWalk implements Listener {
                 if(isDev) {
                     int pointsToAdd = 10 + random.nextInt(11);
                     pointsManager.addPoints(uuid, pointsToAdd);
-                    p.sendActionBar(Colorize("<main>Checkpoint reached: <accent>" + Double.toString(checkpointNumber).replace(".0", "") + " <main>• <accent>+" + pointsToAdd + "<main> points"));
+                    p.sendActionBar(Colorize("<main>Checkpoint reached: <accent>" + Double.toString(checkpointNumber).replace(".0", "") + " <main>• <accent>+" + pointsToAdd + "<main> points" + " <main>• <accent>" + getCurrentLevelTimeFormatted(uuid)));
                 } else {
-                    p.sendActionBar(Colorize("<main>Checkpoint reached: <accent>" + Double.toString(checkpointNumber).replace(".0", "")));
+                    p.sendActionBar(Colorize("<main>Checkpoint reached: <accent>" + Double.toString(checkpointNumber).replace(".0", "") + " <main>• <accent>" + getCurrentLevelTimeFormatted(uuid)));
                 }
 
                 p.setRespawnLocation(loc.add(0, 1, 0), true);
+                resetForNewLevel(uuid);
                 checkpointDatabase.setCheckpointData(uuid, season, checkpointNumber, checkpointDatabase.getPoints(uuid) != null ? checkpointDatabase.getPoints(uuid) : 0);
                 if(!checkpointDatabase.checkpointLocationExists(season, checkpointNumber)) {
                     checkpointDatabase.storeCheckpointLocationIfAbsent(season, checkpointNumber, loc.subtract(0, 1, 0), difficulty);
@@ -169,7 +172,8 @@ public class onWalk implements Listener {
         p.teleport(Bukkit.getWorld("Season" + nextSeason).getSpawnLocation());
         p.setGameMode(GameMode.ADVENTURE);
         p.setRespawnLocation(p.getLocation().add(0, 1, 0), true);
-        checkpointDatabase.setCheckpointData(p.getUniqueId(), nextSeason, 1, checkpointDatabase.getPoints(p.getUniqueId()));
+        checkpointDatabase.setLevel(p.getUniqueId(), 0);
+        checkpointDatabase.setSeason(p.getUniqueId(), nextSeason);
         addRank(p.getUniqueId(), String.valueOf(nextSeason));
         p.sendMessage(Colorize("<main>You have been teleported to the next season. You can now continue your journey!"));
     }

@@ -10,6 +10,8 @@ import com.denied403.Hardcourse.Points.*;
 import com.denied403.Hardcourse.Points.Shop.PointsShop;
 import com.denied403.Hardcourse.Utils.*;
 
+import com.transfemme.dev.core403.Core403;
+import com.transfemme.dev.core403.Punishments.Database.PunishmentDatabase;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -20,6 +22,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.*;
 
 import static com.denied403.Hardcourse.Discord.HardcourseDiscord.*;
+import static com.denied403.Hardcourse.Utils.CheckpointLevelTimer.shutdown;
 import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
 
 public final class Hardcourse extends JavaPlugin implements Listener {
@@ -29,6 +32,8 @@ public final class Hardcourse extends JavaPlugin implements Listener {
     public static CheckpointDatabase checkpointDatabase;
     public static LinkManager linkManager;
     public static PointsManager pointsManager;
+    public static PunishmentDatabase punishmentDatabase;
+    public static CheckpointUpdating checkpointUpdating;
 
     @Override
     public void onEnable() {
@@ -36,6 +41,8 @@ public final class Hardcourse extends JavaPlugin implements Listener {
         checkpointDatabase = new CheckpointDatabase();
         linkManager = new LinkManager();
         pointsManager = new PointsManager();
+        punishmentDatabase = Core403.database;
+        checkpointUpdating = new CheckpointUpdating();
         saveDefaultConfig();
         loadConfigValues();
 
@@ -64,6 +71,9 @@ public final class Hardcourse extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new onSneak(), this);
         getServer().getPluginManager().registerEvents(new onVanish(), this);
         getServer().getPluginManager().registerEvents(new onDeath(), this);
+        getServer().getPluginManager().registerEvents(new onCommand(), this);
+        getServer().getPluginManager().registerEvents(new ReportListener(), this);
+        getServer().getPluginManager().registerEvents(new CheckpointLevelTimer(), this);
         if(isDev) {
             getServer().getPluginManager().registerEvents(new PointsShop(), this);
             getServer().getPluginManager().registerEvents(new OminousTrail(this), this);
@@ -73,8 +83,6 @@ public final class Hardcourse extends JavaPlugin implements Listener {
             getServer().getPluginManager().registerEvents(new DoubleJump(), this);
             getServer().getPluginManager().registerEvents(new TempCheckpoint(), this);
         }
-        getServer().getPluginManager().registerEvents(new onCommand(), this);
-        getServer().getPluginManager().registerEvents(new ReportListener(), this);
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, cmd -> {
             cmd.registrar().register(Clock.createCommand("clock"));
             cmd.registrar().register(CheckpointCommand.createCommand("checkpoint"));
@@ -125,6 +133,7 @@ public final class Hardcourse extends JavaPlugin implements Listener {
                 jda.shutdown();
             }
         }
+        shutdown();
     }
 
     public static List<String> messages = new ArrayList<>();

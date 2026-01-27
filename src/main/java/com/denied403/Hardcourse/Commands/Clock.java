@@ -40,6 +40,8 @@ public class Clock {
                 }).build();
     }
     public static void giveItems(Player player) {
+        player.getInventory().clear();
+
         Material killItem = Material.CLOCK;
         ItemStack killItemStack = new ItemStack(killItem);
 
@@ -50,7 +52,7 @@ public class Clock {
         killItemMeta.displayName(Colorize("&c&lStuck").decoration(TextDecoration.ITALIC, false));
 
         var lore = new java.util.ArrayList<Component>();
-        lore.add(Colorize(" "));
+        lore.add(Colorize("&f"));
         lore.add(Colorize("&7Click if you're stuck to go back to your level").decoration(TextDecoration.ITALIC, false));
         killItemMeta.lore(lore);
         killItemStack.setItemMeta(killItemMeta);
