@@ -26,28 +26,28 @@ public class onChat implements Listener {
     public void onAsyncChat(AsyncChatEvent event) {
         String content = LegacyComponentSerializer.legacySection().serialize(event.message());
         if(!DiscordEnabled) return;
-
-        if (event.isCancelled()){
-            return;
-        }
-        sendMessage(event.getPlayer(), content, "logs", "false", null);
         Player player = event.getPlayer();
-        content = content
+        String newcontent = content
                 .replaceAll("@everyone", "`@everyone`")
                 .replaceAll("@here", "`@here`")
                 .replaceAll("<@", "`<@`")
                 .replaceAll("https://", "`https://`")
                 .replaceAll("http://", "`http://`");
 
+        if (newcontent.startsWith("#") && player.hasPermission("core403.staffchat")) {
+            sendMessage(player, newcontent.substring(1), "staffchat", null, null);
+            return;
+        }
+        if (event.isCancelled()){
+            return;
+        }
+        sendMessage(player, content, "logs", "false", null);
+
         String season = checkpointDatabase.getSeason(player.getUniqueId()).toString() + "-";
-        if (content.startsWith("#") && player.hasPermission("core403.staffchat")) {
-            sendMessage(player, content.substring(1), "staffchat", null, null);
+        if (!player.hasPermission("hardcourse.jrmod")){
+            sendMessage(player, newcontent, "chat", season, null);
         } else {
-            if (!player.hasPermission("hardcourse.jrmod")){
-                sendMessage(player, content, "chat", season, null);
-            } else {
-                sendMessage(player, content, "staffmessage", season, player.getUniqueId().toString());
-            }
+            sendMessage(player, newcontent, "staffmessage", season, player.getUniqueId().toString());
         }
     }
     @EventHandler
