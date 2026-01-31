@@ -9,7 +9,6 @@ import java.awt.*;
 import java.util.ArrayList;
 
 import static com.denied403.Hardcourse.Hardcourse.isDev;
-import static com.transfemme.dev.core403.Commands.Moderation.Vanish.Vanish.vanishedPlayers;
 import static com.transfemme.dev.core403.Util.ColorUtil.stripAllColors;
 
 public class List {

@@ -19,7 +19,6 @@ import java.util.UUID;
 
 import static com.denied403.Hardcourse.Hardcourse.checkpointDatabase;
 import static com.denied403.Hardcourse.Hardcourse.isDev;
-import static com.transfemme.dev.core403.Commands.Moderation.Vanish.Vanish.vanishedPlayers;
 
 public class Info {
     static OptionMapping typeOption;
@@ -58,6 +57,12 @@ public class Info {
             } else {
                 playersList = String.join(", ", playerNames);
             }
+            java.util.List<Player> vanishedPlayerSize = new ArrayList<>();
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                if(player.hasMetadata("vanished")) {
+                    vanishedPlayerSize.add(player);
+                }
+            }
             try {
                 EmbedBuilder serverEmbed = new EmbedBuilder();
                 serverEmbed.setThumbnail(Objects.requireNonNull(Objects.requireNonNull(event.getGuild()).getIconUrl()));
@@ -67,7 +72,7 @@ public class Info {
                 serverEmbed.addField("Online Since", getUptime(), false);
                 serverEmbed.addField("Server TPS", String.format("%.2f", Bukkit.getTPS()[0]), false);
                 serverEmbed.addField("Server Memory", getUsedMemory() + "MB", false);
-                serverEmbed.addField("Players", (Bukkit.getOnlinePlayers().size() - vanishedPlayers.size()) + "/" + Bukkit.getMaxPlayers(), false);
+                serverEmbed.addField("Players", (Bukkit.getOnlinePlayers().size() - vanishedPlayerSize.size()) + "/" + Bukkit.getMaxPlayers(), false);
                 serverEmbed.addField("Online Players", playersList, false);
                 event.replyEmbeds(serverEmbed.build()).setEphemeral(true).queue();
                 return;
