@@ -29,9 +29,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
 
+import static com.denied403.Hardcourse.Events.onVanish.vanished;
 import static com.denied403.Hardcourse.Hardcourse.*;
 import static com.denied403.Hardcourse.Utils.Playtime.getPlaytime;
-import static com.transfemme.dev.core403.Commands.Moderation.Vanish.Vanish.vanishedPlayers;
 import static com.transfemme.dev.core403.Util.ColorUtil.stripAllColors;
 
 public class HardcourseDiscord {
@@ -152,6 +152,7 @@ public class HardcourseDiscord {
         }
         if (type.equals("staffchat")) {
             staffChatChannel.sendMessage("**`" + stripAllColors(player.displayName()) + "`**: " + content).queue();
+            logsChannel.sendMessage("`[SC] [" + f.format(new Date()) + "] " + stripAllColors(player.getName()) + ": " + content.replaceAll("`", "'") + "`").queue();
         }
         if (type.equals("chat")) {
             chatChannel.sendMessage("[**" + extra1 + checkpointDatabase.getLevel(player.getUniqueId()).toString().replace(".0", "") + "**] `" + stripAllColors(player.displayName()) + "`: " + content).queue();
@@ -166,9 +167,7 @@ public class HardcourseDiscord {
             chatChannel.sendMessage(":inbox_tray: **`" + stripAllColors(player.displayName()) + "`** joined the server for the first time _[#" + Bukkit.getOfflinePlayers().length + "]_").queue();
         }
         if (type.equals("leave")) {
-            if(!vanishedPlayers.contains(player.getUniqueId())) {
-                chatChannel.sendMessage(":outbox_tray: **`" + stripAllColors(player.displayName()) + "`** left the server").queue();
-            }
+            chatChannel.sendMessage(":outbox_tray: **`" + stripAllColors(player.displayName()) + "`** left the server").queue();
         }
         if (type.equals("hacks")) {
             String playerName = stripAllColors(player.displayName());
@@ -214,7 +213,7 @@ public class HardcourseDiscord {
                 logsChannel.sendMessage("`[" + f.format(new Date()) + "] " + stripAllColors(player.getName()) + " joined" + (!player.hasPlayedBefore() ? " for the first time`" : "`")).queue();
             }
             if(extra1.equals("quit")){
-                logsChannel.sendMessage((vanishedPlayers.contains(player.getUniqueId()) ? "`[SILENT] " : "`") + "[" + f.format(new Date()) + "] " + stripAllColors(player.getName()) + " quit" + (vanishedPlayers.contains(player.getUniqueId()) ? " while vanished`" : "`")).queue();
+                logsChannel.sendMessage((vanished.contains(player) ? "`[SILENT] " : "`") + "[" + f.format(new Date()) + "] " + stripAllColors(player.getName()) + " quit" + (vanished.contains(player) ? " while vanished`" : "`")).queue();
             }
             if(extra1.equals("vanished")){
                 logsChannel.sendMessage((extra2.equals("silent") ? "`[SILENT] " : "`") + "[" + f.format(new Date()) + "] " + stripAllColors(player.getName()) + " vanished`").queue();

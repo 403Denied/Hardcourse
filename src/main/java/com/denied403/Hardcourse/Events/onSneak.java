@@ -10,7 +10,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 
 import static com.denied403.Hardcourse.Hardcourse.checkpointDatabase;
-import static com.transfemme.dev.core403.Commands.Moderation.Vanish.Vanish.vanishedPlayers;
 import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
 
 public class onSneak implements Listener {
@@ -39,7 +38,7 @@ public class onSneak implements Listener {
             int playerSeason = checkpointDatabase.getSeason(p.getUniqueId()) != null ? checkpointDatabase.getSeason(p.getUniqueId()) : 1;
             double level = checkpointDatabase.getLevel(p.getUniqueId());
             if(playerSeason == season && level == checkpointNumber){
-                if(vanishedPlayers.contains(p.getUniqueId())){return;}
+                if(p.hasMetadata("vanished")){return;}
                 p.sendActionBar(Colorize("<main>Reset Orientation: <accent>" + Double.toString(checkpointNumber).replace(".0", "")));
                 p.playSound(loc, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
                 p.setRespawnLocation(loc.add(0, 1, 0), true);

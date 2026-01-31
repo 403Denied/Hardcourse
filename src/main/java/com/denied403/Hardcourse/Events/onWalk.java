@@ -21,7 +21,6 @@ import static com.denied403.Hardcourse.Hardcourse.*;
 import static com.denied403.Hardcourse.Utils.CheckpointLevelTimer.getCurrentLevelTimeFormatted;
 import static com.denied403.Hardcourse.Utils.CheckpointLevelTimer.resetForNewLevel;
 import static com.denied403.Hardcourse.Utils.Luckperms.addRank;
-import static com.transfemme.dev.core403.Commands.Moderation.Vanish.Vanish.vanishedPlayers;
 import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
 
 public class onWalk implements Listener {
@@ -120,7 +119,7 @@ public class onWalk implements Listener {
                     p.sendMessage(Colorize("<prefix>You can't set a checkpoint here! Please refrain from making any more progress, and contact an administrator to fix the issue!"));
                     return;
                 }
-                if(vanishedPlayers.contains(p.getUniqueId())) {return;}
+                if(p.hasMetadata("vanished")) {return;}
                 p.playSound(loc, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
                 if(isDev) {
                     int pointsToAdd = 10 + random.nextInt(11);

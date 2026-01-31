@@ -5,6 +5,7 @@ import com.transfemme.dev.core403.Punishments.Api.CustomEvents.NameBanEvent;
 import com.transfemme.dev.core403.Punishments.Api.CustomEvents.PunishmentEvent;
 import com.transfemme.dev.core403.Punishments.Api.CustomEvents.RevertEvent;
 import com.transfemme.dev.core403.Punishments.Api.CustomEvents.PunishmentEditEvent;
+import com.transfemme.dev.core403.Punishments.Enums.PunishmentType;
 import com.transfemme.dev.core403.Punishments.Events.onChatEdit;
 import com.transfemme.dev.core403.Punishments.Utils.PunishmentDurationParser;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -31,6 +32,8 @@ import java.util.UUID;
 import static com.denied403.Hardcourse.Discord.HardcourseDiscord.*;
 import static com.denied403.Hardcourse.Hardcourse.*;
 import static com.denied403.Hardcourse.Utils.Luckperms.hasLuckPermsPermission;
+import static com.transfemme.dev.core403.Punishments.Events.onChatEdit.editPunishment;
+import static com.transfemme.dev.core403.Punishments.Events.onChatRevert.revertPunishment;
 import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
 import static org.bukkit.Bukkit.getServer;
 
@@ -209,7 +212,11 @@ public class PunishmentListener extends ListenerAdapter implements Listener {
             String note = event.getValue("reason").getAsString();
             String linkedUuidString = checkpointDatabase.getUUIDFromDiscord(event.getMember().getId());
             UUID linkedUUID = UUID.fromString(linkedUuidString);
-            com.transfemme.dev.core403.Punishments.Events.onChatRevert.revertPunishment(punishmentId, linkedUUID, System.currentTimeMillis(), note, punishmentDatabase);
+            if(!hasLuckPermsPermission(linkedUUID, "core403.punish.revert")){
+                event.reply("❌ You do not have permission to do that!").setEphemeral(true).queue();
+                return;
+            }
+            revertPunishment(punishmentId, linkedUUID, System.currentTimeMillis(), note);
             EmbedBuilder punishmentEmbed = new EmbedBuilder().setColor(Color.GREEN).setDescription("✅ Punishment `" + punishmentId + "` successfully reverted.");
             event.replyEmbeds(punishmentEmbed.build()).setEphemeral(true).queue();
             return;
@@ -241,7 +248,7 @@ public class PunishmentListener extends ListenerAdapter implements Listener {
                 return;
             }
             String reason = event.getValue("reason").getAsString();
-            onChatEdit.editPunishment(punishmentId, linkedUuid, duration, reason, punishmentDatabase);
+            editPunishment(punishmentId, linkedUuid, duration, reason);
             EmbedBuilder noteEmbed = new EmbedBuilder().setColor(Color.GREEN).setDescription("✅ Successfully updated duration of punishment `" + punishmentId + "` to `" +  duration + "`.");
             event.replyEmbeds(noteEmbed.build()).setEphemeral(true).queue();
         }
@@ -254,7 +261,11 @@ public class PunishmentListener extends ListenerAdapter implements Listener {
         String reason = event.getReason();
         String punishmentType = event.getType().toLowerCase();
         if(DiscordEnabled) {
-            punishmentChannel.sendMessage("`" + staffName + "` reverted a " + punishmentType + " from `" + playerName + "` for `" + reason + "`").queue();
+            if(punishmentType.equals("blacklist")) {
+                punishmentChannel.sendMessage("`" + staffName + "` reverted an IP Ban from `" + playerName + "`").queue();
+            } else {
+                punishmentChannel.sendMessage("`" + staffName + "` reverted a " + punishmentType + " from `" + playerName + "` for `" + reason + "`").queue();
+            }
         }
     }
     @EventHandler
@@ -272,15 +283,25 @@ public class PunishmentListener extends ListenerAdapter implements Listener {
     }
     @EventHandler
     public void onIpBan(IPBanEvent event){
-        String playerName = Bukkit.getOfflinePlayer(event.getTargetUUID()).getName();
+        List<UUID> targetUUIDs = event.getTargetUUIDs();
+        List<String> targetNames = new ArrayList<>();
+        for (UUID targetUUID : targetUUIDs){
+            targetNames.add("`" + Bukkit.getOfflinePlayer(targetUUID).getName() + "`");
+        }
         String staffName = event.getStaff();
+        String notes = event.getNotes();
+        if(notes == null){
+            notes = "None";
+        }
         if(DiscordEnabled) {
             EmbedBuilder punishmentEmbed = new EmbedBuilder()
                     .setTitle("IP Ban Issued")
-                    .setDescription("**ID:** " + event.getPunishmentId() + "\n**Staff:** " + staffName + "\n**Target:** " + playerName)
-                    .setThumbnail("https://mc-heads.net/avatar/" + event.getTargetUUID() + ".png")
+                    .setDescription("**ID:** " + event.getPunishmentId() + "\n**Staff:** " + staffName + "\n**Target" + (targetUUIDs.size() > 1 ? "s:** " : ":** ") + String.join(", ", targetNames) + "\n**Note:** " + notes)
+                    .setThumbnail("https://mc-heads.net/avatar/" + event.getTargetUUIDs().getFirst() + ".png")
                     .setColor(Color.RED);
-            punishmentChannel.sendMessageEmbeds(punishmentEmbed.build()).queue();
+            Button revert = Button.danger("punishment_revert:" + event.getPunishmentId(), "Revert");
+            Button note = Button.primary("punishment_addNote:" + event.getPunishmentId(), "Add Note");
+            punishmentChannel.sendMessageEmbeds(punishmentEmbed.build()).setActionRow(revert, note).queue();
         }
     }
     @EventHandler
