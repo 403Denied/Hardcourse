@@ -4,7 +4,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import com.transfemme.dev.core403.Punishments.Events.onConfirmClick;
-import com.transfemme.dev.core403.Punishments.PunishmentReason;
+import com.transfemme.dev.core403.Punishments.Utils.PunishmentReason;
 import org.bukkit.Bukkit;
 
 import java.awt.*;

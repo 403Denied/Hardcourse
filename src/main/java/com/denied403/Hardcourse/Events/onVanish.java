@@ -1,6 +1,6 @@
 package com.denied403.Hardcourse.Events;
 
-import com.transfemme.dev.core403.Punishments.Api.CustomEvents.VanishEvent;
+import com.transfemme.dev.core403.Punishments.Api.VanishEvent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

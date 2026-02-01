@@ -1,7 +1,7 @@
 package com.denied403.Hardcourse.Discord.Commands;
 
 import com.transfemme.dev.core403.Punishments.Enums.PunishmentType;
-import com.transfemme.dev.core403.Punishments.PunishmentReason;
+import com.transfemme.dev.core403.Punishments.Utils.PunishmentReason;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import com.transfemme.dev.core403.Punishments.Events.onConfirmClick;

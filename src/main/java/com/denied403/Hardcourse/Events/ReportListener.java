@@ -3,7 +3,7 @@ package com.denied403.Hardcourse.Events;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
-import com.transfemme.dev.core403.Punishments.Api.CustomEvents.ReportEvent;
+import com.transfemme.dev.core403.Punishments.Api.ReportEvent;
 
 import static com.denied403.Hardcourse.Discord.HardcourseDiscord.reportChannel;
 import static com.denied403.Hardcourse.Hardcourse.DiscordEnabled;
