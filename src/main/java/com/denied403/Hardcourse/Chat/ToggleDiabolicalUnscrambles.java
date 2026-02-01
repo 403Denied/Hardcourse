@@ -1,15 +1,14 @@
 package com.denied403.Hardcourse.Chat;
 
-import com.denied403.Hardcourse.Hardcourse;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 
-import static com.denied403.Hardcourse.Hardcourse.diabolicalUnscrambles;
 import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
 
 public class ToggleDiabolicalUnscrambles {
+    public static boolean diabolicalUnscrambles;
     public static LiteralCommandNode<CommandSourceStack> createCommand(String commandName) {
         return Commands.literal(commandName)
                 .requires(source -> source.getSender().hasPermission("hardcourse.admin"))

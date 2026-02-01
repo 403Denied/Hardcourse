@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Random;
 
+import static com.denied403.Hardcourse.Chat.ToggleDiabolicalUnscrambles.diabolicalUnscrambles;
 import static com.denied403.Hardcourse.Hardcourse.*;
 import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
 import static com.transfemme.dev.core403.Util.ColorUtil.stripAllColors;

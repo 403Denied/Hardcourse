@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.jetbrains.annotations.NotNull;
-import com.transfemme.dev.core403.Punishments.PunishmentReason;
+import com.transfemme.dev.core403.Punishments.Utils.PunishmentReason;
 
 import java.util.ArrayList;
 

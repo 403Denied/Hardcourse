@@ -1,12 +1,10 @@
 package com.denied403.Hardcourse.Events;
 
-import com.transfemme.dev.core403.Punishments.Api.CustomEvents.IPBanEvent;
-import com.transfemme.dev.core403.Punishments.Api.CustomEvents.NameBanEvent;
-import com.transfemme.dev.core403.Punishments.Api.CustomEvents.PunishmentEvent;
-import com.transfemme.dev.core403.Punishments.Api.CustomEvents.RevertEvent;
-import com.transfemme.dev.core403.Punishments.Api.CustomEvents.PunishmentEditEvent;
-import com.transfemme.dev.core403.Punishments.Enums.PunishmentType;
-import com.transfemme.dev.core403.Punishments.Events.onChatEdit;
+import com.transfemme.dev.core403.Punishments.Api.PunishmentEvent;
+import com.transfemme.dev.core403.Punishments.Api.NameBanEvent;
+import com.transfemme.dev.core403.Punishments.Api.RevertEvent;
+import com.transfemme.dev.core403.Punishments.Api.PunishmentEditEvent;
+import com.transfemme.dev.core403.Punishments.Api.IPBanEvent;
 import com.transfemme.dev.core403.Punishments.Utils.PunishmentDurationParser;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
