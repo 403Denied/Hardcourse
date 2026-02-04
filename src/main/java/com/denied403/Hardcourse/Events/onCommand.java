@@ -1,7 +1,5 @@
 package com.denied403.Hardcourse.Events;
 
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
@@ -12,7 +10,6 @@ import java.util.TimeZone;
 
 import static com.denied403.Hardcourse.Discord.HardcourseDiscord.commandsChannel;
 import static com.denied403.Hardcourse.Hardcourse.DiscordEnabled;
-import static com.denied403.Hardcourse.Utils.CheckpointLevelTimer.shutdown;
 import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
 
 public class onCommand implements Listener {

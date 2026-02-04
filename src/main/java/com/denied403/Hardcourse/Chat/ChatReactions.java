@@ -24,7 +24,7 @@ public class ChatReactions implements Listener {
 
     private static FileConfiguration wordConfig;
     private static final Random random = new Random();
-    private static String currentWord;
+    public static String currentWord;
     public static boolean gameActive = false;
 
     public ChatReactions() {
@@ -103,9 +103,5 @@ public class ChatReactions implements Listener {
                 gameActive = false;
             }
         }
-    }
-
-    public static String getCurrentWord() {
-        return currentWord;
     }
 }
