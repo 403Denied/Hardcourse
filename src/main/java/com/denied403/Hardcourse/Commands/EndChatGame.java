@@ -8,8 +8,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import static com.denied403.Hardcourse.Chat.ChatReactions.currentWord;
 import static com.denied403.Hardcourse.Chat.ChatReactions.gameActive;
-import static com.denied403.Hardcourse.Chat.ChatReactions.getCurrentWord;
 import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
 
 public class EndChatGame {
@@ -24,7 +24,7 @@ public class EndChatGame {
 
                     if (gameActive) {
                         gameActive = false;
-                        Bukkit.broadcast(Colorize("<prefix>The chat game has been ended early. The word was <accent>" + getCurrentWord()));
+                        Bukkit.broadcast(Colorize("<prefix>The chat game has been ended early. The word was <accent>" + currentWord));
                     } else {
                         sender.sendMessage(Colorize("<prefix>There is no game running currently."));
                     }
