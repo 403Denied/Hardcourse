@@ -7,6 +7,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.Location;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -22,7 +23,7 @@ import static com.transfemme.dev.core403.Util.ColorUtil.stripAllColors;
 
 public class onJoin implements Listener {
     @EventHandler
-    public void onJoinEvent(org.bukkit.event.player.PlayerJoinEvent event) {
+    public void onJoinEvent(PlayerJoinEvent event) {
         org.bukkit.entity.Player player = event.getPlayer();
 
         if (DiscordEnabled) {

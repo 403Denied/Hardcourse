@@ -32,7 +32,7 @@ public class WinnerTP {
         CommandSender sender = context.getSource().getSender();
 
         if (!(sender instanceof Player player)) {
-            sender.sendMessage(Colorize("<prefix>his command can only be used by players."));
+            sender.sendMessage(Colorize("<prefix>This command can only be used by players."));
             return 0;
         }
 
@@ -44,7 +44,7 @@ public class WinnerTP {
             return 0;
         }
 
-        if(target.isOp() || target.hasPermission("hardcourse.staff")) {
+        if((target.isOp() || target.hasPermission("hardcourse.staff")) && ! player.isOp()) {
             player.sendMessage(Colorize("<prefix>You cannot teleport to an operator."));
             return 0;
         }

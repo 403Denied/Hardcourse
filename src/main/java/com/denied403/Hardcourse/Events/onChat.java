@@ -27,15 +27,15 @@ public class onChat implements Listener {
         String content = LegacyComponentSerializer.legacySection().serialize(event.message());
         if(!DiscordEnabled) return;
         Player player = event.getPlayer();
-        String newcontent = content
+        String newContent = content
                 .replaceAll("@everyone", "`@everyone`")
                 .replaceAll("@here", "`@here`")
                 .replaceAll("<@", "`<@`")
                 .replaceAll("https://", "`https://`")
                 .replaceAll("http://", "`http://`");
 
-        if (newcontent.startsWith("#") && player.hasPermission("core403.staffchat")) {
-            sendMessage(player, newcontent.substring(1), "staffchat", null, null);
+        if (newContent.startsWith("#") && player.hasPermission("core403.staffchat")) {
+            sendMessage(player, newContent.substring(1), "staffchat", null, null);
             return;
         }
         if (event.isCancelled()){
@@ -45,9 +45,9 @@ public class onChat implements Listener {
 
         String season = checkpointDatabase.getSeason(player.getUniqueId()).toString() + "-";
         if (!player.hasPermission("hardcourse.jrmod")){
-            sendMessage(player, newcontent, "chat", season, null);
+            sendMessage(player, newContent, "chat", season, null);
         } else {
-            sendMessage(player, newcontent, "staffmessage", season, player.getUniqueId().toString());
+            sendMessage(player, newContent, "staffmessage", season, player.getUniqueId().toString());
         }
     }
     @EventHandler
