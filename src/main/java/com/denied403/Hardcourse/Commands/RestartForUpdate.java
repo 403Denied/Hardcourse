@@ -16,9 +16,7 @@ public class RestartForUpdate {
         return Commands.literal(commandName)
                 .requires(source -> source.getSender().hasPermission("hardcourse.admin"))
                 .executes(ctx -> {
-
                     Bukkit.broadcast(Colorize("<prefix>The server will be restarting to apply updates in <accent>30 seconds<main>. Please find a safe stopping point."));
-
                     new BukkitRunnable() {
                         int timeLeft = 30;
 
@@ -36,7 +34,6 @@ public class RestartForUpdate {
                             timeLeft--;
                         }
                     }.runTaskTimer(plugin, 20L, 20L);
-
                     return Command.SINGLE_SUCCESS;
                 })
                 .build();

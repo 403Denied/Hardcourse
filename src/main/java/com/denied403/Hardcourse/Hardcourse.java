@@ -63,7 +63,6 @@ public final class Hardcourse extends JavaPlugin implements Listener {
 
         getServer().getPluginManager().registerEvents(new ChatReactions(), this);
         getServer().getPluginManager().registerEvents(new onJoin(), this);
-        getServer().getPluginManager().registerEvents(new onDrop(), this);
         getServer().getPluginManager().registerEvents(new onClick(), this);
         getServer().getPluginManager().registerEvents(new onWalk(), this);
         getServer().getPluginManager().registerEvents(new onChat(), this);
@@ -122,8 +121,7 @@ public final class Hardcourse extends JavaPlugin implements Listener {
             if(UnscrambleEnabled) {
                 if(Bukkit.getOnlinePlayers().isEmpty()) return;
                 ChatReactions.runGame(ChatReactions.getRandomWord());
-            }
-        }, 0L, 4800);
+            }}, 0L, 4800);
     }
 
     @Override
