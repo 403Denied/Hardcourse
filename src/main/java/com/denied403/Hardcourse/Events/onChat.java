@@ -34,8 +34,8 @@ public class onChat implements Listener {
                 .replaceAll("https://", "`https://`")
                 .replaceAll("http://", "`http://`");
 
-        if (newContent.startsWith("#") && player.hasPermission("core403.staffchat")) {
-            sendMessage(player, newContent.substring(1), "staffchat", null, null);
+        if (newContent.startsWith("# ") && player.hasPermission("core403.staffchat")) {
+            sendMessage(player, newContent.substring(2), "staffchat", null, null);
             return;
         }
         if (event.isCancelled()){
