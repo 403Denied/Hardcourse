@@ -1,6 +1,7 @@
 package com.denied403.Hardcourse.Discord.Commands;
 
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -8,7 +9,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.components.buttons.Button;
 
 import java.awt.*;
 
@@ -32,7 +33,7 @@ public class SendTicketPanel {
         Button application = Button.success("ticket:application", "Apply Now").withEmoji(Emoji.fromUnicode("🛡️"));
 
         targetChannel.sendMessageEmbeds(embed.build())
-                .addActionRow(application)
+                .setComponents(ActionRow.of(application))
                 .queue(
                         success -> e.reply("✅ Ticket panel sent to " + targetChannel.getAsMention()).setEphemeral(true).queue(),
                         failure -> e.reply("❌ Failed to send ticket panel.").setEphemeral(true).queue()
