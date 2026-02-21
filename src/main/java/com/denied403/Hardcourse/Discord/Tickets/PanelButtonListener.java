@@ -1,9 +1,10 @@
 package com.denied403.Hardcourse.Discord.Tickets;
 
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.components.buttons.Button;
 
 import java.awt.*;
 import java.util.*;
@@ -66,10 +67,10 @@ public class PanelButtonListener extends ListenerAdapter {
                         .setColor(Color.ORANGE);
 
                 event.replyEmbeds(embed.build())
-                        .addActionRow(
+                        .setComponents(ActionRow.of(
                                 Button.success("send_application:agree", "Agree"),
                                 Button.danger("send_application:cancel", "Cancel")
-                        )
+                        ))
                         .setEphemeral(true).queue();
             }
             case "send_application:agree" -> event.getUser().openPrivateChannel().queue(

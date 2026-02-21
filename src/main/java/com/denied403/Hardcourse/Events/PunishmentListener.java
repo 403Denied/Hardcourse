@@ -7,15 +7,17 @@ import com.transfemme.dev.core403.Punishments.Api.PunishmentEditEvent;
 import com.transfemme.dev.core403.Punishments.Api.IPBanEvent;
 import com.transfemme.dev.core403.Punishments.Utils.PunishmentDurationParser;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.components.MessageTopLevelComponentUnion;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.interactions.components.text.TextInput;
-import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
-import net.dv8tion.jda.api.interactions.modals.Modal;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.textinput.TextInput;
+import net.dv8tion.jda.api.components.textinput.TextInputStyle;
+import net.dv8tion.jda.api.modals.Modal;
+import net.dv8tion.jda.api.components.label.Label;
 import org.bukkit.Bukkit;
 import org.bukkit.Statistic;
 import org.bukkit.event.EventHandler;
@@ -39,20 +41,28 @@ public class PunishmentListener extends ListenerAdapter implements Listener {
     public static void runBanCleanup(String playerName) {
         hacksChannel.getHistory().retrievePast(100).queue(messages -> {
             for (Message msg : messages) {
-                List<Button> buttons = msg.getButtons();
                 boolean changed = false;
 
-                List<Button> updated = new ArrayList<>();
-                for (Button b : buttons) {
-                    if (b.getId() != null && b.getId().equalsIgnoreCase("ban:" + playerName)) {
-                        updated.add(Button.success(b.getId(), "✅ Banned").asDisabled());
-                        changed = true;
-                    } else {
-                        updated.add(b);
+                List<MessageTopLevelComponentUnion> componentUnions = msg.getComponents();
+                List<ActionRow> updatedRows = new ArrayList<>();
+
+                for (MessageTopLevelComponentUnion union : componentUnions) {
+                    if (union instanceof ActionRow) {
+                        ActionRow row = union.asActionRow();
+                        List<Button> buttons = new ArrayList<>();
+                        for (Button b : row.getButtons()) {
+                            if (b.getCustomId() != null && b.getCustomId().equalsIgnoreCase("ban:" + playerName)) {
+                                buttons.add(Button.success(b.getCustomId(), "✅ Banned").asDisabled());
+                                changed = true;
+                            } else {
+                                buttons.add(b);
+                            }
+                        }
+                        updatedRows.add(ActionRow.of(buttons));
                     }
-                }
-                if (changed) {
-                    hacksChannel.editMessageComponentsById(msg.getId(), ActionRow.of(updated)).queue();
+                    if (changed) {
+                        msg.editMessageComponents(updatedRows).queue();
+                    }
                 }
             }
         });
@@ -92,7 +102,7 @@ public class PunishmentListener extends ListenerAdapter implements Listener {
             Button revert = Button.danger("punishment_revert:" + event.getPunishmentId(), "Revert");
             Button note = Button.primary("punishment_addNote:" + event.getPunishmentId(), "Add Note");
             Button duration = Button.success("punishment_modify:" + event.getPunishmentId(), "Change Duration");
-            punishmentChannel.sendMessageEmbeds(punishmentEmbed.build()).setActionRow(revert, note, duration).queue();
+            punishmentChannel.sendMessageEmbeds(punishmentEmbed.build()).setComponents(ActionRow.of(revert, note, duration)).queue();
         }
     }
 
@@ -108,65 +118,69 @@ public class PunishmentListener extends ListenerAdapter implements Listener {
             event.replyEmbeds(embed.build()).setEphemeral(true).queue();
             return;
         }
-        if(event.getButton().getId().startsWith("punishment_revert:")) {
-            String punishmentId = event.getButton().getId().split(":")[1];
+        if(event.getButton().getCustomId().startsWith("punishment_revert:")) {
+            String punishmentId = event.getButton().getCustomId().split(":")[1];
 
             if(!hasLuckPermsPermission(linkedUUID, "core403.punish.revert")){
                 event.reply("❌ You do not have permission to do that!").setEphemeral(true).queue();
                 return;
             }
             if (checkReverted(event, punishmentId)) return;
+            TextInput reasonInput = TextInput.create("reason", TextInputStyle.PARAGRAPH)
+                    .setPlaceholder("The reason to revert this punishment")
+                    .setRequired(true)
+                    .build();
+
             Modal modal = Modal.create("confirm_revert:" + punishmentId, "Revert Punishment")
-                    .addActionRow(
-                            TextInput.create("reason", "Reason", TextInputStyle.PARAGRAPH)
-                                    .setPlaceholder("The reason to revert this punishment")
-                                    .setRequired(true)
-                                    .build()
-                    )
+                    // Use addComponents with the Label wrapper to satisfy the builder
+                    .addComponents(Label.of("Reversion Reason", reasonInput))
                     .build();
 
             event.replyModal(modal).queue();
         }
-        if(event.getButton().getId().startsWith("punishment_addNote:")) {
-            String punishmentId = event.getButton().getId().split(":")[1];
+        if(event.getButton().getCustomId().startsWith("punishment_addNote:")) {
+            String punishmentId = event.getButton().getCustomId().split(":")[1];
 
             if(!hasLuckPermsPermission(linkedUUID, "core403.punish.use")){
                 event.reply("❌ You do not have permission to do that!").setEphemeral(true).queue();
                 return;
             }
             if (checkReverted(event, punishmentId)) return;
+            TextInput noteInput = TextInput.create("note", TextInputStyle.PARAGRAPH)
+                    .setPlaceholder("The note to add to this punishment")
+                    .setRequired(true)
+                    .build();
+
             Modal modal = Modal.create("add_note:" + punishmentId, "Add Note")
-                    .addActionRow(
-                            TextInput.create("note", "Note", TextInputStyle.PARAGRAPH)
-                                    .setPlaceholder("The note to add to this punishment")
-                                    .setRequired(true)
-                                    .build()
-                    )
+                    .addComponents(Label.of("Note", noteInput))
                     .build();
 
             event.replyModal(modal).queue();
         }
-        if(event.getButton().getId().startsWith("punishment_modify:")) {
-            String punishmentId = event.getButton().getId().split(":")[1];
+        if(event.getButton().getCustomId().startsWith("punishment_modify:")) {
+            String punishmentId = event.getButton().getCustomId().split(":")[1];
             if(!hasLuckPermsPermission(linkedUUID, "core403.punish.edit")){
                 event.reply("❌ You do not have permission to do that!").setEphemeral(true).queue();
                 return;
             }
             if (checkReverted(event, punishmentId)) return;
+            TextInput durationInput = TextInput.create("duration", TextInputStyle.SHORT)
+                    .setPlaceholder("Ex: 6h, 3d, 1w, perm")
+                    .setRequired(true)
+                    .build();
+
+            TextInput reasonInput = TextInput.create("reason", TextInputStyle.SHORT)
+                    .setPlaceholder("Why is the duration being changed?")
+                    .setRequired(true)
+                    .build();
+
             Modal modal = Modal.create("modify:" + punishmentId, "Change Duration")
-                    .addActionRow(
-                            TextInput.create("duration", "Duration", TextInputStyle.SHORT)
-                                    .setPlaceholder("The new duration for this punishment (ex. 6h, 3d, 1w, perm, etc)")
-                                    .setRequired(true)
-                                    .build()
-                    )
-                    .addActionRow(
-                            TextInput.create("reason", "Reason", TextInputStyle.SHORT)
-                                    .setPlaceholder("The reason to change this punishment's duration.")
-                                    .setRequired(true)
-                                    .build()
+                    .addComponents(
+                            Label.of("New Duration", durationInput),
+                            Label.of("Change Reason", reasonInput)
                     )
                     .build();
+
             event.replyModal(modal).queue();
         }
     }
@@ -187,15 +201,15 @@ public class PunishmentListener extends ListenerAdapter implements Listener {
         return false;
     }
     private boolean checkRevertedModal(ModalInteractionEvent event, String punishmentId) {
-        event.getMessage().editMessageComponents(
-                ActionRow.of(
-                        Button.danger("button:disabled", "Revert").asDisabled(),
-                        Button.primary("button:disabled1", "Add Note").asDisabled(),
-                        Button.success("button:disabled2", "Change Duration").asDisabled()
-                )
-        ).queue();
         if(punishmentDatabase.isReverted(punishmentId)){
             event.deferEdit().queue();
+            event.getMessage().editMessageComponents(
+                    ActionRow.of(
+                            Button.danger("button:disabled", "Revert").asDisabled(),
+                            Button.primary("button:disabled1", "Add Note").asDisabled(),
+                            Button.success("button:disabled2", "Change Duration").asDisabled()
+                    )
+            ).queue();
             event.getHook().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription("❌ This punishment has already been reverted!").build()).setEphemeral(true).queue();
             return true;
         }
@@ -299,7 +313,7 @@ public class PunishmentListener extends ListenerAdapter implements Listener {
                     .setColor(Color.RED);
             Button revert = Button.danger("punishment_revert:" + event.getPunishmentId(), "Revert");
             Button note = Button.primary("punishment_addNote:" + event.getPunishmentId(), "Add Note");
-            punishmentChannel.sendMessageEmbeds(punishmentEmbed.build()).setActionRow(revert, note).queue();
+            punishmentChannel.sendMessageEmbeds(punishmentEmbed.build()).setComponents(ActionRow.of(revert, note)).queue();
         }
     }
     @EventHandler

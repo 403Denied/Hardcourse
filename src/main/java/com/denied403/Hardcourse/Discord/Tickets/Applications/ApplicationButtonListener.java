@@ -12,11 +12,12 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.interactions.components.text.TextInput;
-import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
-import net.dv8tion.jda.api.interactions.modals.Modal;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.textinput.TextInput;
+import net.dv8tion.jda.api.components.textinput.TextInputStyle;
+import net.dv8tion.jda.api.components.label.Label;
+import net.dv8tion.jda.api.modals.Modal;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
 import java.awt.*;
@@ -114,10 +115,10 @@ public class ApplicationButtonListener extends ListenerAdapter {
 
                         if (i == finalEmbeds.size() - 1) {
                             thread.sendMessageEmbeds(embed)
-                                    .setActionRow(
+                                    .setComponents(ActionRow.of(
                                             Button.success("application_accept:" + userId, "✅ Accept"),
                                             Button.danger("application_deny:" + userId, "❌ Deny")
-                                    )
+                                    ))
                                     .queue();
                         } else {
                             thread.sendMessageEmbeds(embed).queue();
@@ -175,10 +176,10 @@ public class ApplicationButtonListener extends ListenerAdapter {
                     }
                     String targetId = event.getComponentId().split(":")[1];
                     event.reply("Are you sure you want to accept <@" + targetId + ">'s application?")
-                            .addActionRow(
+                            .setComponents(ActionRow.of(
                                     Button.success("application_accept_confirm:" + targetId, "✅ Confirm"),
                                     Button.danger("application_accept_cancel:" + targetId, "❌ Cancel")
-                            )
+                            ))
                             .setEphemeral(true)
                             .queue();
                 }
@@ -192,11 +193,15 @@ public class ApplicationButtonListener extends ListenerAdapter {
                         return;
                     }
                     String targetId = event.getComponentId().split(":")[1];
-                    Modal modal = Modal.create("application_deny_modal:" + targetId, "Deny Application")
-                            .addActionRow(TextInput.create("reason", "Denial Reason", TextInputStyle.PARAGRAPH)
-                                    .setRequired(true)
-                                    .build())
+                    TextInput reason = TextInput.create("reason", TextInputStyle.PARAGRAPH)
+                            .setPlaceholder("Reason for denying this application")
+                            .setRequired(true)
                             .build();
+
+                    Modal modal = Modal.create("application_deny_modal:" + targetId, "Deny Application")
+                            .addComponents(Label.of("Denial Reason", reason))
+                            .build();
+
                     event.replyModal(modal).queue();
                 }
                 if (id.startsWith("application_accept_cancel:")) {
@@ -283,9 +288,11 @@ public class ApplicationButtonListener extends ListenerAdapter {
     }
     private void disableApplicationButtons(GenericInteractionCreateEvent event, String targetId) {
         event.getMessageChannel().getIterableHistory().takeAsync(500).thenAccept(messages ->
-                messages.forEach(msg ->
-                        msg.getButtons().forEach(button -> {
-                            String id = button.getId();
+            messages.forEach(msg ->
+                msg.getComponents().forEach(layout -> {
+                    if(layout instanceof ActionRow row){
+                        row.getButtons().forEach(button -> {
+                            String id = button.getCustomId();
                             if (id != null && (
                                     id.equals("application_accept:" + targetId)
                                             || id.equals("application_deny:" + targetId)
@@ -297,8 +304,10 @@ public class ApplicationButtonListener extends ListenerAdapter {
                                         )
                                 ).queue();
                             }
-                        })
+                        });
+                    }}
                 )
+            )
         );
     }
 

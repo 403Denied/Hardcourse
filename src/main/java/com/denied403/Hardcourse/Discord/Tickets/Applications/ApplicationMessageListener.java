@@ -2,12 +2,13 @@ package com.denied403.Hardcourse.Discord.Tickets.Applications;
 
 import com.denied403.Hardcourse.Discord.Tickets.PanelButtonListener;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.components.buttons.Button;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -132,11 +133,11 @@ public class ApplicationMessageListener extends ListenerAdapter {
                     MessageEmbed lastEmbed = finalEmbeds.getLast();
 
                     channel.sendMessageEmbeds(lastEmbed)
-                            .setActionRow(
+                            .setComponents(ActionRow.of(
                                     Button.success("application:submit", "✅ Submit"),
                                     Button.secondary("application:edit", "✏️ Edit A Response"),
                                     Button.danger("application:cancel", "❌ Cancel")
-                            ).queue();
+                            )).queue();
                 });
 
     }

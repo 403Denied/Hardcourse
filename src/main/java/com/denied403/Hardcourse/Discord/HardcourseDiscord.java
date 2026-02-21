@@ -8,13 +8,14 @@ import com.denied403.Hardcourse.Events.PunishmentListener;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
@@ -185,7 +186,7 @@ public class HardcourseDiscord {
                 hacksChannel.sendMessage(messageContent).queue(sentMessage -> lastHackAlert.put(playerName, sentMessage));
             }
             else {
-                hacksChannel.sendMessage(messageContent).setActionRow(Button.danger("ban:" + playerName, "Ban")).queue(sentMessage -> lastHackAlert.put(playerName, sentMessage));
+                hacksChannel.sendMessage(messageContent).setComponents(ActionRow.of(Button.danger("ban:" + playerName, "Ban"))).queue(sentMessage -> lastHackAlert.put(playerName, sentMessage));
             }
         }
         if (type.equals("starting")){
