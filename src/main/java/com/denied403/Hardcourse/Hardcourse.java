@@ -14,7 +14,6 @@ import com.transfemme.dev.core403.Core403;
 import com.transfemme.dev.core403.Punishments.Database.PunishmentDatabase;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.Bukkit;
-import org.bukkit.WorldCreator;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import org.bukkit.event.Listener;
@@ -45,12 +44,6 @@ public final class Hardcourse extends JavaPlugin implements Listener {
         saveDefaultConfig();
         loadConfigValues();
         if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {new Placeholders().register();}
-
-        getServer().createWorld(new WorldCreator("Season2"));
-        getServer().createWorld(new WorldCreator("Season3"));
-        if(isDev){
-            getServer().createWorld(new WorldCreator("Season4"));
-        }
 
         if(DiscordEnabled) {
             try {

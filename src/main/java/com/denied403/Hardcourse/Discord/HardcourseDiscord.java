@@ -30,7 +30,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
 
-import static com.denied403.Hardcourse.Events.onVanish.vanished;
 import static com.denied403.Hardcourse.Hardcourse.*;
 import static com.denied403.Hardcourse.Utils.Playtime.getPlaytime;
 import static com.transfemme.dev.core403.Util.ColorUtil.stripAllColors;
@@ -164,7 +163,7 @@ public class HardcourseDiscord {
         if (type.equals("join")) {
             chatChannel.sendMessage(":inbox_tray: **`" + stripAllColors(player.displayName()) + "`** joined").queue();
         }
-        if(type.equals("firstjoin")) {
+        if(type.equals("firstJoin")) {
             chatChannel.sendMessage(":inbox_tray: **`" + stripAllColors(player.displayName()) + "`** joined the server for the first time _[#" + Bukkit.getOfflinePlayers().length + "]_").queue();
         }
         if (type.equals("leave")) {
@@ -211,10 +210,10 @@ public class HardcourseDiscord {
                 logsChannel.sendMessage("`[" + f.format(new Date()) + "] " + stripAllColors(player.getName()) + ": " + content.replaceAll("`", "'") + "`").queue();
             }
             if(extra1.equals("join")){
-                logsChannel.sendMessage("`[" + f.format(new Date()) + "] " + stripAllColors(player.getName()) + " joined" + (!player.hasPlayedBefore() ? " for the first time`" : "`")).queue();
+                logsChannel.sendMessage((player.hasMetadata("vanished") ? "`[SILENT] " : "`") + "[" + f.format(new Date()) + "] " + stripAllColors(player.getName()) + " joined" + (!player.hasPlayedBefore() ? " for the first time`" : "") + (player.hasMetadata("vanished") ? " while vanished`" : "`")).queue();
             }
             if(extra1.equals("quit")){
-                logsChannel.sendMessage((vanished.contains(player) ? "`[SILENT] " : "`") + "[" + f.format(new Date()) + "] " + stripAllColors(player.getName()) + " quit" + (vanished.contains(player) ? " while vanished`" : "`")).queue();
+                logsChannel.sendMessage((player.hasMetadata("vanished") ? "`[SILENT] " : "`") + "[" + f.format(new Date()) + "] " + stripAllColors(player.getName()) + " quit" + (player.hasMetadata("vanished") ? " while vanished`" : "`")).queue();
             }
             if(extra1.equals("vanished")){
                 logsChannel.sendMessage((extra2.equals("silent") ? "`[SILENT] " : "`") + "[" + f.format(new Date()) + "] " + stripAllColors(player.getName()) + " vanished`").queue();

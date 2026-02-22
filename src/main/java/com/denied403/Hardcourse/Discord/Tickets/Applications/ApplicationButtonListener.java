@@ -310,6 +310,4 @@ public class ApplicationButtonListener extends ListenerAdapter {
             )
         );
     }
-
-
 }

@@ -89,6 +89,4 @@ public class CommandManager extends ListenerAdapter {
                 .toList();
         event.replyChoices(choices).queue();
     }
-
-
 }

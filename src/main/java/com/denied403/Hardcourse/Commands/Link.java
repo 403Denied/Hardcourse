@@ -25,7 +25,7 @@ public class Link {
                         return 1;
                     }
                     String code = linkManager.createLinkCode(player.getUniqueId());
-                    player.sendMessage(Colorize("<prefix>Your link code is: <accent><click:copy_to_clipboard:'" + code + "'><accent>" + code + "<other> (click to copy)<reset>\nUse the <accent>/link<main> command on Discord to link your account."));
+                    player.sendMessage(Colorize("<prefix>Your link code is: <accent><click:copy_to_clipboard:'" + code + "'><accent>" + code + "<other> (click to copy)<reset>\n<main>Use the <accent>/link<main> command on Discord to link your account."));
                     return Command.SINGLE_SUCCESS;
                 }).build();
     }
