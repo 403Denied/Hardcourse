@@ -71,13 +71,14 @@ public final class DiscordListener extends ListenerAdapter {
         }
 
         Component finalMessage = Colorize(prefix + displayName + "&f: " + coloredMessage);
+        final SimpleDateFormat f = new SimpleDateFormat("HH:mm:ss z");
+        f.setTimeZone(TimeZone.getTimeZone("UTC"));
 
         if (staffChat) {
             Bukkit.broadcast(finalMessage, "hardcourse.jrmod");
+            logsChannel.sendMessage("`[DISCORD] [SC] [" + f.format(new Date()) + "] " + name + ": " + message.replaceAll("`", "'") + "`").queue();
         } else {
             Bukkit.broadcast(finalMessage);
-            final SimpleDateFormat f = new SimpleDateFormat("HH:mm:ss z");
-            f.setTimeZone(TimeZone.getTimeZone("UTC"));
             logsChannel.sendMessage("`[DISCORD] [" + f.format(new Date()) + "] " + name + ": " + message.replaceAll("`", "'") + "`").queue();
         }
     }

@@ -73,8 +73,7 @@ public class Punish {
                 }
 
                 EmbedBuilder eb = new EmbedBuilder()
-                        .setDescription("✅ Issued " + reason.getType().toString().toLowerCase() +
-                                " to `" + target.getName() + "` for **" + reasonName + "** to last until " + expiresText + " (" + expiresRelative + ").")
+                        .setDescription("✅ Issued " + reason.getType().toString().toLowerCase() + " to `" + target.getName() + "` for **" + reasonName + "** to last until " + expiresText + " (" + expiresRelative + ").")
                         .setColor(Color.GREEN);
 
                 event.getHook().sendMessageEmbeds(eb.build()).queue();

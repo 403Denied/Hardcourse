@@ -30,7 +30,7 @@ public class onJoin implements Listener {
             if (player.hasPlayedBefore()) {
                 sendMessage(player, null, "join", null, null);
             } else {
-                sendMessage(player, null, "firstjoin", null, null);
+                sendMessage(player, null, "firstJoin", null, null);
             }
             sendMessage(player, null, "logs", "join", null);
         }

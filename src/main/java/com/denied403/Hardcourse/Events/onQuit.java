@@ -5,7 +5,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import static com.denied403.Hardcourse.Discord.HardcourseDiscord.sendMessage;
-import static com.denied403.Hardcourse.Events.onVanish.vanished;
 import static com.denied403.Hardcourse.Hardcourse.DiscordEnabled;
 import static com.denied403.Hardcourse.Hardcourse.checkpointDatabase;
 
@@ -13,10 +12,8 @@ public class onQuit implements Listener {
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e){
         if(DiscordEnabled) {
-            if(!vanished.contains(e.getPlayer())) {
+            if(!e.getPlayer().hasMetadata("vanished")) {
                 sendMessage(e.getPlayer(), null, "leave", null, null);
-            } else {
-                vanished.remove(e.getPlayer());
             }
             sendMessage(e.getPlayer(), null, "logs", "quit", null);
         }
