@@ -210,7 +210,7 @@ public class HardcourseDiscord {
                 logsChannel.sendMessage("`[" + f.format(new Date()) + "] " + stripAllColors(player.getName()) + ": " + content.replaceAll("`", "'") + "`").queue();
             }
             if(extra1.equals("join")){
-                logsChannel.sendMessage((player.hasMetadata("vanished") ? "`[SILENT] " : "`") + "[" + f.format(new Date()) + "] " + stripAllColors(player.getName()) + " joined" + (!player.hasPlayedBefore() ? " for the first time`" : "") + (player.hasMetadata("vanished") ? " while vanished`" : "`")).queue();
+                logsChannel.sendMessage((player.hasMetadata("vanished") ? "`[SILENT] " : "`") + "[" + f.format(new Date()) + "] " + stripAllColors(player.getName()) + " joined" + (!player.hasPlayedBefore() ? " for the first time" : "") + (player.hasMetadata("vanished") ? " while vanished" : "") + "`").queue();
             }
             if(extra1.equals("quit")){
                 logsChannel.sendMessage((player.hasMetadata("vanished") ? "`[SILENT] " : "`") + "[" + f.format(new Date()) + "] " + stripAllColors(player.getName()) + " quit" + (player.hasMetadata("vanished") ? " while vanished`" : "`")).queue();
