@@ -85,8 +85,6 @@ public final class Hardcourse extends JavaPlugin implements Listener {
             cmd.registrar().register(EndChatGame.createCommand("ecg"));
             cmd.registrar().register(RunChatGame.createCommand("runChatGame"));
             cmd.registrar().register(RunChatGame.createCommand("rcg"));
-            cmd.registrar().register(RestartForUpdate.createCommand("restartForUpdate"));
-            cmd.registrar().register(RestartForUpdate.createCommand("restartForUpdates"));
             cmd.registrar().register(ReloadHardcourse.createCommand("reloadHardcourse"));
             cmd.registrar().register(WinnerTP.createCommand("winnerTp"));
             cmd.registrar().register(WinnerTP.createCommand("wtp"));

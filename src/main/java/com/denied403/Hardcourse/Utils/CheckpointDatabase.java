@@ -6,17 +6,17 @@ import org.bukkit.World;
 
 import java.io.File;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static com.denied403.Hardcourse.Hardcourse.plugin;
 
 public class CheckpointDatabase {
     public CheckpointDatabase() {
         try {
-            createCheckpointTableAndMigrateIfNeeded();
+            createCheckpointTable();
+            updateSchema();
             createCheckpointLocationsTable();
+            updateLocationsSchema();
         } catch (SQLException e) {
             Bukkit.getLogger().severe("[HARDCOURSE] Failed to initialize checkpoint DB: " + e.getMessage());
             e.printStackTrace();
@@ -29,11 +29,9 @@ public class CheckpointDatabase {
         return DriverManager.getConnection("jdbc:sqlite:" + dbFile);
     }
 
-    private void createCheckpointTableAndMigrateIfNeeded() throws SQLException {
-        try (Connection conn = getConnection(); Statement stmt = conn.createStatement()) {
-            if (!tableExists(conn, "checkpoints")) {
-                stmt.executeUpdate("""
-                    CREATE TABLE IF NOT EXISTS checkpoints (
+    private void createCheckpointTable(){
+        String sql = """
+                CREATE TABLE IF NOT EXISTS checkpoints (
                         uuid TEXT PRIMARY KEY NOT NULL,
                         season INTEGER NOT NULL DEFAULT 0,
                         level REAL NOT NULL DEFAULT 0,
@@ -41,90 +39,43 @@ public class CheckpointDatabase {
                         level_time INTEGER NOT NULL DEFAULT 0,
                         discord TEXT
                     )
-                """);
-                Bukkit.getLogger().info("[HARDCOURSE] Created checkpoints table.");
-                return;
-            }
+                """;
+        try (Connection conn = getConnection(); Statement stmt = conn.createStatement()) {
+            stmt.executeUpdate(sql);
+        } catch (SQLException e) {
+            Bukkit.getLogger().severe("[HARDCOURSE] Failed to create checkpoints table: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    private void updateSchema() {
+        java.util.Map<String, String> expectedColumns = new java.util.HashMap<>();
+        expectedColumns.put("season", "INTEGER NOT NULL DEFAULT 0");
+        expectedColumns.put("level", "REAL NOT NULL DEFAULT 0");
+        expectedColumns.put("points", "INTEGER NOT NULL DEFAULT 0");
+        expectedColumns.put("level_time", "INTEGER NOT NULL DEFAULT 0");
+        expectedColumns.put("discord", "TEXT");
 
-            boolean hasDiscord = false;
-            boolean seasonHasDefault = false;
-            boolean levelHasDefault = false;
-            boolean pointsHasDefault = false;
-            boolean hasLevelTime = false;
-
-            try (ResultSet rs = stmt.executeQuery("PRAGMA table_info(checkpoints)")) {
+        try (Connection conn = getConnection()) {
+            Set<String> existingColumns = new HashSet<>();
+            try (Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery("PRAGMA table_info(checkpoints)")) {
                 while (rs.next()) {
-                    String name = rs.getString("name");
-                    String dflt_value = rs.getString("dflt_value");
-                    if ("discord".equalsIgnoreCase(name)) hasDiscord = true;
-                    if ("season".equalsIgnoreCase(name) && dflt_value != null) seasonHasDefault = true;
-                    if ("level".equalsIgnoreCase(name) && dflt_value != null) levelHasDefault = true;
-                    if ("points".equalsIgnoreCase(name) && dflt_value != null) pointsHasDefault = true;
-                    if("level_time".equalsIgnoreCase(name)) hasLevelTime = true;
+                    existingColumns.add(rs.getString("name"));
                 }
             }
+            for (java.util.Map.Entry<String, String> entry : expectedColumns.entrySet()) {
+                String columnName = entry.getKey();
+                String definition = entry.getValue();
 
-            if (!hasDiscord) {
-                Bukkit.getLogger().info("[HARDCOURSE] Adding missing 'discord' column to checkpoints table...");
-                stmt.executeUpdate("ALTER TABLE checkpoints ADD COLUMN discord TEXT");
-                Bukkit.getLogger().info("[HARDCOURSE] 'discord' column added.");
+                if (!existingColumns.contains(columnName)) {
+                    Bukkit.getLogger().info("Database Migration: Adding missing column '" + columnName + "' to checkpoints table.");
+                    try (Statement alterStmt = conn.createStatement()) {
+                        alterStmt.executeUpdate("ALTER TABLE checkpoints ADD COLUMN " + columnName + " " + definition + ";");
+                    }
+                }
             }
-
-            if (!seasonHasDefault || !levelHasDefault || !pointsHasDefault) {
-                Bukkit.getLogger().info("[HARDCOURSE] Ensuring NOT NULL DEFAULTs for season/level/points...");
-                rebuildTableWithDefaults(conn);
-                Bukkit.getLogger().info("[HARDCOURSE] Migration to add defaults complete.");
-            }
-            if(!hasLevelTime){
-                stmt.executeUpdate("ALTER TABLE checkpoints ADD COLUMN level_time INTEGER NOT NULL DEFAULT 0");
-                Bukkit.getLogger().info("[HARDCOURSE] Adding level time column...");
-            }
-        }
-    }
-
-    private boolean tableExists(Connection conn, String tableName) throws SQLException {
-        try (PreparedStatement ps = conn.prepareStatement(
-                "SELECT name FROM sqlite_master WHERE type='table' AND name = ?")) {
-            ps.setString(1, tableName);
-            try (ResultSet rs = ps.executeQuery()) {
-                return rs.next();
-            }
-        }
-    }
-
-    private void rebuildTableWithDefaults(Connection conn) throws SQLException {
-        conn.setAutoCommit(false);
-        try (Statement stmt = conn.createStatement()) {
-            stmt.executeUpdate("ALTER TABLE checkpoints RENAME TO checkpoints_old");
-
-            stmt.executeUpdate("""
-                    CREATE TABLE checkpoints (
-                        uuid TEXT PRIMARY KEY NOT NULL,
-                        season INTEGER NOT NULL DEFAULT 0,
-                        level REAL NOT NULL DEFAULT 0,
-                        points INTEGER NOT NULL DEFAULT 0,
-                        discord TEXT
-                    )
-                """);
-
-            stmt.executeUpdate("""
-                INSERT INTO checkpoints (uuid, season, level, points, discord)
-                SELECT
-                    uuid,
-                    COALESCE(season, 0),
-                    COALESCE(level, 0),
-                    COALESCE(points, 0),
-                    discord
-                FROM checkpoints_old
-            """);
-
-            stmt.executeUpdate("DROP TABLE checkpoints_old");
-            conn.commit();
         } catch (SQLException e) {
-            conn.rollback();
-            throw e;
-        } finally {
-            conn.setAutoCommit(true);
+            Bukkit.getLogger().severe("Failed to update player logs table schema:");
+            e.printStackTrace();
         }
     }
 
@@ -399,6 +350,40 @@ public class CheckpointDatabase {
                 PRIMARY KEY (season, level)
             )
         """);
+        }
+    }
+    public void updateLocationsSchema() {
+        java.util.Map<String, String> expectedColumns = new java.util.HashMap<>();
+        expectedColumns.put("season", "INTEGER NOT NULL");
+        expectedColumns.put("level", "REAL NOT NULL");
+        expectedColumns.put("world", "TEXT NOT NULL");
+        expectedColumns.put("x", "REAL NOT NULL");
+        expectedColumns.put("y", "REAL NOT NULL");
+        expectedColumns.put("z", "REAL NOT NULL");
+        expectedColumns.put("yaw", "INTEGER NOT NULL");
+        expectedColumns.put("difficulty", "TEXT");
+
+        try (Connection conn = getConnection()) {
+            Set<String> existingColumns = new HashSet<>();
+            try (Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery("PRAGMA table_info(checkpoint_locations)")) {
+                while (rs.next()) {
+                    existingColumns.add(rs.getString("name"));
+                }
+            }
+            for (java.util.Map.Entry<String, String> entry : expectedColumns.entrySet()) {
+                String columnName = entry.getKey();
+                String definition = entry.getValue();
+
+                if (!existingColumns.contains(columnName)) {
+                    Bukkit.getLogger().info("Database Migration: Adding missing column '" + columnName + "' to checkpoint locations table.");
+                    try (Statement alterStmt = conn.createStatement()) {
+                        alterStmt.executeUpdate("ALTER TABLE checkpoint_locations ADD COLUMN " + columnName + " " + definition + ";");
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            Bukkit.getLogger().severe("Failed to update player logs table schema:");
+            e.printStackTrace();
         }
     }
 
