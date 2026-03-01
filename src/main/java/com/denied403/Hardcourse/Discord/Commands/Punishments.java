@@ -49,8 +49,7 @@ public class Punishments {
 
         List<Object> formatted = new ArrayList<>();
 
-        String sql = "SELECT id, type, reasonId, issued, expires, reverted " +
-                "FROM punishments WHERE playerUuid = ? ORDER BY issued DESC";
+        String sql = "SELECT id, type, reasonId, issued, expires, reverted FROM punishments WHERE playerUuid = ? ORDER BY issued DESC";
 
         try (Connection conn = database.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
