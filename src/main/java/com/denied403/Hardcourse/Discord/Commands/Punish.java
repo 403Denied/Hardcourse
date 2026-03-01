@@ -14,6 +14,9 @@ import java.util.UUID;
 import static com.denied403.Hardcourse.Hardcourse.checkpointDatabase;
 import static com.denied403.Hardcourse.Hardcourse.plugin;
 import static com.denied403.Hardcourse.Utils.Luckperms.hasLuckPermsPermission;
+import static com.transfemme.dev.core403.Core403.bypassPunishBlacklist;
+import static com.transfemme.dev.core403.Core403.punishBlacklist;
+import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
 
 public class Punish {
     public static void run(SlashCommandInteractionEvent event) {
@@ -52,6 +55,10 @@ public class Punish {
                 OfflinePlayer target = Bukkit.getOfflinePlayer(targetName);
                 if (!hasLuckPermsPermission(staff.getUniqueId(), "core403.punish.use")) {
                     event.reply("❌ You do not have permission to use this command.").setEphemeral(true).queue();
+                    return;
+                }
+                if(punishBlacklist.contains(target.getUniqueId().toString()) && !bypassPunishBlacklist.contains(staffUUID.toString())) {
+                    event.reply("❌ You cannot punish this player!").setEphemeral(true).queue();
                     return;
                 }
                 long expires;
