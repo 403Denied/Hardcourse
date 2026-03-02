@@ -22,6 +22,7 @@ import static com.denied403.Hardcourse.Utils.CheckpointLevelTimer.resetForNewLev
 import static com.denied403.Hardcourse.Utils.Luckperms.addRank;
 import static com.transfemme.dev.core403.Punishments.Events.onConfirmClick.handlePunishment;
 import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
+import static com.transfemme.dev.core403.Util.Playtime.getPlaytime;
 
 public class onWalk implements Listener {
     private final PointsManager pointsManager;
@@ -88,7 +89,7 @@ public class onWalk implements Listener {
                         if (onlineStaff.isEmpty()) {
                             try {
                                 p.teleport(checkpointDatabase.getCheckpointLocation(season, previousLevel));
-                                handlePunishment("00000000-0000-0000-0000-000000000000", PunishmentReason.getReasonByName("Unfair Advantage"), p, "ban", "Skipped from level " + Double.toString(previousLevel).replace(".0", "") + " to level " + Double.toString(checkpointNumber).replace(".0", "") + " while no staff were online.");
+                                handlePunishment("00000000-0000-0000-0000-000000000000", PunishmentReason.getReasonByName("Unfair Advantage"), p, "ban", "Skipped from level " + Double.toString(previousLevel).replace(".0", "") + " to level " + Double.toString(checkpointNumber).replace(".0", "") + " while no staff were online with a playtime of " + getPlaytime(p) + ".");
                                 return;
                             } catch (SQLException e) {return;}
                         }

@@ -1,6 +1,5 @@
 package com.denied403.Hardcourse.Discord.Commands;
 
-import com.denied403.Hardcourse.Utils.Playtime;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.Command;
@@ -19,6 +18,7 @@ import java.util.UUID;
 
 import static com.denied403.Hardcourse.Hardcourse.checkpointDatabase;
 import static com.denied403.Hardcourse.Hardcourse.isDev;
+import static com.transfemme.dev.core403.Util.Playtime.getPlaytime;
 
 public class Info {
     static OptionMapping typeOption;
@@ -120,7 +120,7 @@ public class Info {
             }
             playerEmbed.addBlankField(false);
             playerEmbed.addField("First Joined", "<t:" + offlinePlayer.getFirstPlayed() / 1000L + ":F>", false);
-            playerEmbed.addField("Playtime", Playtime.getPlaytime(offlinePlayer), false);
+            playerEmbed.addField("Playtime", getPlaytime(offlinePlayer), false);
             if(!offlinePlayer.isOnline()) {
                 playerEmbed.addField("Last Seen", "<t:" + offlinePlayer.getLastSeen() / 1000L + ":F>", false);
             } else {
