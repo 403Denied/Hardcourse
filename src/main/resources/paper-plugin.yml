@@ -4,8 +4,8 @@ main: com.denied403.Hardcourse.Hardcourse
 api-version: '1.21.11'
 author: 403Denied
 contributors:
-  - Rockyy321
   - Evelyn344
+  - Rockyy321
 dependencies:
   server:
     Core403:
