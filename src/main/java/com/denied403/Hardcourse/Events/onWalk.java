@@ -1,6 +1,7 @@
 package com.denied403.Hardcourse.Events;
 
 import com.denied403.Hardcourse.Points.PointsManager;
+import com.transfemme.dev.core403.Punishments.Utils.PunishmentReason;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -10,17 +11,16 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Random;
-import java.util.TimeZone;
-import java.util.UUID;
+import java.util.*;
 
 import static com.denied403.Hardcourse.Discord.HardcourseDiscord.*;
 import static com.denied403.Hardcourse.Hardcourse.*;
 import static com.denied403.Hardcourse.Utils.CheckpointLevelTimer.getCurrentLevelTimeFormatted;
 import static com.denied403.Hardcourse.Utils.CheckpointLevelTimer.resetForNewLevel;
 import static com.denied403.Hardcourse.Utils.Luckperms.addRank;
+import static com.transfemme.dev.core403.Punishments.Events.onConfirmClick.handlePunishment;
 import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
 
 public class onWalk implements Listener {
@@ -80,6 +80,19 @@ public class onWalk implements Listener {
                     }
                 }
                 if (checkpointNumber > previousLevel + 10 && isSkipExempted((int) previousLevel, (int) checkpointNumber) && !p.hasPermission("hardcourse.staff")) {
+                    if(checkpointNumber > previousLevel + 100 && ((p.getStatistic(Statistic.PLAY_ONE_MINUTE) <= 12000))) {
+                        List<Player> onlineStaff = new ArrayList<>();
+                        for (Player staff : Bukkit.getOnlinePlayers()) {
+                            if (staff.hasPermission("hardcourse.staff")) {onlineStaff.add(staff);}
+                        }
+                        if (onlineStaff.isEmpty()) {
+                            try {
+                                p.teleport(checkpointDatabase.getCheckpointLocation(season, previousLevel));
+                                handlePunishment("00000000-0000-0000-0000-000000000000", PunishmentReason.getReasonByName("Unfair Advantage"), p, "ban", "Skipped from level " + Double.toString(previousLevel).replace(".0", "") + " to level " + Double.toString(checkpointNumber).replace(".0", "") + " while no staff were online.");
+                                return;
+                            } catch (SQLException e) {return;}
+                        }
+                    }
                     if (DiscordEnabled) {
                         if(playerSeason > 1) {
                             sendMessage(p, null, "hacks",
