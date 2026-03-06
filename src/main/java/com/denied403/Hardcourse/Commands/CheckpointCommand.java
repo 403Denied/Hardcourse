@@ -379,7 +379,7 @@ public class CheckpointCommand {
                         )
                 )
                 .then(Commands.literal("tp")
-                        .requires(source -> true) // anyone can use
+                        .requires(source -> true)
                         .then(Commands.argument("level", DoubleArgumentType.doubleArg(0))
                                 .executes(ctx -> {
                                     CommandSender sender = ctx.getSource().getSender();
@@ -393,7 +393,6 @@ public class CheckpointCommand {
 
                                     return handleTeleport(sender, player, requestedSeason, requestedLevel, false);
                                 })
-                                // Optional season argument
                                 .then(Commands.argument("season", IntegerArgumentType.integer(1, 3))
                                         .executes(ctx -> {
                                             CommandSender sender = ctx.getSource().getSender();
@@ -407,7 +406,6 @@ public class CheckpointCommand {
 
                                             return handleTeleport(sender, player, requestedSeason, requestedLevel, false);
                                         })
-                                        // Player argument (only ops)
                                         .then(Commands.argument("player", StringArgumentType.word())
                                                 .suggests(CheckpointCommand::playerSuggestions)
                                                 .requires(source -> source.getSender().isOp())
@@ -424,7 +422,6 @@ public class CheckpointCommand {
 
                                                     return handleTeleport(sender, target, requestedSeason, requestedLevel, false);
                                                 })
-                                                // Set checkpoint for player (only ops)
                                                 .then(Commands.argument("setCheckpoint", BoolArgumentType.bool())
                                                         .executes(ctx -> {
                                                             CommandSender sender = ctx.getSource().getSender();

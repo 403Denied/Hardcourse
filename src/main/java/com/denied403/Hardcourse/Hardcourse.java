@@ -23,7 +23,6 @@ import java.util.*;
 
 import static com.denied403.Hardcourse.Discord.HardcourseDiscord.*;
 import static com.denied403.Hardcourse.Utils.CheckpointLevelTimer.shutdown;
-import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
 
 public final class Hardcourse extends JavaPlugin implements Listener {
     public static Hardcourse plugin;
@@ -104,11 +103,6 @@ public final class Hardcourse extends JavaPlugin implements Listener {
         });
 
         Bukkit.getScheduler().runTaskTimer(this, () -> {
-            if(BroadcastEnabled){
-                if(Bukkit.getOnlinePlayers().isEmpty()) return;
-                Bukkit.broadcast(Colorize("\n<prefix>" + messages.get(random.nextInt(messages.size())) + "\n"));
-            }}, 0L, 6000);
-        Bukkit.getScheduler().runTaskTimer(this, () -> {
             if(UnscrambleEnabled) {
                 if(Bukkit.getOnlinePlayers().isEmpty()) return;
                 ChatReactions.runGame(ChatReactions.getRandomWord());
@@ -126,22 +120,17 @@ public final class Hardcourse extends JavaPlugin implements Listener {
         shutdown();
     }
 
-    public static List<String> messages = new ArrayList<>();
     public static boolean DiscordEnabled;
-    public static boolean BroadcastEnabled;
     public static boolean UnscrambleEnabled;
     public static boolean isDev;
     public static List<String> exemptions;
     public static List<String> applicationQuestions;
-    private final Random random = new Random();
 
     public static void loadConfigValues() {
         FileConfiguration config = plugin.getConfig();
         DiscordEnabled = config.getBoolean("discord-enabled");
-        BroadcastEnabled = config.getBoolean("broadcast-enabled");
         UnscrambleEnabled = config.getBoolean("unscramble-enabled");
         isDev = config.getBoolean("is-dev");
-        messages = config.getStringList("broadcast-messages");
         exemptions = config.getStringList("skip-alert-exemptions");
         applicationQuestions = config.getStringList("application-questions");
     }
