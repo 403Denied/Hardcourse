@@ -38,6 +38,7 @@ public class Link {
                     return Command.SINGLE_SUCCESS;
                 })
                 .then(Commands.argument("player", StringArgumentType.word())
+                        .suggests(WinnerTP::onlinePlayerSuggestions)
                         .requires(source -> source.getSender().hasPermission("hardcourse.staff"))
                         .then(Commands.argument("id", StringArgumentType.word())
                                 .executes(ctx -> {
