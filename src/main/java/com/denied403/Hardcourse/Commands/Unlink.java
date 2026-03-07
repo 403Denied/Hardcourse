@@ -11,8 +11,11 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 
 
-import static com.denied403.Hardcourse.Discord.HardcourseDiscord.guild;
-import static com.denied403.Hardcourse.Discord.HardcourseDiscord.linkedRole;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
+
+import static com.denied403.Hardcourse.Discord.HardcourseDiscord.*;
 import static com.denied403.Hardcourse.Hardcourse.*;
 import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
 
@@ -38,6 +41,9 @@ public class Unlink {
                                     String discordId = checkpointDatabase.getDiscordId(target.getUniqueId());
                                     if (discordId != null) {
                                         guild.removeRoleFromMember(UserSnowflake.fromId(discordId), linkedRole).queue();
+                                        final SimpleDateFormat f = new SimpleDateFormat("HH:mm:ss z");
+                                        f.setTimeZone(TimeZone.getTimeZone("UTC"));
+                                        linksChannel.sendMessage("`[" + f.format(new Date()) + "] " + target.getName() + " unlinked from` <@" + discordId + "> `(forced by " + ctx.getSource().getSender().getName() + ")`").queue();
                                     }
                                 }
                             }
