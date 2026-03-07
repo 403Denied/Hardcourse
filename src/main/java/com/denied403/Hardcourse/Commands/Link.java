@@ -78,7 +78,7 @@ public class Link {
 
                                                 final SimpleDateFormat f = new SimpleDateFormat("HH:mm:ss z");
                                                 f.setTimeZone(TimeZone.getTimeZone("UTC"));
-                                                linksChannel.sendMessage("`[" + f.format(new Date()) + "] " + target.getName() + " linked to` <@" + discordId + "> (forced by " + sender.getName() + ")").queue();
+                                                linksChannel.sendMessage("`[" + f.format(new Date()) + "] " + target.getName() + " linked to` <@" + discordId + "> `(forced by " + sender.getName() + ")`").queue();
 
                                                 Bukkit.getScheduler().runTask(plugin, () -> Bukkit.broadcast(Colorize("<prefix><accent>" + target.getName() + " <main>just linked their Discord account and gained access to the Minecraft <-> Discord chat!")));
 
