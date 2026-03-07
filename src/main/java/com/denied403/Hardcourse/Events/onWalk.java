@@ -1,6 +1,5 @@
 package com.denied403.Hardcourse.Events;
 
-import com.denied403.Hardcourse.Points.PointsManager;
 import com.transfemme.dev.core403.Punishments.Utils.PunishmentReason;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -25,12 +24,7 @@ import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
 import static com.transfemme.dev.core403.Util.Playtime.getPlaytime;
 
 public class onWalk implements Listener {
-    private final PointsManager pointsManager;
     private final Random random = new Random();
-
-    public onWalk() {
-        this.pointsManager = new PointsManager();
-    }
 
     @EventHandler
     public void onWalkEvent(PlayerMoveEvent event) {
@@ -137,7 +131,7 @@ public class onWalk implements Listener {
                 p.playSound(loc, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
                 if(isDev) {
                     int pointsToAdd = 10 + random.nextInt(11);
-                    pointsManager.addPoints(uuid, pointsToAdd);
+                    econ.depositPlayer(p, pointsToAdd);
                     p.sendActionBar(Colorize("<main>Checkpoint reached: <accent>" + Double.toString(checkpointNumber).replace(".0", "") + " <main>• <accent>+" + pointsToAdd + "<main> points" + " <main>• <accent>" + getCurrentLevelTimeFormatted(uuid)));
                 } else {
                     p.sendActionBar(Colorize("<main>Checkpoint reached: <accent>" + Double.toString(checkpointNumber).replace(".0", "") + " <main>• <accent>" + getCurrentLevelTimeFormatted(uuid)));
@@ -145,7 +139,7 @@ public class onWalk implements Listener {
 
                 p.setRespawnLocation(loc.add(0, 1, 0), true);
                 resetForNewLevel(uuid);
-                checkpointDatabase.setCheckpointData(uuid, season, checkpointNumber, checkpointDatabase.getPoints(uuid) != null ? checkpointDatabase.getPoints(uuid) : 0);
+                checkpointDatabase.setCheckpointData(uuid, season, checkpointNumber);
                 if(!checkpointDatabase.checkpointLocationExists(season, checkpointNumber)) {
                     checkpointDatabase.storeCheckpointLocationIfAbsent(season, checkpointNumber, loc.subtract(0, 1, 0), difficulty);
                 }

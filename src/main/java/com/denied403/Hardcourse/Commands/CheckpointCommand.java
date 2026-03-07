@@ -121,7 +121,7 @@ public class CheckpointCommand {
                                             OfflinePlayer player = Bukkit.getOfflinePlayer(playerName);
                                             UUID uuid = player.getUniqueId();
 
-                                            checkpointDatabase.setCheckpointData(uuid, 1, 0, 0);
+                                            checkpointDatabase.setCheckpointData(uuid, 1, 0);
                                             sender.sendMessage(Colorize("<prefix>Checkpoint for <accent>" + playerName + " <main>has been reset."));
                                             return Command.SINGLE_SUCCESS;
                                         })
@@ -209,7 +209,7 @@ public class CheckpointCommand {
                             UUID uuid = player.getUniqueId();
                             Bukkit.getScheduler().runTaskLater(plugin, () -> {
                                 if (!restartCancelled.contains(player.getUniqueId())) {
-                                    checkpointDatabase.setCheckpointData(uuid, 1, 0, 0);
+                                    checkpointDatabase.setCheckpointData(uuid, 1, 0);
                                     player.performCommand("spawn");
                                     giveItems(player);
                                     player.setRespawnLocation(player.getWorld().getSpawnLocation());

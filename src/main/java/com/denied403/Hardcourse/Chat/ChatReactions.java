@@ -94,7 +94,7 @@ public class ChatReactions implements Listener {
                 Player p = event.getPlayer();
                 if (isDev) {
                     int points = 5 + random.nextInt(11);
-                    pointsManager.addPoints(p.getUniqueId(), points);
+                    econ.depositPlayer(p, points);
                     Bukkit.broadcast(Colorize("<prefix><accent>" + stripAllColors(p.getName()) + "<main> successfully unscrambled the word and earned <accent>" + points + "<main> points! It was <accent>" + currentWord));
                 } else {
                     Bukkit.broadcast(Colorize("<prefix><accent>" + stripAllColors(p.getName()) + "<main> successfully unscrambled the word! It was <accent>" + currentWord));

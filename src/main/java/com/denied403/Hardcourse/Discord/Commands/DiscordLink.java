@@ -42,7 +42,7 @@ public class DiscordLink extends ListenerAdapter {
                 player.sendMessage(Colorize("<prefix>Successfully linked your Minecraft account to <accent>" + event.getUser().getName()));
             }
             if(isDev){
-                pointsManager.addPoints(player.getUniqueId(), 500);
+                econ.depositPlayer(player, 500);
             }
             Bukkit.broadcast(Colorize("<prefix><accent>" + player.getName() + " <main>just linked their Discord account and gained access to the Minecraft <-> Discord chat" + (isDev ? " and <accent>500<main> points!" : "!")));
         });
