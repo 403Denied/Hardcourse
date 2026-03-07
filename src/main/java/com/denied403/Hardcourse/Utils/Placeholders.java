@@ -1,12 +1,12 @@
 package com.denied403.Hardcourse.Utils;
 
+import com.transfemme.dev.core403.Util.NumberUtil;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
 
 import static com.denied403.Hardcourse.Hardcourse.checkpointDatabase;
 import static com.denied403.Hardcourse.Hardcourse.isDev;
-import static com.denied403.Hardcourse.Points.PointsManager.getPoints;
 import static com.denied403.Hardcourse.Utils.CheckpointLevelTimer.getCurrentLevelTimeFormatted;
 import static com.transfemme.dev.core403.Core403.*;
 import static com.transfemme.dev.core403.Util.NickManager.getNick;
@@ -22,7 +22,7 @@ public class Placeholders extends PlaceholderExpansion {
     public boolean persist(){return true;}
     @Override
     public String onRequest(OfflinePlayer player, String params){
-        if(params.equalsIgnoreCase("points") && isDev){return String.valueOf(getPoints(player.getUniqueId()));}
+        if(params.equalsIgnoreCase("points") && isDev){return NumberUtil.formatNoUnits((long) econ.getBalance(player));}
         if(params.equalsIgnoreCase("level")){return String.valueOf(checkpointDatabase.getLevel(player.getUniqueId())).replace(".0", "");}
         if(params.equalsIgnoreCase("season")){return String.valueOf(checkpointDatabase.getSeason(player.getUniqueId()));}
         if(params.equalsIgnoreCase("formatted-level")){

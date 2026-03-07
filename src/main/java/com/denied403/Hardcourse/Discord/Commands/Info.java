@@ -16,8 +16,8 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.UUID;
 
-import static com.denied403.Hardcourse.Hardcourse.checkpointDatabase;
-import static com.denied403.Hardcourse.Hardcourse.isDev;
+import static com.denied403.Hardcourse.Hardcourse.*;
+import static com.transfemme.dev.core403.Util.NumberUtil.formatNoUnits;
 import static com.transfemme.dev.core403.Util.Playtime.getPlaytime;
 
 public class Info {
@@ -116,7 +116,7 @@ public class Info {
             playerEmbed.setTitle(offlinePlayer.getName());
             playerEmbed.addField("Level", fullLevelString, false);
             if(isDev) {
-                playerEmbed.addField("Points", String.valueOf(checkpointDatabase.getPoints(uuid)), false);
+                playerEmbed.addField("Points", formatNoUnits((long) econ.getBalance(offlinePlayer)), false);
             }
             playerEmbed.addBlankField(false);
             playerEmbed.addField("First Joined", "<t:" + offlinePlayer.getFirstPlayed() / 1000L + ":F>", false);

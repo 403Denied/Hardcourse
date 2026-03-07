@@ -1,6 +1,5 @@
 package com.denied403.Hardcourse.Points.Shop;
 
-import com.denied403.Hardcourse.Points.PointsManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.*;
@@ -16,8 +15,8 @@ import org.bukkit.persistence.PersistentDataType;
 
 import java.util.List;
 
+import static com.denied403.Hardcourse.Hardcourse.econ;
 import static com.denied403.Hardcourse.Hardcourse.plugin;
-import static com.denied403.Hardcourse.Hardcourse.pointsManager;
 import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
 
 public class PointsShop implements Listener {
@@ -91,12 +90,11 @@ public class PointsShop implements Listener {
     }
 
     private boolean tryPurchase(Player player, int cost) {
-        int points = PointsManager.getPoints(player.getUniqueId());
-        if (points < cost) {
+        if (!econ.has(player, cost)) {
             player.sendMessage(Colorize("<prefix>You don't have enough points!"));
             return true;
         }
-        pointsManager.removePoints(player.getUniqueId(), cost);
+        econ.withdrawPlayer(player, cost);
         return false;
     }
 

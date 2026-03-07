@@ -56,9 +56,9 @@ public class onJoin implements Listener {
                     Bukkit.getLogger().severe("Failed to save checkpoints file: " + e.getMessage());
                 }
                 player.sendMessage(Colorize("<prefix>Your checkpoint data has successfully been migrated from legacy storage to the new system. Level: <accent>" + String.valueOf(level).replace(".0", "") + "<main> Season: <accent>" + season + "<main>. If you believe there is an error with these numbers, please contact an administrator."));
-                checkpointDatabase.setCheckpointData(player.getUniqueId(), season, level, 0);
+                checkpointDatabase.setCheckpointData(player.getUniqueId(), season, level);
             } else {
-                checkpointDatabase.setCheckpointData(player.getUniqueId(), 1, 0, 0);
+                checkpointDatabase.setCheckpointData(player.getUniqueId(), 1, 0);
                 player.teleport(player.getWorld().getSpawnLocation());
                 player.setRespawnLocation(player.getLocation());
             }
@@ -89,7 +89,7 @@ public class onJoin implements Listener {
             Location spawnLocation = targetWorld.getSpawnLocation();
             player.teleport(spawnLocation);
             player.updateCommands();
-            checkpointDatabase.setCheckpointData(player.getUniqueId(), 1, 0, 0);
+            checkpointDatabase.setCheckpointData(player.getUniqueId(), 1, 0);
             giveItems(player);
             player.sendMessage(Colorize("<prefix>Welcome to hardcourse. This parkour server contains over 1000 levels that will test your patience (and your will to live). To die you may click the <accent>clock<main> in your 9th hotbar slot. Think it's worth it? <accent>You may begin<main>."));
         }

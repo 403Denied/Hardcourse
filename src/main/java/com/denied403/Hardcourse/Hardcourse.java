@@ -10,13 +10,16 @@ import com.denied403.Hardcourse.Points.*;
 import com.denied403.Hardcourse.Points.Shop.PointsShop;
 import com.denied403.Hardcourse.Utils.*;
 
+import com.transfemme.dev.core403.Commands.Economy.Vault;
 import com.transfemme.dev.core403.Core403;
 import com.transfemme.dev.core403.Punishments.Database.PunishmentDatabase;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
+import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import org.bukkit.event.Listener;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
@@ -28,21 +31,23 @@ public final class Hardcourse extends JavaPlugin implements Listener {
     public static Hardcourse plugin;
     public static CheckpointDatabase checkpointDatabase;
     public static LinkManager linkManager;
-    public static PointsManager pointsManager;
     public static PunishmentDatabase punishmentDatabase;
     public static CheckpointUpdating checkpointUpdating;
+    public static Economy econ;
 
     @Override
     public void onEnable() {
         plugin = this;
         checkpointDatabase = new CheckpointDatabase();
         linkManager = new LinkManager();
-        pointsManager = new PointsManager();
         punishmentDatabase = Core403.database;
         checkpointUpdating = new CheckpointUpdating();
         saveDefaultConfig();
         loadConfigValues();
         if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {new Placeholders().register();}
+        if(Bukkit.getPluginManager().getPlugin("Vault") != null) {Vault.register();}
+        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+        if(rsp != null) {econ = rsp.getProvider();}
 
         if(DiscordEnabled) {
             try {
@@ -95,8 +100,6 @@ public final class Hardcourse extends JavaPlugin implements Listener {
             }
             if(isDev) {
                 cmd.registrar().register(Clock.createCommand("shop"));
-                cmd.registrar().register(Points.createCommand(pointsManager, "points"));
-                cmd.registrar().register(Points.createCommand(pointsManager, "pts"));
                 cmd.registrar().register(EndTrail.createCommand("endTrail"));
                 cmd.registrar().register(OminousTrail.createCommand("ominousTrail"));
             }

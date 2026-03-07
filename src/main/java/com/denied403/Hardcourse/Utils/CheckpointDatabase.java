@@ -26,7 +26,12 @@ public class CheckpointDatabase {
     public Connection getConnection() throws SQLException {
         File dbFile = new File(plugin.getDataFolder(), "data.db");
         dbFile.getParentFile().mkdirs();
-        return DriverManager.getConnection("jdbc:sqlite:" + dbFile);
+        Connection conn = DriverManager.getConnection("jdbc:sqlite:" + dbFile);
+        try (Statement stmt = conn.createStatement()){
+            stmt.execute("PRAGMA journal_mode=WAL");
+            stmt.execute("PRAGMA busy_timeout=3000");
+        }
+        return conn;
     }
 
     private void createCheckpointTable(){
@@ -35,7 +40,6 @@ public class CheckpointDatabase {
                         uuid TEXT PRIMARY KEY NOT NULL,
                         season INTEGER NOT NULL DEFAULT 0,
                         level REAL NOT NULL DEFAULT 0,
-                        points INTEGER NOT NULL DEFAULT 0,
                         level_time INTEGER NOT NULL DEFAULT 0,
                         discord TEXT
                     )
@@ -51,7 +55,6 @@ public class CheckpointDatabase {
         java.util.Map<String, String> expectedColumns = new java.util.HashMap<>();
         expectedColumns.put("season", "INTEGER NOT NULL DEFAULT 0");
         expectedColumns.put("level", "REAL NOT NULL DEFAULT 0");
-        expectedColumns.put("points", "INTEGER NOT NULL DEFAULT 0");
         expectedColumns.put("level_time", "INTEGER NOT NULL DEFAULT 0");
         expectedColumns.put("discord", "TEXT");
 
@@ -79,21 +82,19 @@ public class CheckpointDatabase {
         }
     }
 
-    public void setCheckpointData(UUID uuid, int season, double level, int points) {
+    public void setCheckpointData(UUID uuid, int season, double level) {
         String sql = """
-            INSERT INTO checkpoints (uuid, season, level, points)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO checkpoints (uuid, season, level)
+            VALUES (?, ?, ?)
             ON CONFLICT(uuid) DO UPDATE SET
                 season = excluded.season,
-                level = excluded.level,
-                points = excluded.points
+                level = excluded.level
         """;
 
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, uuid.toString());
             ps.setInt(2, season);
             ps.setDouble(3, level);
-            ps.setInt(4, points);
             ps.executeUpdate();
         } catch (SQLException e) {
             plugin.getLogger().severe("[HARDCOURSE] Failed to save checkpoint data: " + e.getMessage());
@@ -101,17 +102,16 @@ public class CheckpointDatabase {
     }
 
     public CheckpointData getCheckpointData(UUID uuid) {
-        String sql = "SELECT season, level, points, level_time, discord FROM checkpoints WHERE uuid = ?";
+        String sql = "SELECT season, level, level_time, discord FROM checkpoints WHERE uuid = ?";
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, uuid.toString());
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     int season = rs.getInt("season");
                     double level = rs.getDouble("level");
-                    int points = rs.getInt("points");
                     long level_time = rs.getLong("level_time");
                     String discord = rs.getString("discord");
-                    return new CheckpointData(uuid, season, level, points, level_time, discord);
+                    return new CheckpointData(uuid, season, level, level_time, discord);
                 }
             }
         } catch (SQLException e) {
@@ -130,30 +130,16 @@ public class CheckpointDatabase {
         return (d != null) ? d.level() : 0.0;
     }
 
-    public Integer getPoints(UUID uuid) {
-        CheckpointData d = getCheckpointData(uuid);
-        return (d != null) ? d.points() : 0;
-    }
-
     public void setSeason(UUID uuid, int season) {
-        int curSeason = getSeason(uuid);
         double curLevel = getLevel(uuid);
-        int curPoints = getPoints(uuid);
-        setCheckpointData(uuid, season, curLevel, curPoints);
+        setCheckpointData(uuid, season, curLevel);
     }
 
     public void setLevel(UUID uuid, double level) {
         int curSeason = getSeason(uuid);
-        double curLevel = getLevel(uuid);
-        int curPoints = getPoints(uuid);
-        setCheckpointData(uuid, curSeason, level, curPoints);
+        setCheckpointData(uuid, curSeason, level);
     }
 
-    public void setPoints(UUID uuid, int points) {
-        int curSeason = getSeason(uuid);
-        double curLevel = getLevel(uuid);
-        setCheckpointData(uuid, curSeason, curLevel, points);
-    }
     public long getLevelTime(UUID uuid) {
         String sql = "SELECT level_time FROM checkpoints WHERE uuid = ?";
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -179,8 +165,8 @@ public class CheckpointDatabase {
 
     public void linkDiscord(UUID uuid, String discordId) {
         String sql = """
-            INSERT INTO checkpoints (uuid, season, level, points, discord)
-            VALUES (?, 0, 0, 0, ?)
+            INSERT INTO checkpoints (uuid, season, level, discord)
+            VALUES (?, 0, 0, ?)
             ON CONFLICT(uuid) DO UPDATE SET discord = excluded.discord
         """;
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -241,7 +227,7 @@ public class CheckpointDatabase {
 
     public List<CheckpointData> getAllSortedBySeasonLevel() {
         List<CheckpointData> list = new ArrayList<>();
-        String sql = "SELECT uuid, season, level, points, level_time, discord FROM checkpoints ORDER BY season DESC, level DESC";
+        String sql = "SELECT uuid, season, level, level_time, discord FROM checkpoints ORDER BY season DESC, level DESC";
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -251,7 +237,6 @@ public class CheckpointDatabase {
                         UUID.fromString(rs.getString("uuid")),
                         rs.getInt("season"),
                         rs.getDouble("level"),
-                        rs.getInt("points"),
                         rs.getLong("level_time"),
                         rs.getString("discord")
                 ));
@@ -262,28 +247,6 @@ public class CheckpointDatabase {
         return list;
     }
 
-    public List<CheckpointData> getAllSortedByPoints() {
-        List<CheckpointData> list = new ArrayList<>();
-        String sql = "SELECT uuid, season, level, points, level_time, discord FROM checkpoints ORDER BY points DESC";
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-
-            while (rs.next()) {
-                list.add(new CheckpointData(
-                        UUID.fromString(rs.getString("uuid")),
-                        rs.getInt("season"),
-                        rs.getDouble("level"),
-                        rs.getInt("points"),
-                        rs.getLong("level_time"),
-                        rs.getString("discord")
-                ));
-            }
-        } catch (SQLException e) {
-            plugin.getLogger().severe("[HARDCOURSE] Failed to fetch sorted points data: " + e.getMessage());
-        }
-        return list;
-    }
     public String getUUIDFromDiscord(String discordId) {
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(
@@ -330,9 +293,7 @@ public class CheckpointDatabase {
     }
 
 
-    public record CheckpointData(UUID uuid, int season, double level, int points, long level_time, String discord) {}
-
-
+    public record CheckpointData(UUID uuid, int season, double level, long level_time, String discord) {}
 
     //Checkpoint Locations
     private void createCheckpointLocationsTable() throws SQLException {

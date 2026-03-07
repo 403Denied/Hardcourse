@@ -16,7 +16,6 @@ import java.util.UUID;
 import static com.denied403.Hardcourse.Commands.Clock.giveItems;
 import static com.denied403.Hardcourse.Hardcourse.checkpointDatabase;
 import static com.denied403.Hardcourse.Hardcourse.plugin;
-import static com.denied403.Hardcourse.Points.PointsManager.getPoints;
 import static com.denied403.Hardcourse.Utils.CheckpointLevelTimer.resetForNewLevel;
 import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
 
@@ -195,7 +194,7 @@ public class CheckpointUpdating {
             if (level >= update.start && level <= update.end) {
                 player.teleport(targetLoc);
                 player.setRespawnLocation(targetLoc);
-                checkpointDatabase.setCheckpointData(uuid, 1, update.resetTo, getPoints(uuid));
+                checkpointDatabase.setCheckpointData(uuid, 1, update.resetTo);
                 level = update.resetTo;
                 giveItems(player);
                 resetForNewLevel(uuid);
@@ -207,7 +206,7 @@ public class CheckpointUpdating {
                             if (!(audience instanceof Player p)) return;
 
                             p.teleport(targetLoc);
-                            checkpointDatabase.setCheckpointData(p.getUniqueId(), 1, update.resetTo, getPoints(p.getUniqueId()));
+                            checkpointDatabase.setCheckpointData(p.getUniqueId(), 1, update.resetTo);
                             giveItems(p);
                             resetForNewLevel(p.getUniqueId());
 
