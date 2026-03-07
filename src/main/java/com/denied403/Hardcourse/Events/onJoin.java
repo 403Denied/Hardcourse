@@ -5,6 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -24,12 +25,12 @@ import static com.transfemme.dev.core403.Util.ColorUtil.stripAllColors;
 public class onJoin implements Listener {
     @EventHandler
     public void onJoinEvent(PlayerJoinEvent event) {
-        org.bukkit.entity.Player player = event.getPlayer();
+        Player player = event.getPlayer();
 
         if (DiscordEnabled) {
-            if (player.hasPlayedBefore()) {
+            if (player.hasPlayedBefore() && !player.hasMetadata("vanished")) {
                 sendMessage(player, null, "join", null, null);
-            } else {
+            } if(!player.hasPlayedBefore()) {
                 sendMessage(player, null, "firstJoin", null, null);
             }
             sendMessage(player, null, "logs", "join", null);
