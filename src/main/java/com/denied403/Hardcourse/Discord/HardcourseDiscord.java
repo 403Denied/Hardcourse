@@ -31,8 +31,8 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import static com.denied403.Hardcourse.Hardcourse.*;
-import static com.transfemme.dev.core403.Util.ColorUtil.stripAllColors;
-import static com.transfemme.dev.core403.Util.Playtime.getPlaytime;
+import static com.denied403.core403.Util.ColorUtil.stripAllColors;
+import static com.denied403.core403.Util.Playtime.getPlaytime;
 
 public class HardcourseDiscord {
     public static JDA jda;

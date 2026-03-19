@@ -17,7 +17,7 @@ import java.util.List;
 
 import static com.denied403.Hardcourse.Hardcourse.econ;
 import static com.denied403.Hardcourse.Hardcourse.plugin;
-import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
+import static com.denied403.core403.Util.ColorUtil.Colorize;
 
 public class PointsShop implements Listener {
 

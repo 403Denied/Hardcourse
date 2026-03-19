@@ -14,7 +14,7 @@ import java.util.UUID;
 import static com.denied403.Hardcourse.Discord.HardcourseDiscord.linkedRole;
 import static com.denied403.Hardcourse.Discord.HardcourseDiscord.linksChannel;
 import static com.denied403.Hardcourse.Hardcourse.*;
-import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
+import static com.denied403.core403.Util.ColorUtil.Colorize;
 
 public class DiscordLink extends ListenerAdapter {
     public static void run(SlashCommandInteractionEvent event){

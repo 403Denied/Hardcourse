@@ -1,10 +1,10 @@
 package com.denied403.Hardcourse.Discord.Commands;
 
-import com.transfemme.dev.core403.Punishments.Enums.PunishmentType;
-import com.transfemme.dev.core403.Punishments.Utils.PunishmentReason;
+import com.denied403.core403.Punishments.Enums.PunishmentType;
+import com.denied403.core403.Punishments.Utils.PunishmentReason;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import com.transfemme.dev.core403.Punishments.Events.onConfirmClick;
+import com.denied403.core403.Punishments.Events.onConfirmClick;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
@@ -14,9 +14,9 @@ import java.util.UUID;
 import static com.denied403.Hardcourse.Hardcourse.checkpointDatabase;
 import static com.denied403.Hardcourse.Hardcourse.plugin;
 import static com.denied403.Hardcourse.Utils.Luckperms.hasLuckPermsPermission;
-import static com.transfemme.dev.core403.Core403.bypassPunishBlacklist;
-import static com.transfemme.dev.core403.Core403.punishBlacklist;
-import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
+import static com.denied403.core403.Core403.bypassPunishBlacklist;
+import static com.denied403.core403.Core403.punishBlacklist;
+import static com.denied403.core403.Util.ColorUtil.Colorize;
 
 public class Punish {
     public static void run(SlashCommandInteractionEvent event) {

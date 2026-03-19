@@ -1,6 +1,6 @@
 package com.denied403.Hardcourse.Utils;
 
-import com.transfemme.dev.core403.Util.NumberUtil;
+import com.denied403.core403.Util.NumberUtil;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
@@ -8,8 +8,8 @@ import org.jetbrains.annotations.NotNull;
 import static com.denied403.Hardcourse.Hardcourse.checkpointDatabase;
 import static com.denied403.Hardcourse.Hardcourse.isDev;
 import static com.denied403.Hardcourse.Utils.CheckpointLevelTimer.getCurrentLevelTimeFormatted;
-import static com.transfemme.dev.core403.Core403.*;
-import static com.transfemme.dev.core403.Util.NickManager.getNick;
+import static com.denied403.core403.Core403.*;
+import static com.denied403.core403.Util.NickManager.getNick;
 
 public class Placeholders extends PlaceholderExpansion {
     @Override

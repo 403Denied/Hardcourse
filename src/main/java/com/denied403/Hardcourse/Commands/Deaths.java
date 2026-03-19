@@ -22,7 +22,7 @@ import java.util.concurrent.CompletableFuture;
 
 import static com.denied403.Hardcourse.Discord.HardcourseDiscord.deathsChannel;
 import static com.denied403.Hardcourse.Hardcourse.DiscordEnabled;
-import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
+import static com.denied403.core403.Util.ColorUtil.Colorize;
 
 public class Deaths {
     public static LiteralCommandNode<CommandSourceStack> createCommand(String commandName) {

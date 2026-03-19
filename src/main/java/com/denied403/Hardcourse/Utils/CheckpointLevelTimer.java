@@ -94,5 +94,4 @@ public class CheckpointLevelTimer implements Listener {
         if (!sb.isEmpty()) sb.append(" ");
         sb.append(value).append(suffix);
     }
-
 }

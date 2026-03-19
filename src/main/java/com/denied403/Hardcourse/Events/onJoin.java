@@ -19,8 +19,8 @@ import static com.denied403.Hardcourse.Commands.Clock.giveItems;
 import static com.denied403.Hardcourse.Discord.HardcourseDiscord.sendMessage;
 import static com.denied403.Hardcourse.Hardcourse.*;
 import static com.denied403.Hardcourse.Points.Shop.PointsShop.givePointsShopPaper;
-import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
-import static com.transfemme.dev.core403.Util.ColorUtil.stripAllColors;
+import static com.denied403.core403.Util.ColorUtil.Colorize;
+import static com.denied403.core403.Util.ColorUtil.stripAllColors;
 
 public class onJoin implements Listener {
     @EventHandler

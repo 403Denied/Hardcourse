@@ -10,8 +10,8 @@ import org.bukkit.event.Listener;
 import static com.denied403.Hardcourse.Discord.HardcourseDiscord.sendMessage;
 import static com.denied403.Hardcourse.Hardcourse.DiscordEnabled;
 import static com.denied403.Hardcourse.Hardcourse.checkpointDatabase;
-import static com.transfemme.dev.core403.Commands.Moderation.Chat.StaffChat.staffChat;
-import com.transfemme.dev.core403.Punishments.Api.ChatFilterEvent;
+import static com.denied403.core403.Commands.Moderation.Chat.StaffChat.staffChat;
+import com.denied403.core403.Punishments.Api.ChatFilterEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
 public class onChat implements Listener {
