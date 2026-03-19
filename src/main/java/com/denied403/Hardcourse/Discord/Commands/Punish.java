@@ -14,9 +14,8 @@ import java.util.UUID;
 import static com.denied403.Hardcourse.Hardcourse.checkpointDatabase;
 import static com.denied403.Hardcourse.Hardcourse.plugin;
 import static com.denied403.Hardcourse.Utils.Luckperms.hasLuckPermsPermission;
-import static com.denied403.core403.Core403.bypassPunishBlacklist;
-import static com.denied403.core403.Core403.punishBlacklist;
-import static com.denied403.core403.Util.ColorUtil.Colorize;
+import static com.denied403.core403.Util.ConfigManager.bypassPunishBlacklist;
+import static com.denied403.core403.Util.ConfigManager.punishBlacklist;
 
 public class Punish {
     public static void run(SlashCommandInteractionEvent event) {
