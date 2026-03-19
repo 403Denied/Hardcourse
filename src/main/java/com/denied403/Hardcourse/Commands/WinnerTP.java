@@ -14,7 +14,7 @@ import org.bukkit.entity.Player;
 
 import java.util.concurrent.CompletableFuture;
 
-import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
+import static com.denied403.core403.Util.ColorUtil.Colorize;
 
 public class WinnerTP {
 

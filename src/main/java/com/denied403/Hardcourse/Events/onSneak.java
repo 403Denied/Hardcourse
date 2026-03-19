@@ -10,7 +10,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 
 import static com.denied403.Hardcourse.Hardcourse.checkpointDatabase;
-import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
+import static com.denied403.core403.Util.ColorUtil.Colorize;
 
 public class onSneak implements Listener {
     @EventHandler

@@ -17,7 +17,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import static com.denied403.Hardcourse.Hardcourse.isDev;
 import static com.denied403.Hardcourse.Points.Shop.PointsShop.givePointsShopPaper;
-import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
+import static com.denied403.core403.Util.ColorUtil.Colorize;
 
 public class Clock {
     public static LiteralCommandNode<CommandSourceStack> createCommand(final String commandName) {

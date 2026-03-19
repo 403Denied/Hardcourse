@@ -9,7 +9,7 @@ import java.awt.*;
 import java.util.ArrayList;
 
 import static com.denied403.Hardcourse.Hardcourse.isDev;
-import static com.transfemme.dev.core403.Util.ColorUtil.stripAllColors;
+import static com.denied403.core403.Util.ColorUtil.stripAllColors;
 
 public class List {
     public static void run(SlashCommandInteractionEvent event) {

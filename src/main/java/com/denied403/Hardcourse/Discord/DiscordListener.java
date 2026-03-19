@@ -18,7 +18,7 @@ import static com.denied403.Hardcourse.Hardcourse.DiscordEnabled;
 import static com.denied403.Hardcourse.Hardcourse.checkpointDatabase;
 import static com.denied403.Hardcourse.Utils.Luckperms.getLuckPermsPrefix;
 import static com.denied403.Hardcourse.Utils.Luckperms.hasLuckPermsPermission;
-import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
+import static com.denied403.core403.Util.ColorUtil.Colorize;
 
 public final class DiscordListener extends ListenerAdapter {
     @Override

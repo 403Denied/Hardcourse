@@ -15,7 +15,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
-import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
+import static com.denied403.core403.Util.ColorUtil.Colorize;
 
 public class OminousTrail implements Listener {
 

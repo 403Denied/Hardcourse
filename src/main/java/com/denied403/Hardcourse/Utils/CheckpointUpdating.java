@@ -17,7 +17,7 @@ import static com.denied403.Hardcourse.Commands.Clock.giveItems;
 import static com.denied403.Hardcourse.Hardcourse.checkpointDatabase;
 import static com.denied403.Hardcourse.Hardcourse.plugin;
 import static com.denied403.Hardcourse.Utils.CheckpointLevelTimer.resetForNewLevel;
-import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
+import static com.denied403.core403.Util.ColorUtil.Colorize;
 
 public class CheckpointUpdating {
 

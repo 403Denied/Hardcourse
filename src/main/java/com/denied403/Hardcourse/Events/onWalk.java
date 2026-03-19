@@ -1,6 +1,6 @@
 package com.denied403.Hardcourse.Events;
 
-import com.transfemme.dev.core403.Punishments.Utils.PunishmentReason;
+import com.denied403.core403.Punishments.Utils.PunishmentReason;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -19,9 +19,9 @@ import static com.denied403.Hardcourse.Hardcourse.*;
 import static com.denied403.Hardcourse.Utils.CheckpointLevelTimer.getCurrentLevelTimeFormatted;
 import static com.denied403.Hardcourse.Utils.CheckpointLevelTimer.resetForNewLevel;
 import static com.denied403.Hardcourse.Utils.Luckperms.addRank;
-import static com.transfemme.dev.core403.Punishments.Events.onConfirmClick.handlePunishment;
-import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
-import static com.transfemme.dev.core403.Util.Playtime.getPlaytime;
+import static com.denied403.core403.Punishments.Events.onConfirmClick.handlePunishment;
+import static com.denied403.core403.Util.ColorUtil.Colorize;
+import static com.denied403.core403.Util.Playtime.getPlaytime;
 
 public class onWalk implements Listener {
     private final Random random = new Random();

@@ -9,7 +9,7 @@ import org.bukkit.command.CommandSender;
 import static com.denied403.Hardcourse.Discord.HardcourseDiscord.InitJDA;
 import static com.denied403.Hardcourse.Discord.HardcourseDiscord.jda;
 import static com.denied403.Hardcourse.Hardcourse.*;
-import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
+import static com.denied403.core403.Util.ColorUtil.Colorize;
 
 public class ReloadHardcourse {
 

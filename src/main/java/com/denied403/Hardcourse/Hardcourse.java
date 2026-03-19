@@ -10,9 +10,9 @@ import com.denied403.Hardcourse.Points.*;
 import com.denied403.Hardcourse.Points.Shop.PointsShop;
 import com.denied403.Hardcourse.Utils.*;
 
-import com.transfemme.dev.core403.Commands.Economy.Vault;
-import com.transfemme.dev.core403.Core403;
-import com.transfemme.dev.core403.Punishments.Database.PunishmentDatabase;
+import com.denied403.core403.Commands.Economy.Vault;
+import com.denied403.core403.Core403;
+import com.denied403.core403.Punishments.Database.PunishmentDatabase;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;

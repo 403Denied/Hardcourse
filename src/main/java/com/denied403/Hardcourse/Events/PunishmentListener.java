@@ -1,11 +1,11 @@
 package com.denied403.Hardcourse.Events;
 
-import com.transfemme.dev.core403.Punishments.Api.PunishmentEvent;
-import com.transfemme.dev.core403.Punishments.Api.NameBanEvent;
-import com.transfemme.dev.core403.Punishments.Api.RevertEvent;
-import com.transfemme.dev.core403.Punishments.Api.PunishmentEditEvent;
-import com.transfemme.dev.core403.Punishments.Api.IPBanEvent;
-import com.transfemme.dev.core403.Punishments.Utils.PunishmentDurationParser;
+import com.denied403.core403.Punishments.Api.PunishmentEvent;
+import com.denied403.core403.Punishments.Api.NameBanEvent;
+import com.denied403.core403.Punishments.Api.RevertEvent;
+import com.denied403.core403.Punishments.Api.PunishmentEditEvent;
+import com.denied403.core403.Punishments.Api.IPBanEvent;
+import com.denied403.core403.Punishments.Utils.PunishmentDurationParser;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.components.MessageTopLevelComponentUnion;
 import net.dv8tion.jda.api.entities.Message;
@@ -32,9 +32,9 @@ import java.util.UUID;
 import static com.denied403.Hardcourse.Discord.HardcourseDiscord.*;
 import static com.denied403.Hardcourse.Hardcourse.*;
 import static com.denied403.Hardcourse.Utils.Luckperms.hasLuckPermsPermission;
-import static com.transfemme.dev.core403.Punishments.Events.onChatEdit.editPunishment;
-import static com.transfemme.dev.core403.Punishments.Events.onChatRevert.revertPunishment;
-import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
+import static com.denied403.core403.Punishments.Events.onChatEdit.editPunishment;
+import static com.denied403.core403.Punishments.Events.onChatRevert.revertPunishment;
+import static com.denied403.core403.Util.ColorUtil.Colorize;
 import static org.bukkit.Bukkit.getServer;
 
 public class PunishmentListener extends ListenerAdapter implements Listener {

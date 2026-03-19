@@ -29,7 +29,7 @@ import static com.denied403.Hardcourse.Commands.Clock.giveItems;
 import static com.denied403.Hardcourse.Discord.HardcourseDiscord.checkpointsChannel;
 import static com.denied403.Hardcourse.Hardcourse.*;
 import static com.denied403.Hardcourse.Utils.CheckpointLevelTimer.resetForNewLevel;
-import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
+import static com.denied403.core403.Util.ColorUtil.Colorize;
 
 public class CheckpointCommand {
     private static final Set<UUID> restartCancelled = new HashSet<>();
@@ -389,7 +389,7 @@ public class CheckpointCommand {
                                     }
 
                                     double requestedLevel = DoubleArgumentType.getDouble(ctx, "level");
-                                    int requestedSeason = checkpointDatabase.getSeason(player.getUniqueId()); // default to current season
+                                    int requestedSeason = checkpointDatabase.getSeason(player.getUniqueId());
 
                                     return handleTeleport(sender, player, requestedSeason, requestedLevel, false);
                                 })

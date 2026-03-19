@@ -17,8 +17,8 @@ import java.util.Objects;
 import java.util.UUID;
 
 import static com.denied403.Hardcourse.Hardcourse.*;
-import static com.transfemme.dev.core403.Util.NumberUtil.formatNoUnits;
-import static com.transfemme.dev.core403.Util.Playtime.getPlaytime;
+import static com.denied403.core403.Util.NumberUtil.formatNoUnits;
+import static com.denied403.core403.Util.Playtime.getPlaytime;
 
 public class Info {
     static OptionMapping typeOption;

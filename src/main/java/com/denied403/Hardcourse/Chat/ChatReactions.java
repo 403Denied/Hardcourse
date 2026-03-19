@@ -17,8 +17,8 @@ import java.util.Random;
 
 import static com.denied403.Hardcourse.Chat.ToggleDiabolicalUnscrambles.diabolicalUnscrambles;
 import static com.denied403.Hardcourse.Hardcourse.*;
-import static com.transfemme.dev.core403.Util.ColorUtil.Colorize;
-import static com.transfemme.dev.core403.Util.ColorUtil.stripAllColors;
+import static com.denied403.core403.Util.ColorUtil.Colorize;
+import static com.denied403.core403.Util.ColorUtil.stripAllColors;
 
 public class ChatReactions implements Listener {
 

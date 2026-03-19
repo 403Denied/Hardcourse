@@ -1,6 +1,6 @@
 package com.denied403.Hardcourse.Discord.Commands;
 
-import com.transfemme.dev.core403.Punishments.Utils.PunishmentReason;
+import com.denied403.core403.Punishments.Utils.PunishmentReason;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.bukkit.Bukkit;
@@ -15,8 +15,8 @@ import java.util.List;
 
 import static com.denied403.Hardcourse.Hardcourse.checkpointDatabase;
 import static com.denied403.Hardcourse.Utils.Luckperms.hasLuckPermsPermission;
-import static com.transfemme.dev.core403.Core403.database;
-import static com.transfemme.dev.core403.Punishments.Utils.PunishmentConfigLoader.getReasonById;
+import static com.denied403.core403.Core403.database;
+import static com.denied403.core403.Punishments.Utils.PunishmentConfigLoader.getReasonById;
 
 public class Punishments {
     public static void run(SlashCommandInteractionEvent event) {
