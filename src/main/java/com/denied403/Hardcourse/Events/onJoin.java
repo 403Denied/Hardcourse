@@ -27,14 +27,13 @@ public class onJoin implements Listener {
     public void onJoinEvent(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
-        if (DiscordEnabled) {
-            if (player.hasPlayedBefore() && !player.hasMetadata("vanished")) {
-                sendMessage(player, null, "join", null, null);
-            } if(!player.hasPlayedBefore()) {
-                sendMessage(player, null, "firstJoin", null, null);
-            }
-            sendMessage(player, null, "logs", "join", null);
+        if (player.hasPlayedBefore() && !player.hasMetadata("vanished")) {
+            sendMessage(player, null, "join", null, null);
+        } if(!player.hasPlayedBefore()) {
+            sendMessage(player, null, "firstJoin", null, null);
         }
+        sendMessage(player, null, "logs", "join", null);
+
         if(checkpointDatabase.getCheckpointData(player.getUniqueId()) == null) {
             int season;
             double level;

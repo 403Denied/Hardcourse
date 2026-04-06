@@ -5,9 +5,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static com.denied403.Hardcourse.Discord.HardcourseDiscord.sendMessage;
 
 public class onVanish implements Listener {

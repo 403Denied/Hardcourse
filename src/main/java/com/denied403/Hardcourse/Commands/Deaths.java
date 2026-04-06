@@ -15,13 +15,9 @@ import org.bukkit.Statistic;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.TimeZone;
 import java.util.concurrent.CompletableFuture;
 
-import static com.denied403.Hardcourse.Discord.HardcourseDiscord.deathsChannel;
-import static com.denied403.Hardcourse.Hardcourse.DiscordEnabled;
+import static com.denied403.Hardcourse.Discord.HardcourseDiscord.sendMessage;
 import static com.denied403.core403.Util.ColorUtil.Colorize;
 
 public class Deaths {
@@ -122,11 +118,7 @@ public class Deaths {
                 }
             }
         }
-        if(DiscordEnabled){
-            final SimpleDateFormat f = new SimpleDateFormat("HH:mm:ss z");
-            f.setTimeZone(TimeZone.getTimeZone("UTC"));
-            deathsChannel.sendMessage("`[" + f.format(new Date()) + "] " + target.getName() + " had their deaths set to " + target.getStatistic(Statistic.DEATHS) + " by " + sender.getName() + "`").queue();
-        }
+        sendMessage((Player) sender, String.valueOf(target.getStatistic(Statistic.DEATHS)), "setDeaths", targetName, null);
 
         return Command.SINGLE_SUCCESS;
     }

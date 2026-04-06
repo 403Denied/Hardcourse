@@ -4,12 +4,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.TimeZone;
-
-import static com.denied403.Hardcourse.Discord.HardcourseDiscord.commandsChannel;
-import static com.denied403.Hardcourse.Hardcourse.DiscordEnabled;
+import static com.denied403.Hardcourse.Discord.HardcourseDiscord.sendMessage;
 import static com.denied403.core403.Util.ColorUtil.Colorize;
 
 public class onCommand implements Listener {
@@ -19,10 +14,6 @@ public class onCommand implements Listener {
         if (command.equalsIgnoreCase("/suicide") || command.equalsIgnoreCase("/die") || command.equalsIgnoreCase("/stuck")) {
             e.getPlayer().sendMessage(Colorize("<click:run_command:'/clock'><prefix>Hey! Try using your <accent>clock<main> instead. Lost it? Click here, or run <accent>/clock"));
         }
-        if(DiscordEnabled) {
-            final SimpleDateFormat f = new SimpleDateFormat("HH:mm:ss z");
-            f.setTimeZone(TimeZone.getTimeZone("UTC"));
-            commandsChannel.sendMessage("`[" + f.format(new Date()) + "] " + e.getPlayer().getName() + ": " + e.getMessage() + "`").queue();
-        }
+        sendMessage(e.getPlayer(), e.getMessage(), "logs", "command", null);
     }
 }

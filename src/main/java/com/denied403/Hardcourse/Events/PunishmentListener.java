@@ -39,6 +39,7 @@ import static org.bukkit.Bukkit.getServer;
 
 public class PunishmentListener extends ListenerAdapter implements Listener {
     public static void runBanCleanup(String playerName) {
+        if(!DiscordEnabled) return;
         hacksChannel.getHistory().retrievePast(100).queue(messages -> {
             for (Message msg : messages) {
                 boolean changed = false;
@@ -80,9 +81,7 @@ public class PunishmentListener extends ListenerAdapter implements Listener {
                         }
                     }
                 }
-                if(DiscordEnabled) {
-                    runBanCleanup(playerName);
-                }
+                runBanCleanup(playerName);
             }
         }
         if(DiscordEnabled) {
@@ -132,7 +131,6 @@ public class PunishmentListener extends ListenerAdapter implements Listener {
                     .build();
 
             Modal modal = Modal.create("confirm_revert:" + punishmentId, "Revert Punishment")
-                    // Use addComponents with the Label wrapper to satisfy the builder
                     .addComponents(Label.of("Reversion Reason", reasonInput))
                     .build();
 

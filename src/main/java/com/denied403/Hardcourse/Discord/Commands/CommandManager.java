@@ -15,8 +15,6 @@ import com.denied403.core403.Punishments.Utils.PunishmentReason;
 
 import java.util.ArrayList;
 
-import static com.denied403.Hardcourse.Hardcourse.DiscordEnabled;
-
 public class CommandManager extends ListenerAdapter {
 
     private final Console consoleCommand;
@@ -29,51 +27,47 @@ public class CommandManager extends ListenerAdapter {
 
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event){
-        if (DiscordEnabled) {
-            String command = event.getName();
-            switch (command.toLowerCase()) {
-                case "list" -> List.run(event);
-                case "info" -> Info.run(event);
-                case "console" -> consoleCommand.run(event);
-                case "setuptickets" -> setupTicketsCommand.run(event);
-                case "link" -> DiscordLink.run(event);
-                case "punish" -> Punish.run(event);
-                case "puns" -> Punishments.run(event);
-            }
+        String command = event.getName();
+        switch (command.toLowerCase()) {
+            case "list" -> List.run(event);
+            case "info" -> Info.run(event);
+            case "console" -> consoleCommand.run(event);
+            case "setuptickets" -> setupTicketsCommand.run(event);
+            case "link" -> DiscordLink.run(event);
+            case "punish" -> Punish.run(event);
+            case "puns" -> Punishments.run(event);
         }
     }
 
     @Override
     public void onGuildReady(@NotNull GuildReadyEvent event){
-        if (DiscordEnabled) {
-            ArrayList<CommandData> commandData = new ArrayList<>();
-            commandData.add(Commands.slash("list", "Get a list of online players"));
-            commandData.add(Commands.slash("info", "Get server or player info")
-                    .addOptions(Info.infoType, Info.playerName));
-            commandData.add(Commands.slash("puns", "View a players punishments").addOption(OptionType.STRING, "username", "The username to check", true).setDefaultPermissions(DefaultMemberPermissions.DISABLED));
-            commandData.add(Commands.slash("console", "Run a console command")
-                    .addOption(OptionType.STRING, "command", "The command to run on the server console", true).setDefaultPermissions(DefaultMemberPermissions.DISABLED));
-            commandData.add(Commands.slash("setuptickets", "Setup the ticket system")
-                    .setDefaultPermissions(DefaultMemberPermissions.DISABLED)
-                    .addOptions(SendTicketPanel.channel())
-            );
-            commandData.add(Commands.slash("link", "Link your Minecraft account")
-                    .addOption(OptionType.STRING, "username", "Your Minecraft username", true)
-                    .addOption(OptionType.STRING, "code", "Your 6-digit link code", true)
-            );
+        ArrayList<CommandData> commandData = new ArrayList<>();
+        commandData.add(Commands.slash("list", "Get a list of online players"));
+        commandData.add(Commands.slash("info", "Get server or player info")
+                .addOptions(Info.infoType, Info.playerName));
+        commandData.add(Commands.slash("puns", "View a players punishments").addOption(OptionType.STRING, "username", "The username to check", true).setDefaultPermissions(DefaultMemberPermissions.DISABLED));
+        commandData.add(Commands.slash("console", "Run a console command")
+                .addOption(OptionType.STRING, "command", "The command to run on the server console", true).setDefaultPermissions(DefaultMemberPermissions.DISABLED));
+        commandData.add(Commands.slash("setuptickets", "Setup the ticket system")
+                .setDefaultPermissions(DefaultMemberPermissions.DISABLED)
+                .addOptions(SendTicketPanel.channel())
+        );
+        commandData.add(Commands.slash("link", "Link your Minecraft account")
+                .addOption(OptionType.STRING, "username", "Your Minecraft username", true)
+                .addOption(OptionType.STRING, "code", "Your 6-digit link code", true)
+        );
 
-            OptionData punishments = new OptionData(OptionType.STRING, "reason", "The punishment reason", true).setAutoComplete(true);
+        OptionData punishments = new OptionData(OptionType.STRING, "reason", "The punishment reason", true).setAutoComplete(true);
 
 
-            commandData.add(Commands.slash("punish", "Punish a user in-game")
-                    .setDefaultPermissions(DefaultMemberPermissions.DISABLED)
-                    .addOption(OptionType.STRING, "player", "The name of the player", true)
-                    .addOptions(punishments)
-                    .addOption(OptionType.BOOLEAN, "warn", "Warn the player if available", false)
-                    .addOption(OptionType.STRING, "note", "The note for this punishment", false)
-            );
-            event.getGuild().updateCommands().addCommands(commandData).queue();
-        }
+        commandData.add(Commands.slash("punish", "Punish a user in-game")
+                .setDefaultPermissions(DefaultMemberPermissions.DISABLED)
+                .addOption(OptionType.STRING, "player", "The name of the player", true)
+                .addOptions(punishments)
+                .addOption(OptionType.BOOLEAN, "warn", "Warn the player if available", false)
+                .addOption(OptionType.STRING, "note", "The note for this punishment", false)
+        );
+        event.getGuild().updateCommands().addCommands(commandData).queue();
     }
     @Override
     public void onCommandAutoCompleteInteraction(CommandAutoCompleteInteractionEvent event) {

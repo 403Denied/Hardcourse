@@ -59,7 +59,7 @@ public class onChat implements Listener {
     public void onCommand(PlayerCommandPreprocessEvent event) {
         String command = event.getMessage();
         Player player = event.getPlayer();
-        if(!player.hasPermission("core403.staffchat") || !DiscordEnabled) return;
+        if(!player.hasPermission("core403.staffchat")) return;
         if (command.startsWith("/sc ") || command.startsWith("/staffchat ")) {
             String message = command.replaceFirst("(?i)^/sc|^/staffchat", "").trim();
             sendMessage(player, message, "staffchat", null, null);
