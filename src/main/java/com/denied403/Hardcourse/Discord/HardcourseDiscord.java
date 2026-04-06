@@ -51,95 +51,95 @@ public class HardcourseDiscord {
     private static final Map<String, Message> lastHackAlert = new HashMap<>();
 
     public static void InitJDA() {
-        if(DiscordEnabled) {
-            String discordToken = plugin.getConfig().getString("DISCORD_TOKEN");
-            if (discordToken == null) {
-                plugin.getLogger().severe("Please provide a DISCORD_TOKEN in the config.yml file!");
-                return;
-            }
-            try {
-                jda = JDABuilder.createDefault(discordToken)
-                        .setActivity(Activity.playing("On Hardcourse"))
-                        .setStatus(OnlineStatus.ONLINE)
-                        .enableIntents(GatewayIntent.GUILD_MEMBERS,
-                                GatewayIntent.GUILD_MESSAGES,
-                                GatewayIntent.GUILD_WEBHOOKS,
-                                GatewayIntent.GUILD_PRESENCES,
-                                GatewayIntent.MESSAGE_CONTENT)
-                        .setMemberCachePolicy(MemberCachePolicy.ALL)
-                        .setChunkingFilter(ChunkingFilter.ALL)
-                        .enableCache(CacheFlag.ONLINE_STATUS)
-                        .addEventListeners(
-                                new DiscordListener(),
-                                new CommandManager(),
-                                new DiscordButtonListener(),
-                                new PanelButtonListener(),
-                                new ApplicationMessageListener(),
-                                new ApplicationButtonListener(),
-                                new PunishmentListener()
+        if(!DiscordEnabled) return;
+        String discordToken = plugin.getConfig().getString("DISCORD_TOKEN");
+        if (discordToken == null) {
+            plugin.getLogger().severe("Please provide a DISCORD_TOKEN in the config.yml file!");
+            return;
+        }
+        try {
+            jda = JDABuilder.createDefault(discordToken)
+                    .setActivity(Activity.playing("On Hardcourse"))
+                    .setStatus(OnlineStatus.ONLINE)
+                    .enableIntents(GatewayIntent.GUILD_MEMBERS,
+                            GatewayIntent.GUILD_MESSAGES,
+                            GatewayIntent.GUILD_WEBHOOKS,
+                            GatewayIntent.GUILD_PRESENCES,
+                            GatewayIntent.MESSAGE_CONTENT)
+                    .setMemberCachePolicy(MemberCachePolicy.ALL)
+                    .setChunkingFilter(ChunkingFilter.ALL)
+                    .enableCache(CacheFlag.ONLINE_STATUS)
+                    .addEventListeners(
+                            new DiscordListener(),
+                            new CommandManager(),
+                            new DiscordButtonListener(),
+                            new PanelButtonListener(),
+                            new ApplicationMessageListener(),
+                            new ApplicationButtonListener(),
+                            new PunishmentListener()
 
-                        ).build().awaitReady();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            if (jda == null) {
-                plugin.getServer().getPluginManager().disablePlugin(plugin);
-                return;
-            }
-            String chatChannelId = plugin.getConfig().getString("Chat-Channel-Id");
-            if (chatChannelId != null) {
-                chatChannel = jda.getTextChannelById(chatChannelId);
-            }
+                    ).build().awaitReady();
+        } catch (InterruptedException e) {
+            plugin.getLogger().severe("Error initializing JDA: " + e.getMessage());
+        }
+        if (jda == null) {
+            plugin.getServer().getPluginManager().disablePlugin(plugin);
+            return;
+        }
+        String chatChannelId = plugin.getConfig().getString("Chat-Channel-Id");
+        if (chatChannelId != null) {
+            chatChannel = jda.getTextChannelById(chatChannelId);
+        }
 
-            String staffChatChannelId = plugin.getConfig().getString("Staff-Chat-Channel-Id");
-            if (staffChatChannelId != null) {
-                staffChatChannel = jda.getTextChannelById(staffChatChannelId);
-            }
+        String staffChatChannelId = plugin.getConfig().getString("Staff-Chat-Channel-Id");
+        if (staffChatChannelId != null) {
+            staffChatChannel = jda.getTextChannelById(staffChatChannelId);
+        }
 
-            String hacksChannelId = plugin.getConfig().getString("Anticheat-Channel-Id");
-            if (hacksChannelId != null) {
-                hacksChannel = jda.getThreadChannelById(hacksChannelId);
-            }
-            String logsChannelId = plugin.getConfig().getString("Logs-Channel-Id");
-            if (logsChannelId != null) {
-                logsChannel = jda.getThreadChannelById(logsChannelId);
-            }
-            String punishmentChannelId = plugin.getConfig().getString("Punishment-Channel-Id");
-            if (punishmentChannelId != null) {
-                punishmentChannel = jda.getThreadChannelById(punishmentChannelId);
-            }
-            String reportChannelId = plugin.getConfig().getString("Reports-Channel-Id");
-            if (reportChannelId != null) {
-                reportChannel = jda.getThreadChannelById(reportChannelId);
-            }
-            String deathsChannelId = plugin.getConfig().getString("Deaths-Channel-Id");
-            if (deathsChannelId != null) {
-                deathsChannel = jda.getThreadChannelById(deathsChannelId);
-            }
-            String checkpointsChannelId = plugin.getConfig().getString("Checkpoints-Channel-Id");
-            if (checkpointsChannelId != null) {
-                checkpointsChannel = jda.getThreadChannelById(checkpointsChannelId);
-            }
-            String commandsChannelId = plugin.getConfig().getString("Commands-Channel-Id");
-            if (commandsChannelId != null) {
-                commandsChannel = jda.getThreadChannelById(commandsChannelId);
-            }
-            String linksChannelId = plugin.getConfig().getString("Links-Channel-Id");
-            if (linksChannelId != null) {
-                linksChannel = jda.getThreadChannelById(linksChannelId);
-            }
-            String guildId = plugin.getConfig().getString("Guild-Id");
-            if (guildId != null) {
-                guild = jda.getGuildById(guildId);
-            }
-            String linkedRoleId = plugin.getConfig().getString("Linked-Role-Id");
-            if (linkedRoleId != null && guild != null) {
-                linkedRole = guild.getRoleById(linkedRoleId);
-            }
+        String hacksChannelId = plugin.getConfig().getString("Anticheat-Channel-Id");
+        if (hacksChannelId != null) {
+            hacksChannel = jda.getThreadChannelById(hacksChannelId);
+        }
+        String logsChannelId = plugin.getConfig().getString("Logs-Channel-Id");
+        if (logsChannelId != null) {
+            logsChannel = jda.getThreadChannelById(logsChannelId);
+        }
+        String punishmentChannelId = plugin.getConfig().getString("Punishment-Channel-Id");
+        if (punishmentChannelId != null) {
+            punishmentChannel = jda.getThreadChannelById(punishmentChannelId);
+        }
+        String reportChannelId = plugin.getConfig().getString("Reports-Channel-Id");
+        if (reportChannelId != null) {
+            reportChannel = jda.getThreadChannelById(reportChannelId);
+        }
+        String deathsChannelId = plugin.getConfig().getString("Deaths-Channel-Id");
+        if (deathsChannelId != null) {
+            deathsChannel = jda.getThreadChannelById(deathsChannelId);
+        }
+        String checkpointsChannelId = plugin.getConfig().getString("Checkpoints-Channel-Id");
+        if (checkpointsChannelId != null) {
+            checkpointsChannel = jda.getThreadChannelById(checkpointsChannelId);
+        }
+        String commandsChannelId = plugin.getConfig().getString("Commands-Channel-Id");
+        if (commandsChannelId != null) {
+            commandsChannel = jda.getThreadChannelById(commandsChannelId);
+        }
+        String linksChannelId = plugin.getConfig().getString("Links-Channel-Id");
+        if (linksChannelId != null) {
+            linksChannel = jda.getThreadChannelById(linksChannelId);
+        }
+        String guildId = plugin.getConfig().getString("Guild-Id");
+        if (guildId != null) {
+            guild = jda.getGuildById(guildId);
+        }
+        String linkedRoleId = plugin.getConfig().getString("Linked-Role-Id");
+        if (linkedRoleId != null && guild != null) {
+            linkedRole = guild.getRoleById(linkedRoleId);
         }
     }
 
     public static void sendMessage(Player player, String content, String type, String extra1, String extra2) {
+        if(!DiscordEnabled) return;
         final SimpleDateFormat f = new SimpleDateFormat("HH:mm:ss z");
         f.setTimeZone(TimeZone.getTimeZone("UTC"));
         if (chatChannel == null) {
@@ -203,6 +203,9 @@ public class HardcourseDiscord {
                 chatChannel.sendMessage(":trophy: **`" + stripAllColors(player.displayName()) + "`** has completed **Season " + extra1 + "**! Their playtime was " + getPlaytime(player) + ". This player has finished hardcourse!").queue();
             }
         }
+        if(type.equals("report")){
+            reportChannel.sendMessage("`" + stripAllColors(player.displayName()) + "` reported `" + extra1 + "` for `" + content + "`").queue();
+        }
         if(type.equals("logs")){
             if(extra1.equals("true")){
                 logsChannel.sendMessage("`[FILTERED] [" + f.format(new Date()) + "] " + stripAllColors(player.getName()) + ": " + content.replaceAll("`", "'") + "`").queue();
@@ -226,6 +229,15 @@ public class HardcourseDiscord {
                 if(!extra2.equals("silent")){
                     chatChannel.sendMessage(":inbox_tray: **`" + stripAllColors(player.displayName()) + "`** joined").queue();
                 }
+            }
+            if(extra1.equals("command")){
+                commandsChannel.sendMessage("`[" + f.format(new Date()) + "] " + player + ": " + content + "`").queue();
+            }
+            if(extra1.equals("deaths")){
+                deathsChannel.sendMessage("`[" + f.format(new Date()) + "] " + player.getName() + " died [#" + content + "]`").queue();
+            }
+            if(extra1.equals("setDeaths")){
+                deathsChannel.sendMessage("`[" + f.format(new Date()) + "] " + extra2 + " had their deaths set to " + content + " by " + stripAllColors(player.getName()) + "`").queue();
             }
         }
     }

@@ -28,9 +28,7 @@ public class onWalk implements Listener {
 
     @EventHandler
     public void onWalkEvent(PlayerMoveEvent event) {
-        if (event.getFrom().getBlockX() == event.getTo().getBlockX() &&
-                event.getFrom().getBlockY() == event.getTo().getBlockY() &&
-                event.getFrom().getBlockZ() == event.getTo().getBlockZ()) return;
+        if (event.getFrom().getBlockX() == event.getTo().getBlockX() && event.getFrom().getBlockY() == event.getTo().getBlockY() && event.getFrom().getBlockZ() == event.getTo().getBlockZ()) return;
 
         Player p = event.getPlayer();
         Location loc = p.getLocation();
@@ -92,18 +90,17 @@ public class onWalk implements Listener {
                             } catch (SQLException e) {return;}
                         }
                     }
-                    if (DiscordEnabled) {
-                        if(playerSeason > 1) {
-                            sendMessage(p, null, "hacks",
-                                    playerSeason + "-" + Double.toString(previousLevel).replace(".0", ""),
-                                    playerSeason + "-" + Double.toString(checkpointNumber).replace(".0", ""));
-                        }
-                        else {
-                            sendMessage(p, null, "hacks",
-                                    Double.toString(previousLevel).replace(".0", ""),
-                                    Double.toString(checkpointNumber).replace(".0", ""));
-                        }
+                    if(playerSeason > 1) {
+                        sendMessage(p, null, "hacks",
+                                playerSeason + "-" + Double.toString(previousLevel).replace(".0", ""),
+                                playerSeason + "-" + Double.toString(checkpointNumber).replace(".0", ""));
                     }
+                    else {
+                        sendMessage(p, null, "hacks",
+                                Double.toString(previousLevel).replace(".0", ""),
+                                Double.toString(checkpointNumber).replace(".0", ""));
+                    }
+
                     if(playerSeason > 1) {
                         Bukkit.broadcast(Colorize("<prefix><accent> " + p.getName() + " <main>skipped from level <accent>" + playerSeason + "-" +
                                 Double.toString(previousLevel).replace(".0", "") + " <main>to level <accent>" + playerSeason + "-" +
@@ -167,7 +164,7 @@ public class onWalk implements Listener {
                             p.sendMessage(Colorize("<prefix>You have reached the end. However, we have reason to believe you are &4cheating<main>. If you are not, please contact a staff member to verify your progress."));
                             return;
                         }
-                        if (DiscordEnabled) sendMessage(p, null, "winning", "3", null);
+                        sendMessage(p, null, "winning", "3", null);
                         p.sendMessage(Colorize("<prefix><accent>Congratulations! <main>You have completed Season 3! There is currently no Season 4, so you have reached the end of the Hardcourse for now. By completing the map, you have unlocked some perks! Try <accnet>/wtp <player><main> to teleport, and <accent>/checkpoint tp <level> [<season>]<main> to teleport to any level."));
                         addRank(p.getUniqueId(), "winner");
                     } else if (!p.hasPermission("hardcourse.staff")) {
@@ -178,7 +175,7 @@ public class onWalk implements Listener {
         }
     }
     private void handleSeasonComplete(Player p, int nextSeason, String discordSeasonId) {
-        if (DiscordEnabled) sendMessage(p, null, "winning", discordSeasonId, null);
+        sendMessage(p, null, "winning", discordSeasonId, null);
         p.sendMessage(Colorize("<prefix><accent>Congratulations! <main>You have completed Season <accent>" + discordSeasonId + "<main>!"));
         p.teleport(Bukkit.getWorld("Season" + nextSeason).getSpawnLocation());
         p.setGameMode(GameMode.ADVENTURE);

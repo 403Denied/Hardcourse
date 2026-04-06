@@ -49,14 +49,13 @@ public final class Hardcourse extends JavaPlugin implements Listener {
         RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
         if(rsp != null) {econ = rsp.getProvider();}
 
-        if(DiscordEnabled) {
-            try {
-                InitJDA();
-            } catch (Exception e) {
-                getLogger().severe("Failed to initialize Discord bot: " + e.getMessage());
-            }
-            sendMessage(null, null, "starting", null, null);
+        try {
+            InitJDA();
+        } catch (Exception e) {
+            getLogger().severe("Failed to initialize Discord bot: " + e.getMessage());
         }
+
+        sendMessage(null, null, "starting", null, null);
 
         getServer().getPluginManager().registerEvents(new ChatReactions(), this);
         getServer().getPluginManager().registerEvents(new onJoin(), this);
@@ -114,11 +113,9 @@ public final class Hardcourse extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable() {
-        if(DiscordEnabled) {
-            sendMessage(null, null, "stopping", null, null);
-            if(jda != null){
-                jda.shutdown();
-            }
+        sendMessage(null, null, "stopping", null, null);
+        if(jda != null){
+            jda.shutdown();
         }
         shutdown();
     }
@@ -137,6 +134,7 @@ public final class Hardcourse extends JavaPlugin implements Listener {
         exemptions = config.getStringList("skip-alert-exemptions");
         applicationQuestions = config.getStringList("application-questions");
     }
+
     public static boolean isSkipExempted(int from, int to) {
         for (String entry : exemptions) {
             String[] parts = entry.split("-");

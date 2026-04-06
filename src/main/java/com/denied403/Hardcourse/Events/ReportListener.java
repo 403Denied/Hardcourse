@@ -5,14 +5,11 @@ import org.bukkit.event.Listener;
 
 import com.denied403.core403.Punishments.Api.ReportEvent;
 
-import static com.denied403.Hardcourse.Discord.HardcourseDiscord.reportChannel;
-import static com.denied403.Hardcourse.Hardcourse.DiscordEnabled;
+import static com.denied403.Hardcourse.Discord.HardcourseDiscord.sendMessage;
 
 public class ReportListener implements Listener {
     @EventHandler
     public void onReportEvent(ReportEvent event){
-        if(DiscordEnabled) {
-            reportChannel.sendMessage("`" + event.getReporter().getName() + "` reported `" + event.getReported().getName() + "` for `" + event.getReason() + "`").queue();
-        }
+        sendMessage(event.getReporter(), event.getReason(), "report", event.getReported().getName(), null);
     }
 }

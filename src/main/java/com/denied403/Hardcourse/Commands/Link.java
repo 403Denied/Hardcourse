@@ -29,10 +29,6 @@ public class Link {
                         player.sendMessage(Colorize("<prefix>You're already linked! Use <accent>/unlink<main> if you want to unlink your account."));
                         return 1;
                     }
-                    if (!DiscordEnabled) {
-                        player.sendMessage(Colorize("<prefix>Discord functionality is currently disabled. Please try again later."));
-                        return 1;
-                    }
                     String code = linkManager.createLinkCode(player.getUniqueId());
                     player.sendMessage(Colorize("<prefix>Your link code is: <accent><click:copy_to_clipboard:'" + code + "'><accent>" + code + "<other> (click to copy)<reset>\n<main>Use the <accent>/link<main> command on Discord to link your account."));
                     return Command.SINGLE_SUCCESS;
@@ -43,11 +39,6 @@ public class Link {
                         .then(Commands.argument("id", StringArgumentType.word())
                                 .executes(ctx -> {
                                     CommandSender sender = ctx.getSource().getSender();
-
-                                    if (!DiscordEnabled) {
-                                        sender.sendMessage(Colorize("<prefix>Discord functionality is currently disabled. Please try again later."));
-                                        return 1;
-                                    }
 
                                     String playerName = StringArgumentType.getString(ctx, "player");
                                     String discordId = StringArgumentType.getString(ctx, "id");
