@@ -7,10 +7,16 @@ import org.bukkit.World;
 import java.io.File;
 import java.sql.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.denied403.Hardcourse.Hardcourse.plugin;
 
 public class CheckpointDatabase {
+
+    //Caches
+    private final Map<UUID, CheckpointData> cache = new ConcurrentHashMap<>();
+    private final Map<String, Location> locationCache = new ConcurrentHashMap<>();
+
     public CheckpointDatabase() {
         try {
             createCheckpointTable();
@@ -96,22 +102,33 @@ public class CheckpointDatabase {
             ps.setInt(2, season);
             ps.setDouble(3, level);
             ps.executeUpdate();
+
+            CheckpointData existing = cache.get(uuid);
+            long levelTime = existing != null ? existing.level_time() : 0L;
+            String discord = existing != null ? existing.discord() : null;
+
+            cache.put(uuid, new CheckpointData(uuid, season, level, levelTime, discord));
         } catch (SQLException e) {
             plugin.getLogger().severe("[HARDCOURSE] Failed to save checkpoint data: " + e.getMessage());
         }
     }
 
     public CheckpointData getCheckpointData(UUID uuid) {
+        if(cache.containsKey(uuid)) return cache.get(uuid);
         String sql = "SELECT season, level, level_time, discord FROM checkpoints WHERE uuid = ?";
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, uuid.toString());
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    int season = rs.getInt("season");
-                    double level = rs.getDouble("level");
-                    long level_time = rs.getLong("level_time");
-                    String discord = rs.getString("discord");
-                    return new CheckpointData(uuid, season, level, level_time, discord);
+                    CheckpointData data = new CheckpointData(
+                            uuid,
+                            rs.getInt("season"),
+                            rs.getDouble("level"),
+                            rs.getLong("level_time"),
+                            rs.getString("discord")
+                    );
+                    cache.put(uuid, data);
+                    return data;
                 }
             }
         } catch (SQLException e) {
@@ -140,16 +157,13 @@ public class CheckpointDatabase {
         setCheckpointData(uuid, curSeason, level);
     }
 
+    public void invalidateCache(UUID uuid) {
+        cache.remove(uuid);
+    }
+
     public long getLevelTime(UUID uuid) {
-        String sql = "SELECT level_time FROM checkpoints WHERE uuid = ?";
-        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, uuid.toString());
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) return rs.getLong("level_time");
-        } catch (SQLException e) {
-            plugin.getLogger().severe("[HARDCOURSE] Failed to get level time: " + e.getMessage());
-        }
-        return 0L;
+        CheckpointData d = getCheckpointData(uuid);
+        return (d != null) ? d.level_time() : 0L;
     }
     public void setLevelTime(UUID uuid, long time) {
         String sql = "UPDATE checkpoints SET level_time = ? WHERE uuid = ?";
@@ -157,6 +171,11 @@ public class CheckpointDatabase {
             ps.setLong(1, time);
             ps.setString(2, uuid.toString());
             ps.executeUpdate();
+
+            CheckpointData existing = cache.get(uuid);
+            if(existing != null) {
+                cache.put(uuid, new CheckpointData(uuid, existing.season(), existing.level(), time, existing.discord()));
+            }
         } catch (SQLException e) {
             plugin.getLogger().severe("[HARDCOURSE] Failed to save level time: " + e.getMessage());
         }
@@ -173,6 +192,11 @@ public class CheckpointDatabase {
             ps.setString(1, uuid.toString());
             ps.setString(2, discordId);
             ps.executeUpdate();
+
+            CheckpointData existing = cache.get(uuid);
+            if(existing != null) {
+                cache.put(uuid, new CheckpointData(uuid, existing.season, existing.level, existing.level_time, discordId));
+            }
         } catch (SQLException e) {
             plugin.getLogger().severe("[HARDCOURSE] Failed to link Discord: " + e.getMessage());
         }
@@ -183,22 +207,19 @@ public class CheckpointDatabase {
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, uuid.toString());
             ps.executeUpdate();
+
+            CheckpointData existing = cache.get(uuid);
+            if (existing != null) {
+                cache.put(uuid, new CheckpointData(uuid, existing.season(), existing.level(), existing.level_time(), null));
+            }
         } catch (SQLException e) {
             plugin.getLogger().severe("[HARDCOURSE] Failed to unlink Discord: " + e.getMessage());
         }
     }
 
     public String getDiscordId(UUID uuid) {
-        String sql = "SELECT discord FROM checkpoints WHERE uuid = ?";
-        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, uuid.toString());
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) return rs.getString("discord");
-            }
-        } catch (SQLException e) {
-            plugin.getLogger().severe("[HARDCOURSE] Failed to get Discord ID: " + e.getMessage());
-        }
-        return null;
+        CheckpointData d = getCheckpointData(uuid);
+        return (d != null) ? d.discord() : null;
     }
 
     public boolean isLinked(UUID uuid) {
@@ -210,6 +231,7 @@ public class CheckpointDatabase {
         String sql = "DELETE FROM checkpoints";
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.executeUpdate();
+            cache.clear();
         } catch (SQLException e) {
             plugin.getLogger().severe("[HARDCOURSE] Failed to delete all checkpoints: " + e.getMessage());
         }
@@ -219,6 +241,7 @@ public class CheckpointDatabase {
         String sql = "DELETE FROM checkpoints WHERE uuid = ?";
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, uuid.toString());
+            cache.remove(uuid);
             ps.executeUpdate();
         } catch (SQLException e) {
             plugin.getLogger().severe("[HARDCOURSE] Failed to delete checkpoint for " + uuid + ": " + e.getMessage());
@@ -296,6 +319,9 @@ public class CheckpointDatabase {
     public record CheckpointData(UUID uuid, int season, double level, long level_time, String discord) {}
 
     //Checkpoint Locations
+
+    private String locationKey(int season, double level) {return season + ":" + level;}
+
     private void createCheckpointLocationsTable() throws SQLException {
         try (Connection conn = getConnection(); Statement stmt = conn.createStatement()) {
             stmt.executeUpdate("""
@@ -370,6 +396,8 @@ public class CheckpointDatabase {
             ps.setInt(7, yaw);
             ps.setString(8, difficulty);
             ps.executeUpdate();
+
+            locationCache.putIfAbsent(locationKey(season, level), loc);
         } catch (SQLException e) {
             plugin.getLogger().severe("[HARDCOURSE] Failed to store checkpoint location: " + e.getMessage());
         }
@@ -384,6 +412,9 @@ public class CheckpointDatabase {
     }
 
     public Location getCheckpointLocation(int season, double level) {
+        String key = locationKey(season, level);
+        if(locationCache.containsKey(key)) return locationCache.get(key);
+
         String sql = """
         SELECT world, x, y, z, yaw
         FROM checkpoint_locations
@@ -406,6 +437,7 @@ public class CheckpointDatabase {
                             rs.getDouble("z")
                     );
                     loc.setYaw(rs.getInt("yaw"));
+                    locationCache.put(key, loc);
                     return loc;
                 }
             }
@@ -436,26 +468,18 @@ public class CheckpointDatabase {
         return null;
     }
     public boolean checkpointLocationExists(int season, double level) {
-        String sql = "SELECT 1 FROM checkpoint_locations WHERE season = ? AND level = ? LIMIT 1";
-
-        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, season);
-            ps.setDouble(2, level);
-            return ps.executeQuery().next();
-        } catch (SQLException e) {
-            return false;
-        }
+        return locationCache.containsKey(locationKey(season, level)) || getCheckpointLocation(season, level) != null;
     }
-    public boolean removeCheckpointLocation(int season, double level) {
+    public void removeCheckpointLocation(int season, double level) {
         String sql = "DELETE FROM checkpoint_locations WHERE season = ? AND level = ?";
 
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, season);
             ps.setDouble(2, level);
-            return ps.executeUpdate() > 0;
+            boolean removed = ps.executeUpdate() > 0;
+            if(removed) locationCache.remove(locationKey(season, level));
         } catch (SQLException e) {
             plugin.getLogger().severe("[HARDCOURSE] Failed to remove checkpoint location: " + e.getMessage());
-            return false;
         }
     }
 }

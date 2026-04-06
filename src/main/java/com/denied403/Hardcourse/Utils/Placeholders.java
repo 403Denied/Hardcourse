@@ -24,8 +24,8 @@ public class Placeholders extends PlaceholderExpansion {
     @Override
     public String onRequest(OfflinePlayer player, String params){
         if(params.equalsIgnoreCase("points") && isDev){return NumberUtil.formatNoUnits((long) econ.getBalance(player));}
-        if(params.equalsIgnoreCase("level")){return String.valueOf(checkpointDatabase.getLevel(player.getUniqueId())).replace(".0", "");}
-        if(params.equalsIgnoreCase("season")){return String.valueOf(checkpointDatabase.getSeason(player.getUniqueId()));}
+        if (params.equalsIgnoreCase("level")) {return String.valueOf(checkpointDatabase.getLevel(player.getUniqueId())).replace(".0", "");}
+        if (params.equalsIgnoreCase("season")) {return checkpointDatabase.getSeason(player.getUniqueId()).toString();}
         if(params.equalsIgnoreCase("formatted-level")){
             if(checkpointDatabase.getSeason(player.getUniqueId()) == 1){return String.valueOf(checkpointDatabase.getLevel(player.getUniqueId())).replace(".0", "");}
             else {return checkpointDatabase.getSeason(player.getUniqueId()) + "-" + String.valueOf(checkpointDatabase.getLevel(player.getUniqueId())).replace(".0", "");}

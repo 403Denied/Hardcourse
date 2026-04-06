@@ -11,6 +11,7 @@ import static com.denied403.Hardcourse.Hardcourse.checkpointDatabase;
 public class onQuit implements Listener {
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e){
+        checkpointDatabase.invalidateCache(e.getPlayer().getUniqueId());
         if(DiscordEnabled) {
             if(!e.getPlayer().hasMetadata("vanished")) {
                 sendMessage(e.getPlayer(), null, "leave", null, null);
@@ -18,9 +19,10 @@ public class onQuit implements Listener {
             sendMessage(e.getPlayer(), null, "logs", "quit", null);
         }
         Double highestLevel = checkpointDatabase.getLevel(e.getPlayer().getUniqueId());
+        if(highestLevel == null) return;
         int season = checkpointDatabase.getSeason(e.getPlayer().getUniqueId());
         if(highestLevel <= 3 && season == 1){
-            if(!e.getPlayer().isOp() || !e.getPlayer().hasPermission("hardcourse.staff") || !checkpointDatabase.isLinked(e.getPlayer().getUniqueId())) {
+            if(!e.getPlayer().isOp() && !e.getPlayer().hasPermission("hardcourse.staff") && !checkpointDatabase.isLinked(e.getPlayer().getUniqueId())) {
                 checkpointDatabase.deleteSpecific(e.getPlayer().getUniqueId());
             }
         }

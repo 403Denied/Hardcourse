@@ -28,6 +28,10 @@ public class onWalk implements Listener {
 
     @EventHandler
     public void onWalkEvent(PlayerMoveEvent event) {
+        if (event.getFrom().getBlockX() == event.getTo().getBlockX() &&
+                event.getFrom().getBlockY() == event.getTo().getBlockY() &&
+                event.getFrom().getBlockZ() == event.getTo().getBlockZ()) return;
+
         Player p = event.getPlayer();
         Location loc = p.getLocation();
         if (p.getLocation().subtract(0, 1, 0).getBlock().getType() == Material.JUKEBOX && p.getLocation().getBlock().getType() == Material.OAK_SIGN) {
