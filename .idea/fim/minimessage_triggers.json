@@ -1,0 +1,18 @@
+{
+  "methods": [
+    "net.kyori.adventure.audience.Audience#sendMessage",
+    "com.denied403.hardcoursecheckpoints.Utils.ColorUtil#Colorize",
+    "com.transfemme.dev.core403.Core403#getUsageColor",
+    "com.transfemme.dev.core403.Commands.Freeze.Freeze#execute",
+    "java.util.logging.Logger#severe"
+  ],
+  "classes": [
+    "com.marcusslover.plus.lib.text.Text",
+    "com.denied403.hardcoursecheckpoints.Points.TempCheckpoint",
+    "com.marcusslover.plus.lib.item.Item",
+    "com.transfemme.dev.core403.Commands.Freeze.Freeze",
+    "com.denied403.hardcoursecheckpoints.Commands.CheckpointCommand",
+    "net.kyori.adventure.text.minimessage.MiniMessage",
+    "net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer"
+  ]
+}
