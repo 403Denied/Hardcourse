@@ -193,7 +193,7 @@ public class CheckpointUpdating {
 
             if (level >= update.start && level <= update.end) {
                 player.teleport(targetLoc);
-                player.setRespawnLocation(targetLoc);
+                player.setRespawnLocation(targetLoc.add(0, 1, 0));
                 checkpointDatabase.setCheckpointData(uuid, 1, update.resetTo);
                 level = update.resetTo;
                 giveItems(player);

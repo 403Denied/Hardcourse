@@ -30,7 +30,7 @@ public class Info {
     static OptionMapping nameOption;
     public static String getUptime(){
         long uptime = ManagementFactory.getRuntimeMXBean().getUptime();
-        return "<t:" + (Instant.now().toEpochMilli() - uptime) / 1000 + ":f>";
+        return "<t:" + (Instant.now().toEpochMilli() - uptime) / 1000 + ":f> (<t:" + (Instant.now().toEpochMilli() - uptime) / 1000 + ":R>)";
     }
     public static double getUsedMemory(){
         long usedMemory = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
