@@ -14,6 +14,7 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
+import net.kyori.adventure.text.event.ClickEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Statistic;
@@ -109,21 +110,15 @@ public class CheckpointCommand {
                                     String playerName = StringArgumentType.getString(ctx, "player");
 
                                     sender.sendMessage(Colorize("<prefix>This will reset <accent>" + playerName + "<main>'s checkpoint data."));
-                                    sender.sendMessage(Colorize("<main>Run <accent>/checkpoint reset " + playerName + " confirm <main>to confirm."));
+                                    sender.sendMessage(Colorize("<main>Click this message to confirm the reset.").clickEvent(ClickEvent.callback(audience -> {
+                                        if(!(audience instanceof Player player)) return;
+                                        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(playerName);
+                                        UUID uuid = offlinePlayer.getUniqueId();
+                                        checkpointDatabase.setCheckpointData(uuid, 1, 0);
+                                        player.sendMessage(Colorize("<prefix>Checkpoint for <accent>" + playerName + " <main>has been reset."));
+                                    })));
                                     return Command.SINGLE_SUCCESS;
                                 })
-                                .then(Commands.literal("confirm")
-                                        .executes(ctx -> {
-                                            CommandSender sender = ctx.getSource().getSender();
-                                            String playerName = StringArgumentType.getString(ctx, "player");
-                                            OfflinePlayer player = Bukkit.getOfflinePlayer(playerName);
-                                            UUID uuid = player.getUniqueId();
-
-                                            checkpointDatabase.setCheckpointData(uuid, 1, 0);
-                                            sender.sendMessage(Colorize("<prefix>Checkpoint for <accent>" + playerName + " <main>has been reset."));
-                                            return Command.SINGLE_SUCCESS;
-                                        })
-                                )
                         )
                 )
 
@@ -132,17 +127,13 @@ public class CheckpointCommand {
                         .executes(ctx -> {
                             CommandSender sender = ctx.getSource().getSender();
                             sender.sendMessage(Colorize("<prefix>This will erase &4ALL<main> checkpoint data."));
-                            sender.sendMessage(Colorize("<main>Run <accent>/checkpoint resetAll confirm <main>to confirm."));
+                            sender.sendMessage(Colorize("Click this message to confirm the reset.").clickEvent(ClickEvent.callback(audience -> {
+                                if(!(audience instanceof Player player)) return;
+                                checkpointDatabase.deleteAll();
+                                player.sendMessage(Colorize("<prefix>All checkpoint data has been wiped."));
+                            })));
                             return Command.SINGLE_SUCCESS;
                         })
-                        .then(Commands.literal("confirm")
-                                .executes(ctx -> {
-                                    CommandSender sender = ctx.getSource().getSender();
-                                    checkpointDatabase.deleteAll();
-                                    sender.sendMessage(Colorize("<prefix>All checkpoint data has been wiped."));
-                                    return Command.SINGLE_SUCCESS;
-                                })
-                        )
                 )
                 .then(Commands.literal("get")
                         .then(Commands.argument("player", StringArgumentType.word())
@@ -192,46 +183,36 @@ public class CheckpointCommand {
                                 return Command.SINGLE_SUCCESS;
                             }
                             if(isDev) {
-                                player.sendMessage(Colorize("<prefix>Are you sure you want to restart? You will be reset at the beginning. Run <accent>/checkpoint restart confirm <main>to confirm. This &4cannot<main> be undone. This will also remove points and remove your rank."));
+                                player.sendMessage(Colorize("<prefix>Are you sure you want to restart? You will be reset at the beginning. This &4cannot<main> be undone. This will also remove points and remove your rank."));
                             } else {
-                                player.sendMessage(Colorize("<prefix>Are you sure you want to restart? You will be reset at the beginning. Run <accent>/checkpoint restart confirm <main>to confirm. This &4cannot<main> be undone. This will also reset your rank."));
+                                player.sendMessage(Colorize("<prefix>Are you sure you want to restart? You will be reset at the beginning. This &4cannot<main> be undone. This will also reset your rank."));
                             }
-                            return Command.SINGLE_SUCCESS;
-                        }).then(Commands.literal("confirm").executes(ctx -> {
-                            CommandSender sender = ctx.getSource().getSender();
-                            if (!(sender instanceof Player player)) {
-                                sender.sendMessage(Colorize("<prefix>This command can only be run by a player!"));
-                                return Command.SINGLE_SUCCESS;
-                            }
-                            player.sendMessage(Colorize("<click:run_command:'checkpoint restart cancel'><prefix>Your checkpoint is about to be reset in <accent>10 seconds<main>. You may cancel by typing <accent>/checkpoint restart cancel<main>, or by clicking this message."));
-                            UUID uuid = player.getUniqueId();
-                            Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                                if (!restartCancelled.contains(player.getUniqueId())) {
-                                    checkpointDatabase.setCheckpointData(uuid, 1, 0);
-                                    player.performCommand("spawn");
-                                    giveItems(player);
-                                    player.setRespawnLocation(player.getWorld().getSpawnLocation());
-                                    player.sendMessage(Colorize("<prefix>You have been reset to the beginning."));
-                                    Luckperms.removeRank(player.getUniqueId());
-                                    player.setStatistic(Statistic.DEATHS, 0);
+                            player.sendMessage(Colorize("<prefix>Click this message to confirm the reset.").clickEvent(ClickEvent.callback(audience -> {
+                                if(!(audience instanceof Player p)) return;
+                                p.sendMessage(Colorize("<prefix>Your checkpoint is about to be reset in <accent>10 seconds<main>. You may cancel this by clicking this message.").clickEvent(ClickEvent.callback(audience2 -> {
+                                    player.sendMessage(Colorize("<prefix>Restart cancelled."));
+                                    restartCancelled.add(player.getUniqueId());
+                                })));
+                                UUID uuid = p.getUniqueId();
+                                Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                                    if (!restartCancelled.contains(p.getUniqueId())) {
+                                        checkpointDatabase.setCheckpointData(uuid, 1, 0);
+                                        p.performCommand("spawn");
+                                        giveItems(p);
+                                        p.setRespawnLocation(p.getWorld().getSpawnLocation());
+                                        p.sendMessage(Colorize("<prefix>You have been reset to the beginning."));
+                                        Luckperms.removeRank(p.getUniqueId());
+                                        p.setStatistic(Statistic.DEATHS, 0);
 
-                                    final SimpleDateFormat f = new SimpleDateFormat("HH:mm:ss z");
-                                    f.setTimeZone(TimeZone.getTimeZone("UTC"));
-                                    checkpointsChannel.sendMessage("`[" + f.format(new Date()) + "] " + player.getName() + " reset back to level 0!`").queue();
-                                }
-                                restartCancelled.remove(player.getUniqueId());
-                            }, 200L);
+                                        final SimpleDateFormat f = new SimpleDateFormat("HH:mm:ss z");
+                                        f.setTimeZone(TimeZone.getTimeZone("UTC"));
+                                        checkpointsChannel.sendMessage("`[" + f.format(new Date()) + "] " + p.getName() + " reset back to level 0!`").queue();
+                                    }
+                                    restartCancelled.remove(player.getUniqueId());
+                                }, 200L);
+                            })));
                             return Command.SINGLE_SUCCESS;
-                        })).then(Commands.literal("cancel").executes(ctx -> {
-                            CommandSender sender = ctx.getSource().getSender();
-                            if (!(sender instanceof Player player)) {
-                                sender.sendMessage(Colorize("<prefix>This command can only be run by a player!"));
-                                return Command.SINGLE_SUCCESS;
-                            }
-                            player.sendMessage(Colorize("<prefix>Restart cancelled."));
-                            restartCancelled.add(player.getUniqueId());
-                            return Command.SINGLE_SUCCESS;
-                        })))
+                        }))
                 .then(Commands.literal("update")
                         .requires(source -> source.getSender().isOp())
                         .then(Commands.argument("season", IntegerArgumentType.integer(1, 3))

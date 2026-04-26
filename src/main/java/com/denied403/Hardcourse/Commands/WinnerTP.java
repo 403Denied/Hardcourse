@@ -39,15 +39,17 @@ public class WinnerTP {
         String targetName = StringArgumentType.getString(context, "player");
         Player target = Bukkit.getPlayerExact(targetName);
 
-        if (target == null) {
+        if (target == null || target.hasMetadata("vanished")) {
             player.sendMessage(Colorize("<prefix>Player not found or not online!"));
             return 0;
         }
 
-        if((target.isOp() || target.hasPermission("hardcourse.staff")) && ! player.isOp()) {
+        if((target.isOp() || target.hasPermission("hardcourse.staff")) && !player.isOp()) {
             player.sendMessage(Colorize("<prefix>You cannot teleport to an operator."));
             return 0;
         }
+
+
 
         player.teleport(target);
         player.sendMessage(Colorize("<prefix>Teleported to <accent>" + targetName));

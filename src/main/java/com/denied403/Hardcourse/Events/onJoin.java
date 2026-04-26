@@ -3,8 +3,6 @@ package com.denied403.Hardcourse.Events;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -12,8 +10,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.Location;
 import org.bukkit.inventory.meta.ItemMeta;
-
-import java.io.File;
 
 import static com.denied403.Hardcourse.Commands.Clock.giveItems;
 import static com.denied403.Hardcourse.Discord.HardcourseDiscord.sendMessage;
@@ -35,33 +31,9 @@ public class onJoin implements Listener {
         sendMessage(player, null, "logs", "join", null);
 
         if(checkpointDatabase.getCheckpointData(player.getUniqueId()) == null) {
-            int season;
-            double level;
-            if(!player.getWorld().getName().startsWith("Season")){
-                season = 1;
-            } else {
-                season = Integer.parseInt(player.getWorld().getName().replace("Season", ""));
-            }
-            File file = new File(plugin.getDataFolder(), "checkpoints.yml");
-            if (!file.exists()) {
-                return;
-            }
-            FileConfiguration config = YamlConfiguration.loadConfiguration(file);
-            if(config.getKeys(false).contains(player.getUniqueId().toString())) {
-                level = config.getDouble(player.getUniqueId().toString());
-                config.set(player.getUniqueId().toString(), null);
-                try {
-                    config.save(file);
-                } catch (Exception e) {
-                    Bukkit.getLogger().severe("Failed to save checkpoints file: " + e.getMessage());
-                }
-                player.sendMessage(Colorize("<prefix>Your checkpoint data has successfully been migrated from legacy storage to the new system. Level: <accent>" + String.valueOf(level).replace(".0", "") + "<main> Season: <accent>" + season + "<main>. If you believe there is an error with these numbers, please contact an administrator."));
-                checkpointDatabase.setCheckpointData(player.getUniqueId(), season, level);
-            } else {
-                checkpointDatabase.setCheckpointData(player.getUniqueId(), 1, 0);
-                player.teleport(player.getWorld().getSpawnLocation());
-                player.setRespawnLocation(player.getLocation());
-            }
+            checkpointDatabase.setCheckpointData(player.getUniqueId(), 1, 0);
+            player.teleport(player.getWorld().getSpawnLocation());
+            player.setRespawnLocation(player.getLocation());
         }
         if(checkpointDatabase.getSeason(player.getUniqueId()) == 0 || checkpointDatabase.getSeason(player.getUniqueId()) == null) {
             checkpointDatabase.setSeason(player.getUniqueId(), 1);

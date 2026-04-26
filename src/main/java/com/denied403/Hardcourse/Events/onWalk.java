@@ -63,6 +63,7 @@ public class onWalk implements Listener {
             if(event.getPlayer().getGameMode() == GameMode.SPECTATOR){
                 return;
             }
+            if(event.getPlayer().hasMetadata("vanished")) return;
 
             double previousLevel = checkpointDatabase.getLevel(uuid) != null ? checkpointDatabase.getLevel(uuid) : 0;
 
@@ -128,7 +129,6 @@ public class onWalk implements Listener {
                     p.sendMessage(Colorize("<prefix>You can't set a checkpoint here! Please refrain from making any more progress, and contact an administrator to fix the issue!"));
                     return;
                 }
-                if(p.hasMetadata("vanished")) {return;}
                 p.playSound(loc, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
                 if(isDev) {
                     int pointsToAdd = 10 + random.nextInt(11);
