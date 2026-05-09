@@ -145,31 +145,29 @@ public class onWalk implements Listener {
                     checkpointDatabase.storeCheckpointLocationIfAbsent(season, checkpointNumber, loc.subtract(0, 1, 0), difficulty);
                 }
                 if (season == 1 && checkpointNumber == 543.0) {
-                    if (previousLevel >= 542.0) {
+                    if (previousLevel >= 542.0 || p.hasPermission("hardcourse.staff")) {
                         handleSeasonComplete(p, 2, "1");
                     } else {
                         p.sendMessage(Colorize("<prefix>You have reached the end. However, we have reason to believe you are &4cheating<main>. If you are not, please contact a staff member to verify your progress."));
                     }
                 }
                 if (season == 2 && checkpointNumber == 365.0) {
-                    if (previousLevel >= 363.0) {
+                    if (previousLevel >= 363.0 || p.hasPermission("hardcourse.staff")) {
                         handleSeasonComplete(p, 3, "2");
                     } else {
                         p.sendMessage(Colorize("<prefix>You have reached the end. However, we have reason to believe you are &4cheating<main>. If you are not, please contact a staff member to verify your progress."));
                     }
                 }
                 if (season == 3 && checkpointNumber == 240.0) {
-                    if (previousLevel >= 238.0) {
-                        if(p.getStatistic(Statistic.PLAY_ONE_MINUTE) < 60 && ! p.hasPermission("hardcourse.staff")) {
-                            p.sendMessage(Colorize("<prefix>You have reached the end. However, we have reason to believe you are &4cheating<main>. If you are not, please contact a staff member to verify your progress."));
-                            return;
-                        }
-                        sendMessage(p, null, "winning", "3", null);
-                        p.sendMessage(Colorize("<prefix><accent>Congratulations! <main>You have completed Season 3! There is currently no Season 4, so you have reached the end of the Hardcourse for now. By completing the map, you have unlocked some perks! Try <accnet>/wtp <player><main> to teleport, and <accent>/checkpoint tp <level> [<season>]<main> to teleport to any level."));
-                        addRank(p.getUniqueId(), "winner");
-                    } else if (!p.hasPermission("hardcourse.staff")) {
+                    if (previousLevel >= 238.0 || p.hasPermission("hardcourse.staff")) {
                         p.sendMessage(Colorize("<prefix>You have reached the end. However, we have reason to believe you are &4cheating<main>. If you are not, please contact a staff member to verify your progress."));
+                        return;
                     }
+                    sendMessage(p, null, "winning", "3", null);
+                    p.sendMessage(Colorize("<prefix><accent>Congratulations! <main>You have completed Season 3! There is currently no Season 4, so you have reached the end of the Hardcourse for now. By completing the map, you have unlocked some perks! Try <accnet>/wtp <player><main> to teleport, and <accent>/checkpoint tp <level> [<season>]<main> to teleport to any level."));
+                    addRank(p.getUniqueId(), "winner");
+                } else if (!p.hasPermission("hardcourse.staff")) {
+                    p.sendMessage(Colorize("<prefix>You have reached the end. However, we have reason to believe you are &4cheating<main>. If you are not, please contact a staff member to verify your progress."));
                 }
             }
         }
