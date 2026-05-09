@@ -25,10 +25,7 @@ import org.bukkit.Statistic;
 import org.bukkit.entity.Player;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TimeZone;
+import java.util.*;
 
 import static com.denied403.Hardcourse.Hardcourse.*;
 import static com.denied403.core403.Util.ColorUtil.stripAllColors;
@@ -143,11 +140,19 @@ public class HardcourseDiscord {
         final SimpleDateFormat f = new SimpleDateFormat("HH:mm:ss z");
         f.setTimeZone(TimeZone.getTimeZone("UTC"));
         if (chatChannel == null) {
-            player.sendMessage("Chat channel not found!");
+            if(!(player == null)) {
+                player.sendMessage("Chat channel not found!");
+            } else {
+                plugin.getLogger().warning("Chat channel not found!");
+            }
             return;
         }
-        if (staffChatChannel == null) {
-            player.sendMessage("Staff chat channel not found!");
+        if (staffChatChannel == null ) {
+            if(!(player == null)) {
+                player.sendMessage("Staff chat channel not found!");
+            } else {
+                plugin.getLogger().warning("Staff chat channel not found!");
+            }
             return;
         }
         if (type.equals("staffchat")) {
