@@ -166,8 +166,6 @@ public class onWalk implements Listener {
                     sendMessage(p, null, "winning", "3", null);
                     p.sendMessage(Colorize("<prefix><accent>Congratulations! <main>You have completed Season 3! There is currently no Season 4, so you have reached the end of the Hardcourse for now. By completing the map, you have unlocked some perks! Try <accnet>/wtp <player><main> to teleport, and <accent>/checkpoint tp <level> [<season>]<main> to teleport to any level."));
                     addRank(p.getUniqueId(), "winner");
-                } else if (!p.hasPermission("hardcourse.staff")) {
-                    p.sendMessage(Colorize("<prefix>You have reached the end. However, we have reason to believe you are &4cheating<main>. If you are not, please contact a staff member to verify your progress."));
                 }
             }
         }

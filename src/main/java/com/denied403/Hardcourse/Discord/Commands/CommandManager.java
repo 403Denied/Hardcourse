@@ -66,6 +66,7 @@ public class CommandManager extends ListenerAdapter {
                 .addOptions(punishments)
                 .addOption(OptionType.BOOLEAN, "warn", "Warn the player if available", false)
                 .addOption(OptionType.STRING, "note", "The note for this punishment", false)
+                .addOption(OptionType.BOOLEAN, "silent", "Make the punishment silent", false)
         );
         event.getGuild().updateCommands().addCommands(commandData).queue();
     }
