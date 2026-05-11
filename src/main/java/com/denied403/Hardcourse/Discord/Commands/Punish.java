@@ -16,6 +16,7 @@ import static com.denied403.Hardcourse.Hardcourse.plugin;
 import static com.denied403.Hardcourse.Utils.Luckperms.hasLuckPermsPermission;
 import static com.denied403.core403.Util.ConfigManager.bypassPunishBlacklist;
 import static com.denied403.core403.Util.ConfigManager.punishBlacklist;
+import static com.denied403.core403.Punishments.GUIs.PunishGUIManager.silentPlayers;
 
 public class Punish {
     public static void run(SlashCommandInteractionEvent event) {
@@ -25,6 +26,7 @@ public class Punish {
         String reasonName = event.getOption("reason") != null ? event.getOption("reason").getAsString() : null;
         String notes = event.getOption("note") != null ? event.getOption("note").getAsString() : null;
         boolean isWarn = event.getOption("warn") != null && event.getOption("warn").getAsBoolean();
+        boolean silent = event.getOption("silent") != null && event.getOption("silent").getAsBoolean();
         if (targetName == null || reasonName == null) {
             event.getHook().sendMessage("❌ Player or reason not specified.").queue();
             return;
@@ -59,6 +61,11 @@ public class Punish {
                 if(punishBlacklist.contains(target.getUniqueId().toString()) && !bypassPunishBlacklist.contains(staffUUID.toString())) {
                     event.reply("❌ You cannot punish this player!").setEphemeral(true).queue();
                     return;
+                }
+                if(silent){
+                    silentPlayers.add(staff.getUniqueId());
+                } else {
+                    silentPlayers.remove(staff.getUniqueId());
                 }
                 long expires;
                 if(notes != null) {

@@ -259,8 +259,6 @@ public class PunishmentListener extends ListenerAdapter implements Listener {
             }
             String reason = event.getValue("reason").getAsString();
             editPunishment(punishmentId, linkedUuid, duration, reason);
-            EmbedBuilder noteEmbed = new EmbedBuilder().setColor(Color.GREEN).setDescription("✅ Successfully updated duration of punishment `" + punishmentId + "` to `" +  duration + "`.");
-            event.replyEmbeds(noteEmbed.build()).setEphemeral(true).queue();
         }
     }
 
@@ -314,6 +312,7 @@ public class PunishmentListener extends ListenerAdapter implements Listener {
             punishmentChannel.sendMessageEmbeds(punishmentEmbed.build()).setComponents(ActionRow.of(revert, note)).queue();
         }
     }
+
     @EventHandler
     public void onEdit(PunishmentEditEvent event){
         String playerName = Bukkit.getOfflinePlayer(event.getTargetUUID()).getName();
@@ -321,9 +320,23 @@ public class PunishmentListener extends ListenerAdapter implements Listener {
         String id = event.getPunishmentID();
         String reason = event.getReason();
         String punishmentReason = event.getPunishmentReason();
-        String punishmentType = event.getPunishmentType().toLowerCase();
+        String punishment = "";
+        if(event.getPunishmentType().equalsIgnoreCase("ban")){punishment = "Ban";}
+        if(event.getPunishmentType().equalsIgnoreCase("mute")){punishment = "Mute";}
+        if(event.getPunishmentType().equalsIgnoreCase("warn")){punishment = "Warn";}
+        String durationString;
+        long durationMs = event.getNewDuration();
+        if(durationMs == -1){durationString = "Never";} else {durationString = "<t:" + (Instant.now().toEpochMilli() + durationMs) / 1000L + ":R>";}
         if(DiscordEnabled) {
-            punishmentChannel.sendMessage("`" + staffName + "` edited a " + punishmentType + " from `" + playerName + "` for `" + punishmentReason + "`").queue();
+            EmbedBuilder punishmentEmbed = new EmbedBuilder()
+                    .setColor(Color.RED)
+                    .setTitle(punishment + " Edited")
+                    .setThumbnail("https://mc-heads.net/avatar/" + event.getTargetUUID() + ".png")
+                    .setDescription("**ID:** " + id + "\n**Staff:** `" + staffName + "`\n**Target:** `" + playerName + "`\n**Reason:** " + punishmentReason + "\n**New Expiration:** " + durationString + "\n**Notes:** " + reason);
+            Button revert = Button.danger("punishment_revert:" + id, "Revert");
+            Button note = Button.primary("punishment_addNote:" + id, "Add Note");
+            Button duration = Button.success("punishment_modify:" + id, "Change Duration");
+            punishmentChannel.sendMessageEmbeds(punishmentEmbed.build()).setComponents(ActionRow.of(revert, note, duration)).queue();
         }
     }
 }
