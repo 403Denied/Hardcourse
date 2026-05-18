@@ -236,7 +236,7 @@ public class HardcourseDiscord {
                 }
             }
             if(extra1.equals("command")){
-                commandsChannel.sendMessage("`[" + f.format(new Date()) + "] " + player + ": " + content + "`").queue();
+                commandsChannel.sendMessage("`[" + f.format(new Date()) + "] " + player.getName() + ": " + content + "`").queue();
             }
             if(extra1.equals("deaths")){
                 deathsChannel.sendMessage("`[" + f.format(new Date()) + "] " + player.getName() + " died [#" + content + "]`").queue();
