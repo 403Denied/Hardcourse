@@ -326,7 +326,7 @@ public class PunishmentListener extends ListenerAdapter implements Listener {
         if(event.getPunishmentType().equalsIgnoreCase("warn")){punishment = "Warn";}
         String durationString;
         long durationMs = event.getNewDuration();
-        if(durationMs == -1){durationString = "Never";} else {durationString = "<t:" + (Instant.now().toEpochMilli() + durationMs) / 1000L + ":R>";}
+        if(durationMs == -1){durationString = "Never";} else {durationString = "<t:" + durationMs / 1000L + ":R>";}
         if(DiscordEnabled) {
             EmbedBuilder punishmentEmbed = new EmbedBuilder()
                     .setColor(Color.RED)
