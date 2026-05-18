@@ -15,7 +15,7 @@ public class onDeath implements Listener {
     public void onDeathEvent(PlayerRespawnEvent e) {
         Player player = e.getPlayer();
         sendMessage(player, String.valueOf(player.getStatistic(Statistic.DEATHS)), "logs", "deaths", null);
-        if(!player.isOp() || !player.hasPermission("hardcourse.staff")){
+        if(!player.isOp() && !player.hasPermission("hardcourse.staff")){
             if(player.getInventory().getItemInOffHand().equals(ItemStack.of(Material.ELYTRA))) {
                 player.getInventory().setItemInOffHand(new ItemStack(Material.AIR));
             }
