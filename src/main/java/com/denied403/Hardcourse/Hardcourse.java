@@ -13,6 +13,7 @@ import com.denied403.Hardcourse.Utils.*;
 import com.denied403.core403.Commands.Economy.Vault;
 import com.denied403.core403.Core403;
 import com.denied403.core403.Punishments.Database.PunishmentDatabase;
+import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
@@ -80,27 +81,28 @@ public final class Hardcourse extends JavaPlugin implements Listener {
             getServer().getPluginManager().registerEvents(new DoubleJump(), this);
             getServer().getPluginManager().registerEvents(new TempCheckpoint(), this);
         }
-        getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, cmd -> {
-            cmd.registrar().register(Clock.createCommand("clock"));
-            cmd.registrar().register(CheckpointCommand.createCommand("checkpoint"));
-            cmd.registrar().register(CheckpointCommand.createCommand("checkpoints"));
-            cmd.registrar().register(EndChatGame.createCommand("endChatGame"));
-            cmd.registrar().register(EndChatGame.createCommand("ecg"));
-            cmd.registrar().register(RunChatGame.createCommand("runChatGame"));
-            cmd.registrar().register(RunChatGame.createCommand("rcg"));
-            cmd.registrar().register(ReloadHardcourse.createCommand("reloadHardcourse"));
-            cmd.registrar().register(WinnerTP.createCommand("winnerTp"));
-            cmd.registrar().register(WinnerTP.createCommand("wtp"));
-            cmd.registrar().register(ToggleDiabolicalUnscrambles.createCommand("toggleDiabolicalUnscrambles"));
-            cmd.registrar().register(Deaths.createCommand("deaths"));
+        getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
+            Commands registrar = event.registrar();
+            registrar.register(Clock.createCommand("clock"));
+            registrar.register(CheckpointCommand.createCommand("checkpoint"));
+            registrar.register(CheckpointCommand.createCommand("checkpoints"));
+            registrar.register(EndChatGame.createCommand("endChatGame"));
+            registrar.register(EndChatGame.createCommand("ecg"));
+            registrar.register(RunChatGame.createCommand("runChatGame"));
+            registrar.register(RunChatGame.createCommand("rcg"));
+            registrar.register(ReloadHardcourse.createCommand("reloadHardcourse"));
+            registrar.register(WinnerTP.createCommand("winnerTp"));
+            registrar.register(WinnerTP.createCommand("wtp"));
+            registrar.register(ToggleDiabolicalUnscrambles.createCommand("toggleDiabolicalUnscrambles"));
+            registrar.register(Deaths.createCommand("deaths"));
             if(DiscordEnabled) {
-                cmd.registrar().register(Link.createCommand("link"));
-                cmd.registrar().register(Unlink.createCommand("unlink"));
+                registrar.register(Link.createCommand("link"));
+                registrar.register(Unlink.createCommand("unlink"));
             }
             if(isDev) {
-                cmd.registrar().register(Clock.createCommand("shop"));
-                cmd.registrar().register(EndTrail.createCommand("endTrail"));
-                cmd.registrar().register(OminousTrail.createCommand("ominousTrail"));
+                registrar.register(Clock.createCommand("shop"));
+                registrar.register(EndTrail.createCommand("endTrail"));
+                registrar.register(OminousTrail.createCommand("ominousTrail"));
             }
         });
 
