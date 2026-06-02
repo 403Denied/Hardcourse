@@ -95,14 +95,17 @@ public final class Hardcourse extends JavaPlugin implements Listener {
             registrar.register(WinnerTP.createCommand("wtp"));
             registrar.register(ToggleDiabolicalUnscrambles.createCommand("toggleDiabolicalUnscrambles"));
             registrar.register(Deaths.createCommand("deaths"));
+            registrar.register(EndTrail.createCommand("endTrail"));
+            registrar.register(OminousTrail.createCommand("ominousTrail"));
+            registrar.register(Skip.createCommand("skip"));
+            registrar.register(Skip.createCommand("skips"));
             if(DiscordEnabled) {
                 registrar.register(Link.createCommand("link"));
                 registrar.register(Unlink.createCommand("unlink"));
             }
             if(isDev) {
                 registrar.register(Clock.createCommand("shop"));
-                registrar.register(EndTrail.createCommand("endTrail"));
-                registrar.register(OminousTrail.createCommand("ominousTrail"));
+
             }
         });
 
