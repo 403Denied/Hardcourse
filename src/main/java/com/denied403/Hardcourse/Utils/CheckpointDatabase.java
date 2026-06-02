@@ -47,6 +47,7 @@ public class CheckpointDatabase {
                         season INTEGER NOT NULL DEFAULT 0,
                         level REAL NOT NULL DEFAULT 0,
                         level_time INTEGER NOT NULL DEFAULT 0,
+                        skips INTEGER NOT NULL DEFAULT 0,
                         discord TEXT
                     )
                 """;
@@ -62,6 +63,7 @@ public class CheckpointDatabase {
         expectedColumns.put("season", "INTEGER NOT NULL DEFAULT 0");
         expectedColumns.put("level", "REAL NOT NULL DEFAULT 0");
         expectedColumns.put("level_time", "INTEGER NOT NULL DEFAULT 0");
+        expectedColumns.put("skips", "INTEGER NOT NULL DEFAULT 0");
         expectedColumns.put("discord", "TEXT");
 
         try (Connection conn = getConnection()) {
@@ -106,8 +108,9 @@ public class CheckpointDatabase {
             CheckpointData existing = cache.get(uuid);
             long levelTime = existing != null ? existing.level_time() : 0L;
             String discord = existing != null ? existing.discord() : null;
+            int skips = existing != null ? existing.skips() : 0;
 
-            cache.put(uuid, new CheckpointData(uuid, season, level, levelTime, discord));
+            cache.put(uuid, new CheckpointData(uuid, season, level, levelTime, skips, discord));
         } catch (SQLException e) {
             plugin.getLogger().severe("[HARDCOURSE] Failed to save checkpoint data: " + e.getMessage());
         }
@@ -115,7 +118,7 @@ public class CheckpointDatabase {
 
     public CheckpointData getCheckpointData(UUID uuid) {
         if(cache.containsKey(uuid)) return cache.get(uuid);
-        String sql = "SELECT season, level, level_time, discord FROM checkpoints WHERE uuid = ?";
+        String sql = "SELECT season, level, level_time, skips, discord FROM checkpoints WHERE uuid = ?";
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, uuid.toString());
             try (ResultSet rs = ps.executeQuery()) {
@@ -125,6 +128,7 @@ public class CheckpointDatabase {
                             rs.getInt("season"),
                             rs.getDouble("level"),
                             rs.getLong("level_time"),
+                            rs.getInt("skips"),
                             rs.getString("discord")
                     );
                     cache.put(uuid, data);
@@ -157,6 +161,27 @@ public class CheckpointDatabase {
         setCheckpointData(uuid, curSeason, level);
     }
 
+    public void setSkips(UUID uuid, int skips) {
+        String sql = "UPDATE checkpoints SET skips = ? WHERE uuid = ?";
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, skips);
+            ps.setString(2, uuid.toString());
+            ps.executeUpdate();
+
+            CheckpointData existing = cache.get(uuid);
+            if(existing != null) {
+                cache.put(uuid, new CheckpointData(uuid, existing.season(), existing.level(), existing.level_time(), skips, existing.discord()));
+            }
+        } catch (SQLException e) {
+            plugin.getLogger().severe("[HARDCOURSE] Failed to save skips: " + e.getMessage());
+        }
+    }
+
+    public int getSkips(UUID uuid) {
+        CheckpointData d = getCheckpointData(uuid);
+        return (d != null) ? d.skips : 1;
+    }
+
     public void invalidateCache(UUID uuid) {
         cache.remove(uuid);
     }
@@ -174,7 +199,7 @@ public class CheckpointDatabase {
 
             CheckpointData existing = cache.get(uuid);
             if(existing != null) {
-                cache.put(uuid, new CheckpointData(uuid, existing.season(), existing.level(), time, existing.discord()));
+                cache.put(uuid, new CheckpointData(uuid, existing.season(), existing.level(), time, existing.skips(), existing.discord()));
             }
         } catch (SQLException e) {
             plugin.getLogger().severe("[HARDCOURSE] Failed to save level time: " + e.getMessage());
@@ -195,7 +220,7 @@ public class CheckpointDatabase {
 
             CheckpointData existing = cache.get(uuid);
             if(existing != null) {
-                cache.put(uuid, new CheckpointData(uuid, existing.season, existing.level, existing.level_time, discordId));
+                cache.put(uuid, new CheckpointData(uuid, existing.season, existing.level, existing.level_time, existing.skips, discordId));
             }
         } catch (SQLException e) {
             plugin.getLogger().severe("[HARDCOURSE] Failed to link Discord: " + e.getMessage());
@@ -210,7 +235,7 @@ public class CheckpointDatabase {
 
             CheckpointData existing = cache.get(uuid);
             if (existing != null) {
-                cache.put(uuid, new CheckpointData(uuid, existing.season(), existing.level(), existing.level_time(), null));
+                cache.put(uuid, new CheckpointData(uuid, existing.season(), existing.level(), existing.level_time(), existing.skips(), null));
             }
         } catch (SQLException e) {
             plugin.getLogger().severe("[HARDCOURSE] Failed to unlink Discord: " + e.getMessage());
@@ -250,7 +275,7 @@ public class CheckpointDatabase {
 
     public List<CheckpointData> getAllSortedBySeasonLevel() {
         List<CheckpointData> list = new ArrayList<>();
-        String sql = "SELECT uuid, season, level, level_time, discord FROM checkpoints ORDER BY season DESC, level DESC";
+        String sql = "SELECT uuid, season, level, level_time, skips, discord FROM checkpoints ORDER BY season DESC, level DESC";
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -261,6 +286,7 @@ public class CheckpointDatabase {
                         rs.getInt("season"),
                         rs.getDouble("level"),
                         rs.getLong("level_time"),
+                        rs.getInt("skips"),
                         rs.getString("discord")
                 ));
             }
@@ -316,7 +342,7 @@ public class CheckpointDatabase {
     }
 
 
-    public record CheckpointData(UUID uuid, int season, double level, long level_time, String discord) {}
+    public record CheckpointData(UUID uuid, int season, double level, long level_time, int skips, String discord) {}
 
     //Checkpoint Locations
 

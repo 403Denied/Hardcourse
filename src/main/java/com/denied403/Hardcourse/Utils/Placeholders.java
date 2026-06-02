@@ -23,7 +23,7 @@ public class Placeholders extends PlaceholderExpansion {
     public boolean persist(){return true;}
     @Override
     public String onRequest(OfflinePlayer player, String params){
-        if(params.equalsIgnoreCase("points") && isDev){return NumberUtil.formatNoUnits((long) econ.getBalance(player));}
+        if(params.equalsIgnoreCase("points")){return NumberUtil.formatNoUnits((long) econ.getBalance(player));}
         if (params.equalsIgnoreCase("level")) {return String.valueOf(checkpointDatabase.getLevel(player.getUniqueId())).replace(".0", "");}
         if (params.equalsIgnoreCase("season")) {return checkpointDatabase.getSeason(player.getUniqueId()).toString();}
         if(params.equalsIgnoreCase("formatted-level")){
@@ -35,6 +35,7 @@ public class Placeholders extends PlaceholderExpansion {
         if(params.equalsIgnoreCase("prefix")){return prefix;}
         if(params.equalsIgnoreCase("level-time")){return getCurrentLevelTimeFormatted(player.getUniqueId());}
         if(params.equalsIgnoreCase("nickname")){return getNick(player.getUniqueId());}
+        if(params.equalsIgnoreCase("skips")){return String.valueOf(checkpointDatabase.getSkips(player.getUniqueId()));}
         return null;
     }
 }
