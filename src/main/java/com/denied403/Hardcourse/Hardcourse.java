@@ -20,6 +20,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import org.bukkit.event.Listener;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -35,6 +36,7 @@ public final class Hardcourse extends JavaPlugin implements Listener {
     public static PunishmentDatabase punishmentDatabase;
     public static CheckpointUpdating checkpointUpdating;
     public static Economy econ;
+    public static PluginManager eventRegistrar;
 
     @Override
     public void onEnable() {
@@ -43,6 +45,7 @@ public final class Hardcourse extends JavaPlugin implements Listener {
         linkManager = new LinkManager();
         punishmentDatabase = Core403.database;
         checkpointUpdating = new CheckpointUpdating();
+        eventRegistrar = Bukkit.getPluginManager();
         saveDefaultConfig();
         loadConfigValues();
         if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {new Placeholders().register();}
@@ -58,29 +61,24 @@ public final class Hardcourse extends JavaPlugin implements Listener {
 
         sendMessage(null, null, "starting", null, null);
 
-        getServer().getPluginManager().registerEvents(new ChatReactions(), this);
-        getServer().getPluginManager().registerEvents(new onJoin(), this);
-        getServer().getPluginManager().registerEvents(new onClick(), this);
-        getServer().getPluginManager().registerEvents(new onWalk(), this);
-        getServer().getPluginManager().registerEvents(new onChat(), this);
-        getServer().getPluginManager().registerEvents(new onHunger(), this);
-        getServer().getPluginManager().registerEvents(new PunishmentListener(), this);
-        getServer().getPluginManager().registerEvents(new onQuit(), this);
-        getServer().getPluginManager().registerEvents(new onSneak(), this);
-        getServer().getPluginManager().registerEvents(new onVanish(), this);
-        getServer().getPluginManager().registerEvents(new onDeath(), this);
-        getServer().getPluginManager().registerEvents(new onCommand(), this);
-        getServer().getPluginManager().registerEvents(new ReportListener(), this);
-        getServer().getPluginManager().registerEvents(new CheckpointLevelTimer(), this);
-        if(isDev) {
-            getServer().getPluginManager().registerEvents(new PointsShop(), this);
-            getServer().getPluginManager().registerEvents(new OminousTrail(this), this);
-            getServer().getPluginManager().registerEvents(new onPortalEnter(), this);
-            getServer().getPluginManager().registerEvents(new EndTrail(this), this);
-            getServer().getPluginManager().registerEvents(new JumpBoost(), this);
-            getServer().getPluginManager().registerEvents(new DoubleJump(), this);
-            getServer().getPluginManager().registerEvents(new TempCheckpoint(), this);
-        }
+        eventRegistrar.registerEvents(new MiscEvents(), this);
+        eventRegistrar.registerEvents(new ChatReactions(), this);
+        eventRegistrar.registerEvents(new onJoin(), this);
+        eventRegistrar.registerEvents(new onClick(), this);
+        eventRegistrar.registerEvents(new onWalk(), this);
+        eventRegistrar.registerEvents(new onChat(), this);
+        eventRegistrar.registerEvents(new PunishmentListener(), this);
+        eventRegistrar.registerEvents(new onQuit(), this);
+        eventRegistrar.registerEvents(new onSneak(), this);
+        eventRegistrar.registerEvents(new onDeath(), this);
+        eventRegistrar.registerEvents(new CheckpointLevelTimer(), this);
+        eventRegistrar.registerEvents(new OminousTrail(this), this);
+        eventRegistrar.registerEvents(new EndTrail(this), this);
+        eventRegistrar.registerEvents(new PointsShop(), this);
+        eventRegistrar.registerEvents(new JumpBoost(), this);
+        eventRegistrar.registerEvents(new DoubleJump(), this);
+        eventRegistrar.registerEvents(new TempCheckpoint(), this);
+
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
             Commands registrar = event.registrar();
             registrar.register(Clock.createCommand("clock"));
@@ -102,10 +100,6 @@ public final class Hardcourse extends JavaPlugin implements Listener {
             if(DiscordEnabled) {
                 registrar.register(Link.createCommand("link"));
                 registrar.register(Unlink.createCommand("unlink"));
-            }
-            if(isDev) {
-                registrar.register(Clock.createCommand("shop"));
-
             }
         });
 
