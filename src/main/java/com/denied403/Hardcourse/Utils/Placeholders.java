@@ -2,6 +2,7 @@ package com.denied403.Hardcourse.Utils;
 
 import com.denied403.core403.Util.NumberUtil;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
+import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
 
@@ -36,6 +37,7 @@ public class Placeholders extends PlaceholderExpansion {
         if(params.equalsIgnoreCase("level-time")){return getCurrentLevelTimeFormatted(player.getUniqueId());}
         if(params.equalsIgnoreCase("nickname")){return getNick(player.getUniqueId());}
         if(params.equalsIgnoreCase("skips")){return String.valueOf(checkpointDatabase.getSkips(player.getUniqueId()));}
+        if(params.equalsIgnoreCase("vanish")){return Bukkit.getPlayer(player.getUniqueId()).hasMetadata("vanished") ? "&l[V] " : "";}
         return null;
     }
 }

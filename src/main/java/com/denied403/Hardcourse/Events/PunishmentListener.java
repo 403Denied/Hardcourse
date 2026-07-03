@@ -96,7 +96,7 @@ public class PunishmentListener extends ListenerAdapter implements Listener {
             EmbedBuilder punishmentEmbed = new EmbedBuilder()
                     .setTitle(punishment + " Issued")
                     .setDescription("**ID:** " + event.getPunishmentId() + "\n**Staff:** `" + event.getStaff() + "`\n**Target:** `" + playerName + "`\n**Reason:** " + reason + "\n**Expires:** " + durationString + "\n**Note:** " + (event.getNotes() == null ? "None" : event.getNotes()))
-                    .setThumbnail("https://mc-heads.net/avatar/" + event.getTargetUUID() + ".png")
+                    .setThumbnail("https://mc-heads.net/body/" + event.getTargetUUID() + "/left.png")
                     .setColor(Color.RED);
             Button revert = Button.danger("punishment_revert:" + event.getPunishmentId(), "Revert");
             Button note = Button.primary("punishment_addNote:" + event.getPunishmentId(), "Add Note");
@@ -284,7 +284,7 @@ public class PunishmentListener extends ListenerAdapter implements Listener {
             EmbedBuilder punishmentEmbed = new EmbedBuilder()
                     .setTitle("Name Ban Issued")
                     .setDescription("**ID:** " + event.getPunishmentId() + "\n**Staff:** " + staffName + "\n**Target:** " + playerName)
-                    .setThumbnail("https://mc-heads.net/avatar/" + event.getTargetUUID() + ".png")
+                    .setThumbnail("https://mc-heads.net/body/" + event.getTargetUUID() + "/left.png")
                     .setColor(Color.RED);
             punishmentChannel.sendMessageEmbeds(punishmentEmbed.build()).queue();
         }
@@ -305,7 +305,7 @@ public class PunishmentListener extends ListenerAdapter implements Listener {
             EmbedBuilder punishmentEmbed = new EmbedBuilder()
                     .setTitle("IP Ban Issued")
                     .setDescription("**ID:** " + event.getPunishmentId() + "\n**Staff:** " + staffName + "\n**Target" + (targetUUIDs.size() > 1 ? "s:** " : ":** ") + String.join(", ", targetNames) + "\n**Note:** " + notes)
-                    .setThumbnail("https://mc-heads.net/avatar/" + event.getTargetUUIDs().getFirst() + ".png")
+                    .setThumbnail("https://mc-heads.net/body/" + event.getTargetUUIDs().getFirst() + "/left.png")
                     .setColor(Color.RED);
             Button revert = Button.danger("punishment_revert:" + event.getPunishmentId(), "Revert");
             Button note = Button.primary("punishment_addNote:" + event.getPunishmentId(), "Add Note");
@@ -331,7 +331,7 @@ public class PunishmentListener extends ListenerAdapter implements Listener {
             EmbedBuilder punishmentEmbed = new EmbedBuilder()
                     .setColor(Color.RED)
                     .setTitle(punishment + " Edited")
-                    .setThumbnail("https://mc-heads.net/avatar/" + event.getTargetUUID() + ".png")
+                    .setThumbnail("https://mc-heads.net/body/" + event.getTargetUUID() + "/left.png")
                     .setDescription("**ID:** " + id + "\n**Staff:** `" + staffName + "`\n**Target:** `" + playerName + "`\n**Reason:** " + punishmentReason + "\n**New Expiration:** " + durationString + "\n**Notes:** " + reason);
             Button revert = Button.danger("punishment_revert:" + id, "Revert");
             Button note = Button.primary("punishment_addNote:" + id, "Add Note");
