@@ -108,7 +108,7 @@ public class Punishments {
         EmbedBuilder embed = new EmbedBuilder()
                 .setTitle("Punishments for `" + targetName + "`")
                 .setColor(Color.RED)
-                .setThumbnail("https://mc-heads.net/avatar/" + targetUUID + ".png");
+                .setThumbnail("https://mc-heads.net/body/" + targetUUID + "/left.png");
 
         if (formatted.isEmpty()) {
             embed.setDescription("✅ No Punishments Found For `" + targetName + "`");
