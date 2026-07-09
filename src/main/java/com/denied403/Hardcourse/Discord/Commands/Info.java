@@ -100,7 +100,7 @@ public class Info {
             return;
         }
         EmbedBuilder playerEmbed = new EmbedBuilder();
-        playerEmbed.setThumbnail("https://mc-heads.net/avatar/" + uuid + ".png");
+        playerEmbed.setThumbnail("https://mc-heads.net/body/" + uuid + "/left.png");
         String fullLevelString;
         Double level = checkpointDatabase.getLevel(uuid);
 
