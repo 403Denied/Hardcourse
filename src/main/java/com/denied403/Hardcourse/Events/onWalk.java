@@ -15,6 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static com.denied403.Hardcourse.Discord.HardcourseDiscord.*;
+import static com.denied403.Hardcourse.Events.PunishmentListener.runBanCleanup;
 import static com.denied403.Hardcourse.Hardcourse.*;
 import static com.denied403.Hardcourse.Utils.CheckpointLevelTimer.getCurrentLevelTimeFormatted;
 import static com.denied403.Hardcourse.Utils.CheckpointLevelTimer.resetForNewLevel;
@@ -87,6 +88,7 @@ public class onWalk implements Listener {
                             try {
                                 p.teleport(checkpointDatabase.getCheckpointLocation(season, previousLevel));
                                 handlePunishment("00000000-0000-0000-0000-000000000000", PunishmentReason.getReasonByName("Unfair Advantage (Auto)"), p, "ban", "Skipped from level " + Double.toString(previousLevel).replace(".0", "") + " to level " + Double.toString(checkpointNumber).replace(".0", "") + " while no staff were online with a playtime of " + getPlaytime(p) + ".");
+                                runBanCleanup(p.getName());
                                 return;
                             } catch (SQLException e) {return;}
                         }
