@@ -5,6 +5,7 @@ import com.denied403.core403.Punishments.Api.NameBanEvent;
 import com.denied403.core403.Punishments.Api.RevertEvent;
 import com.denied403.core403.Punishments.Api.PunishmentEditEvent;
 import com.denied403.core403.Punishments.Api.IPBanEvent;
+import com.denied403.core403.Punishments.Database.Punishment;
 import com.denied403.core403.Punishments.Utils.PunishmentDurationParser;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.components.MessageTopLevelComponentUnion;
@@ -16,6 +17,7 @@ import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.textinput.TextInput;
 import net.dv8tion.jda.api.components.textinput.TextInputStyle;
+import net.dv8tion.jda.api.interactions.callbacks.IMessageEditCallback;
 import net.dv8tion.jda.api.modals.Modal;
 import net.dv8tion.jda.api.components.label.Label;
 import org.bukkit.Bukkit;
@@ -32,6 +34,7 @@ import java.util.UUID;
 import static com.denied403.Hardcourse.Discord.HardcourseDiscord.*;
 import static com.denied403.Hardcourse.Hardcourse.*;
 import static com.denied403.Hardcourse.Utils.Luckperms.hasLuckPermsPermission;
+import static com.denied403.core403.Core403.punishmentRepository;
 import static com.denied403.core403.Punishments.Events.onChatEdit.editPunishment;
 import static com.denied403.core403.Punishments.Events.onChatRevert.revertPunishment;
 import static com.denied403.core403.Util.ColorUtil.Colorize;
@@ -183,33 +186,23 @@ public class PunishmentListener extends ListenerAdapter implements Listener {
         }
     }
 
-    private boolean checkReverted(ButtonInteractionEvent event, String punishmentId) {
-        if(punishmentDatabase.isReverted(punishmentId)){
-            event.deferEdit().queue();
-            event.getMessage().editMessageComponents(
-                    ActionRow.of(
-                            Button.danger("button:disabled", "Revert").asDisabled(),
-                            Button.primary("button:disabled1", "Add Note").asDisabled(),
-                            Button.success("button:disabled2", "Change Duration").asDisabled()
-                    )
-            ).queue();
-            event.getHook().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription("❌ This punishment has already been reverted!").build()).setEphemeral(true).queue();
-            return true;
-        }
-        return false;
-    }
-    private boolean checkRevertedModal(ModalInteractionEvent event, String punishmentId) {
-        if(punishmentDatabase.isReverted(punishmentId)){
-            event.deferEdit().queue();
-            event.getMessage().editMessageComponents(
-                    ActionRow.of(
-                            Button.danger("button:disabled", "Revert").asDisabled(),
-                            Button.primary("button:disabled1", "Add Note").asDisabled(),
-                            Button.success("button:disabled2", "Change Duration").asDisabled()
-                    )
-            ).queue();
-            event.getHook().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription("❌ This punishment has already been reverted!").build()).setEphemeral(true).queue();
-            return true;
+    private boolean checkReverted(IMessageEditCallback event, String punishmentId) {
+        try {
+            Punishment punishment = punishmentRepository.findById(punishmentId).orElse(null);
+            if(punishment.isReverted()) {
+                event.deferEdit().queue();
+                event.getHook().editOriginalComponents(
+                        ActionRow.of(
+                                Button.danger("button:disabled", "Revert").asDisabled(),
+                                Button.primary("button:disabled1", "Add Note").asDisabled(),
+                                Button.success("button:disabled2", "Change Duration").asDisabled()
+                        )
+                ).queue();
+                event.getHook().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription("❌ This punishment has already been reverted!").build()).setEphemeral(true).queue();
+                return true;
+            }
+        } catch (Exception e) {
+            event.getHook().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription("❌ An error occurred while checking the punishment status. Please try again later.").build()).setEphemeral(true).queue();
         }
         return false;
     }
@@ -218,7 +211,7 @@ public class PunishmentListener extends ListenerAdapter implements Listener {
     public void onModalInteraction(ModalInteractionEvent event){
         if(event.getModalId().startsWith("confirm_revert:")) {
             String punishmentId = event.getModalId().split(":")[1];
-            if (checkRevertedModal(event, punishmentId)) return;
+            if (checkReverted(event, punishmentId)) return;
             String note = event.getValue("reason").getAsString();
             String linkedUuidString = checkpointDatabase.getUUIDFromDiscord(event.getMember().getId());
             UUID linkedUUID = UUID.fromString(linkedUuidString);
@@ -232,21 +225,27 @@ public class PunishmentListener extends ListenerAdapter implements Listener {
             return;
         }
         if(event.getModalId().startsWith("add_note:")) {
-            String punishmentId = event.getModalId().split(":")[1];
-            if (checkRevertedModal(event, punishmentId)) return;
-            String note = event.getValue("note").getAsString();
-            if(!punishmentDatabase.hasNotes(punishmentId)) {
-                punishmentDatabase.addNotes(punishmentId, note);
-            } else {
-                punishmentDatabase.addGeneralNotes(punishmentId, note);
+            try {
+                String punishmentId = event.getModalId().split(":")[1];
+                Punishment punishment = punishmentRepository.findById(punishmentId).orElse(null);
+                if(punishment == null) return;
+                if (checkReverted(event, punishmentId)) return;
+                String note = event.getValue("note").getAsString();
+                if (!punishment.hasNotes()) {
+                    punishmentRepository.updateNotes(punishmentId, note);
+                } else {
+                    punishmentRepository.updateGeneralNotes(punishmentId, note);
+                }
+                EmbedBuilder noteEmbed = new EmbedBuilder().setColor(Color.GREEN).setDescription("✅ Successfully added note to punishment `" + punishmentId + "`.");
+                event.replyEmbeds(noteEmbed.build()).setEphemeral(true).queue();
+                return;
+            } catch (Exception e) {
+                event.getHook().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription("❌ An error occurred while adding the note. Please try again later.").build()).setEphemeral(true).queue();
             }
-            EmbedBuilder noteEmbed = new EmbedBuilder().setColor(Color.GREEN).setDescription("✅ Successfully added note to punishment `" + punishmentId + "`.");
-            event.replyEmbeds(noteEmbed.build()).setEphemeral(true).queue();
-            return;
         }
         if(event.getModalId().startsWith("modify:")) {
             String punishmentId = event.getModalId().split(":")[1];
-            if (checkRevertedModal(event, punishmentId)) return;
+            if (checkReverted(event, punishmentId)) return;
             String discordId = event.getMember().getId();
             UUID linkedUuid = UUID.fromString(checkpointDatabase.getUUIDFromDiscord(discordId));
             String duration =  event.getValue("duration").getAsString();

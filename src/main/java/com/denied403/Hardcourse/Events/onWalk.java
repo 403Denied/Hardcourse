@@ -20,7 +20,7 @@ import static com.denied403.Hardcourse.Hardcourse.*;
 import static com.denied403.Hardcourse.Utils.CheckpointLevelTimer.getCurrentLevelTimeFormatted;
 import static com.denied403.Hardcourse.Utils.CheckpointLevelTimer.resetForNewLevel;
 import static com.denied403.Hardcourse.Utils.Luckperms.addRank;
-import static com.denied403.core403.Punishments.Events.onConfirmClick.handlePunishment;
+import static com.denied403.core403.Punishments.Events.PunishmentConfirmListener.handlePunishment;
 import static com.denied403.core403.Util.ColorUtil.Colorize;
 import static com.denied403.core403.Util.Playtime.getPlaytime;
 

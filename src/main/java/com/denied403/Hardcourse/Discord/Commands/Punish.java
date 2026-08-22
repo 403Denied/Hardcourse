@@ -1,10 +1,10 @@
 package com.denied403.Hardcourse.Discord.Commands;
 
 import com.denied403.core403.Punishments.Enums.PunishmentType;
+import com.denied403.core403.Punishments.Sessions.DraftSessionManager;
 import com.denied403.core403.Punishments.Utils.PunishmentReason;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import com.denied403.core403.Punishments.Events.onConfirmClick;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
@@ -14,9 +14,9 @@ import java.util.UUID;
 import static com.denied403.Hardcourse.Hardcourse.checkpointDatabase;
 import static com.denied403.Hardcourse.Hardcourse.plugin;
 import static com.denied403.Hardcourse.Utils.Luckperms.hasLuckPermsPermission;
+import static com.denied403.core403.Punishments.Events.PunishmentConfirmListener.handlePunishment;
 import static com.denied403.core403.Util.ConfigManager.bypassPunishBlacklist;
 import static com.denied403.core403.Util.ConfigManager.punishBlacklist;
-import static com.denied403.core403.Punishments.GUIs.PunishGUIManager.silentPlayers;
 
 public class Punish {
     public static void run(SlashCommandInteractionEvent event) {
@@ -62,16 +62,12 @@ public class Punish {
                     event.reply("❌ You cannot punish this player!").setEphemeral(true).queue();
                     return;
                 }
-                if(silent){
-                    silentPlayers.add(staff.getUniqueId());
-                } else {
-                    silentPlayers.remove(staff.getUniqueId());
-                }
+                DraftSessionManager.get(staff.getUniqueId()).silent = silent;
                 long expires;
                 if(notes != null) {
-                    expires = onConfirmClick.handlePunishment(staff.getUniqueId().toString(), reason, target, type, notes);
+                    expires = handlePunishment(staff.getUniqueId().toString(), reason, target, type, notes);
                 } else {
-                    expires = onConfirmClick.handlePunishment(staff.getUniqueId().toString(), reason, target, type, null);
+                    expires = handlePunishment(staff.getUniqueId().toString(), reason, target, type, null);
                 }
 
                 String expiresText;

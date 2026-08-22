@@ -3,7 +3,6 @@ package com.denied403.Hardcourse.Discord;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import com.denied403.core403.Punishments.Events.onConfirmClick;
 import com.denied403.core403.Punishments.Utils.PunishmentReason;
 import org.bukkit.Bukkit;
 
@@ -14,6 +13,7 @@ import java.util.UUID;
 import static com.denied403.Hardcourse.Events.PunishmentListener.runBanCleanup;
 import static com.denied403.Hardcourse.Hardcourse.*;
 import static com.denied403.Hardcourse.Utils.Luckperms.hasLuckPermsPermission;
+import static com.denied403.core403.Punishments.Events.PunishmentConfirmListener.handlePunishment;
 
 public class DiscordButtonListener extends ListenerAdapter {
     @Override
@@ -36,7 +36,7 @@ public class DiscordButtonListener extends ListenerAdapter {
                 String playerName = id.substring("ban:".length());
                 Bukkit.getScheduler().runTask(plugin, () -> {
                     try {
-                        onConfirmClick.handlePunishment(linkedUUID.toString(), PunishmentReason.getReasonByName("Unfair Advantage"), Bukkit.getOfflinePlayer(playerName), "ban", "Issued via discord");
+                        handlePunishment(linkedUUID.toString(), PunishmentReason.getReasonByName("Unfair Advantage"), Bukkit.getOfflinePlayer(playerName), "ban", "Issued via discord");
                         event.reply("Issued ban for **`" + playerName + "`**.").setEphemeral(true).queue();
                         runBanCleanup(playerName);
                     } catch(SQLException e){
