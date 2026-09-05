@@ -17,7 +17,8 @@ import org.bukkit.entity.Player;
 
 import java.util.concurrent.CompletableFuture;
 
-import static com.denied403.Hardcourse.Discord.HardcourseDiscord.sendMessage;
+import com.denied403.Hardcourse.Discord.HardcourseDiscordExtras;
+
 import static com.denied403.core403.Util.ColorUtil.Colorize;
 
 public class Deaths {
@@ -118,7 +119,7 @@ public class Deaths {
                 }
             }
         }
-        sendMessage((Player) sender, String.valueOf(target.getStatistic(Statistic.DEATHS)), "setDeaths", targetName, null);
+        HardcourseDiscordExtras.logDeathsSet(targetName, target.getStatistic(Statistic.DEATHS), sender.getName());
 
         return Command.SINGLE_SUCCESS;
     }

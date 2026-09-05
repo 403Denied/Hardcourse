@@ -207,51 +207,6 @@ public class CheckpointDatabase {
     }
 
 
-    public void linkDiscord(UUID uuid, String discordId) {
-        String sql = """
-            INSERT INTO checkpoints (uuid, season, level, discord)
-            VALUES (?, 0, 0, ?)
-            ON CONFLICT(uuid) DO UPDATE SET discord = excluded.discord
-        """;
-        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, uuid.toString());
-            ps.setString(2, discordId);
-            ps.executeUpdate();
-
-            CheckpointData existing = cache.get(uuid);
-            if(existing != null) {
-                cache.put(uuid, new CheckpointData(uuid, existing.season, existing.level, existing.level_time, existing.skips, discordId));
-            }
-        } catch (SQLException e) {
-            plugin.getLogger().severe("[HARDCOURSE] Failed to link Discord: " + e.getMessage());
-        }
-    }
-
-    public void unlinkDiscord(UUID uuid) {
-        String sql = "UPDATE checkpoints SET discord = NULL WHERE uuid = ?";
-        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, uuid.toString());
-            ps.executeUpdate();
-
-            CheckpointData existing = cache.get(uuid);
-            if (existing != null) {
-                cache.put(uuid, new CheckpointData(uuid, existing.season(), existing.level(), existing.level_time(), existing.skips(), null));
-            }
-        } catch (SQLException e) {
-            plugin.getLogger().severe("[HARDCOURSE] Failed to unlink Discord: " + e.getMessage());
-        }
-    }
-
-    public String getDiscordId(UUID uuid) {
-        CheckpointData d = getCheckpointData(uuid);
-        return (d != null) ? d.discord() : null;
-    }
-
-    public boolean isLinked(UUID uuid) {
-        String id = getDiscordId(uuid);
-        return id != null && !id.isEmpty();
-    }
-
     public void deleteAll() {
         String sql = "DELETE FROM checkpoints";
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -294,24 +249,6 @@ public class CheckpointDatabase {
             plugin.getLogger().severe("[HARDCOURSE] Failed to fetch sorted checkpoint data: " + e.getMessage());
         }
         return list;
-    }
-
-    public String getUUIDFromDiscord(String discordId) {
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(
-                     "SELECT uuid FROM checkpoints WHERE discord = ?")) {
-
-            stmt.setString(1, discordId);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                return rs.getString("uuid");
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     public List<UUID> getPlayersAtCheckpoint(int season, double level) {

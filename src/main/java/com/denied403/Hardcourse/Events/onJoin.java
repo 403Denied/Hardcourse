@@ -12,7 +12,6 @@ import org.bukkit.Location;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import static com.denied403.Hardcourse.Commands.Clock.giveItems;
-import static com.denied403.Hardcourse.Discord.HardcourseDiscord.sendMessage;
 import static com.denied403.Hardcourse.Hardcourse.*;
 import static com.denied403.Hardcourse.Points.Shop.PointsShop.givePointsShopPaper;
 import static com.denied403.core403.Util.ColorUtil.Colorize;
@@ -22,13 +21,6 @@ public class onJoin implements Listener {
     @EventHandler
     public void onJoinEvent(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-
-        if (player.hasPlayedBefore() && !player.hasMetadata("vanished")) {
-            sendMessage(player, null, "join", null, null);
-        } if(!player.hasPlayedBefore()) {
-            sendMessage(player, null, "firstJoin", null, null);
-        }
-        sendMessage(player, null, "logs", "join", null);
 
         if(checkpointDatabase.getCheckpointData(player.getUniqueId()) == null) {
             checkpointDatabase.setCheckpointData(player.getUniqueId(), 1, 0);

@@ -23,12 +23,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.Location;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
+import com.denied403.Hardcourse.Discord.HardcourseDiscordExtras;
+
 import static com.denied403.Hardcourse.Commands.Clock.giveItems;
-import static com.denied403.Hardcourse.Discord.HardcourseDiscord.checkpointsChannel;
 import static com.denied403.Hardcourse.Hardcourse.*;
 import static com.denied403.Hardcourse.Utils.CheckpointLevelTimer.resetForNewLevel;
 import static com.denied403.core403.Util.ColorUtil.Colorize;
@@ -64,9 +64,7 @@ public class CheckpointCommand {
                                                 ((Player) offlinePlayer).sendMessage(Colorize("<prefix>Your level has been set to <accent>" + season + "-" + formattedLevel + "<main>!"));
                                             }
 
-                                            final SimpleDateFormat f = new SimpleDateFormat("HH:mm:ss z");
-                                            f.setTimeZone(TimeZone.getTimeZone("UTC"));
-                                            checkpointsChannel.sendMessage("`[" + f.format(new Date()) + "] " + playerName + " was set to level " + season + "-" + String.valueOf(level).replace(".0", "") + " by " + (sender instanceof Player ? sender.getName() + "`" : "CONSOLE`")).queue();
+                                            HardcourseDiscordExtras.logCheckpointChange(playerName + " was set to level " + season + "-" + String.valueOf(level).replace(".0", "") + " by " + (sender instanceof Player ? sender.getName() : "CONSOLE"));
 
                                             return Command.SINGLE_SUCCESS;
                                         })
@@ -92,9 +90,7 @@ public class CheckpointCommand {
                                                         ((Player) offlinePlayer).sendMessage(Colorize("<prefix>Your level has been set to <accent>" + season + "-" + formattedLevel + "<main>!"));
                                                     }
 
-                                                    final SimpleDateFormat f = new SimpleDateFormat("HH:mm:ss z");
-                                                    f.setTimeZone(TimeZone.getTimeZone("UTC"));
-                                                    checkpointsChannel.sendMessage("`[" + f.format(new Date()) + "] " + playerName + " was set to level " + season + "-" + String.valueOf(level).replace(".0", "") + " by " + (sender instanceof Player ? sender.getName() + "`" : "CONSOLE`")).queue();
+                                                    HardcourseDiscordExtras.logCheckpointChange(playerName + " was set to level " + season + "-" + String.valueOf(level).replace(".0", "") + " by " + (sender instanceof Player ? sender.getName() : "CONSOLE"));
 
                                                     return Command.SINGLE_SUCCESS;
                                                 })
@@ -206,9 +202,7 @@ public class CheckpointCommand {
                                         Luckperms.removeRank(p.getUniqueId());
                                         p.setStatistic(Statistic.DEATHS, 0);
 
-                                        final SimpleDateFormat f = new SimpleDateFormat("HH:mm:ss z");
-                                        f.setTimeZone(TimeZone.getTimeZone("UTC"));
-                                        checkpointsChannel.sendMessage("`[" + f.format(new Date()) + "] " + p.getName() + " reset back to level 0!`").queue();
+                                        HardcourseDiscordExtras.logCheckpointChange(p.getName() + " reset back to level 0!");
                                     }
                                     restartCancelled.remove(player.getUniqueId());
                                 }, 200L);
@@ -583,9 +577,7 @@ public class CheckpointCommand {
             checkpointDatabase.setLevel(target.getUniqueId(), level);
             checkpointDatabase.setSeason(target.getUniqueId(), season);
 
-            final SimpleDateFormat f = new SimpleDateFormat("HH:mm:ss z");
-            f.setTimeZone(TimeZone.getTimeZone("UTC"));
-            checkpointsChannel.sendMessage("`[" + f.format(new Date()) + "] " + target.getName() + " was set to level " + season + "-" + String.valueOf(level).replace(".0", "") + " by " + (sender instanceof Player ? sender.getName() + "`" : "CONSOLE`")).queue();
+            HardcourseDiscordExtras.logCheckpointChange(target.getName() + " was set to level " + season + "-" + String.valueOf(level).replace(".0", "") + " by " + (sender instanceof Player ? sender.getName() : "CONSOLE"));
         }
 
         target.teleport(loc);

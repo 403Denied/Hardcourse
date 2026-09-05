@@ -11,11 +11,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static com.denied403.Hardcourse.Discord.HardcourseDiscord.*;
-import static com.denied403.Hardcourse.Events.PunishmentListener.runBanCleanup;
+import com.denied403.Hardcourse.Discord.HardcourseDiscordExtras;
+
 import static com.denied403.Hardcourse.Hardcourse.*;
 import static com.denied403.Hardcourse.Utils.CheckpointLevelTimer.getCurrentLevelTimeFormatted;
 import static com.denied403.Hardcourse.Utils.CheckpointLevelTimer.resetForNewLevel;
@@ -69,14 +68,10 @@ public class onWalk implements Listener {
             double previousLevel = checkpointDatabase.getLevel(uuid) != null ? checkpointDatabase.getLevel(uuid) : 0;
 
             if (checkpointNumber > previousLevel) {
-                if(DiscordEnabled) {
-                    final SimpleDateFormat f = new SimpleDateFormat("HH:mm:ss z");
-                    f.setTimeZone(TimeZone.getTimeZone("UTC"));
-                    if (season == 1) {
-                        checkpointsChannel.sendMessage("`[" + f.format(new Date()) + "] " + p.getName() + ": " + String.valueOf(previousLevel).replace(".0", "") + " -> " + String.valueOf(checkpointNumber).replace(".0", "") + " [" + getCurrentLevelTimeFormatted(uuid) + "]`").queue();
-                    } else {
-                        checkpointsChannel.sendMessage("`[" + f.format(new Date()) + "] " + p.getName() + ": " + String.valueOf(season).replace(".0", "") + "-" + String.valueOf(previousLevel).replace(".0", "") + " -> " + String.valueOf(season).replace(".0", "") + "-" + String.valueOf(checkpointNumber).replace(".0", "") + " [" + getCurrentLevelTimeFormatted(uuid) + "]`").queue();
-                    }
+                if (season == 1) {
+                    HardcourseDiscordExtras.logCheckpointChange(p.getName() + ": " + String.valueOf(previousLevel).replace(".0", "") + " -> " + String.valueOf(checkpointNumber).replace(".0", "") + " [" + getCurrentLevelTimeFormatted(uuid) + "]");
+                } else {
+                    HardcourseDiscordExtras.logCheckpointChange(p.getName() + ": " + season + "-" + String.valueOf(previousLevel).replace(".0", "") + " -> " + season + "-" + String.valueOf(checkpointNumber).replace(".0", "") + " [" + getCurrentLevelTimeFormatted(uuid) + "]");
                 }
                 if (checkpointNumber > previousLevel + 10 && isSkipExempted((int) previousLevel, (int) checkpointNumber) && !p.hasPermission("hardcourse.staff")) {
                     if(checkpointNumber > previousLevel + 100 && ((p.getStatistic(Statistic.PLAY_ONE_MINUTE) <= 12000))) {
@@ -88,18 +83,18 @@ public class onWalk implements Listener {
                             try {
                                 p.teleport(checkpointDatabase.getCheckpointLocation(season, previousLevel));
                                 handlePunishment("00000000-0000-0000-0000-000000000000", PunishmentReason.getReasonByName("Unfair Advantage (Auto)"), p, "ban", "Skipped from level " + Double.toString(previousLevel).replace(".0", "") + " to level " + Double.toString(checkpointNumber).replace(".0", "") + " while no staff were online with a playtime of " + getPlaytime(p) + ".");
-                                runBanCleanup(p.getName());
+                                HardcourseDiscordExtras.runBanCleanup(p.getName());
                                 return;
                             } catch (SQLException e) {return;}
                         }
                     }
                     if(playerSeason > 1) {
-                        sendMessage(p, null, "hacks",
+                        HardcourseDiscordExtras.sendHacksAlert(p,
                                 playerSeason + "-" + Double.toString(previousLevel).replace(".0", ""),
                                 playerSeason + "-" + Double.toString(checkpointNumber).replace(".0", ""));
                     }
                     else {
-                        sendMessage(p, null, "hacks",
+                        HardcourseDiscordExtras.sendHacksAlert(p,
                                 Double.toString(previousLevel).replace(".0", ""),
                                 Double.toString(checkpointNumber).replace(".0", ""));
                     }
@@ -165,7 +160,7 @@ public class onWalk implements Listener {
                         p.sendMessage(Colorize("<prefix>You have reached the end. However, we have reason to believe you are &4cheating<main>. If you are not, please contact a staff member to verify your progress."));
                         return;
                     }
-                    sendMessage(p, null, "winning", "3", null);
+                    HardcourseDiscordExtras.announceWinning(p, "3", true);
                     p.sendMessage(Colorize("<prefix><accent>Congratulations! <main>You have completed Season 3! There is currently no Season 4, so you have reached the end of the Hardcourse for now. By completing the map, you have unlocked some perks! Try <accnet>/wtp <player><main> to teleport, and <accent>/checkpoint tp <level> [<season>]<main> to teleport to any level."));
                     addRank(p.getUniqueId(), "winner");
                 }
@@ -173,7 +168,7 @@ public class onWalk implements Listener {
         }
     }
     private void handleSeasonComplete(Player p, int nextSeason, String discordSeasonId) {
-        sendMessage(p, null, "winning", discordSeasonId, null);
+        HardcourseDiscordExtras.announceWinning(p, discordSeasonId, false);
         p.sendMessage(Colorize("<prefix><accent>Congratulations! <main>You have completed Season <accent>" + discordSeasonId + "<main>!"));
         p.teleport(Bukkit.getWorld("Season" + nextSeason).getSpawnLocation());
         p.setGameMode(GameMode.ADVENTURE);

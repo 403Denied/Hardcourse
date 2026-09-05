@@ -8,13 +8,13 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 
-import static com.denied403.Hardcourse.Discord.HardcourseDiscord.sendMessage;
+import com.denied403.Hardcourse.Discord.HardcourseDiscordExtras;
 
 public class onDeath implements Listener {
     @EventHandler
     public void onDeathEvent(PlayerRespawnEvent e) {
         Player player = e.getPlayer();
-        sendMessage(player, String.valueOf(player.getStatistic(Statistic.DEATHS)), "logs", "deaths", null);
+        HardcourseDiscordExtras.logDeath(player);
         if(!player.isOp() && !player.hasPermission("hardcourse.staff")){
             if(player.getInventory().getItemInOffHand().equals(ItemStack.of(Material.ELYTRA))) {
                 player.getInventory().setItemInOffHand(new ItemStack(Material.AIR));

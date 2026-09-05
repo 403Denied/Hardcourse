@@ -1,14 +1,14 @@
 package com.denied403.Hardcourse.Commands;
 
+import com.denied403.core403.Discord.DiscordService;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.command.CommandSender;
 
-import static com.denied403.Hardcourse.Discord.HardcourseDiscord.InitJDA;
-import static com.denied403.Hardcourse.Discord.HardcourseDiscord.jda;
-import static com.denied403.Hardcourse.Hardcourse.*;
+import static com.denied403.Hardcourse.Hardcourse.loadConfigValues;
+import static com.denied403.Hardcourse.Hardcourse.plugin;
 import static com.denied403.core403.Util.ColorUtil.Colorize;
 
 public class ReloadHardcourse {
@@ -20,19 +20,24 @@ public class ReloadHardcourse {
                     CommandSender sender = ctx.getSource().getSender();
                     plugin.reloadConfig();
                     loadConfigValues();
-                    boolean wasEnabled = jda != null;
-                    if (DiscordEnabled) {
-                        if (wasEnabled) {
-                            jda.shutdown();
-                        }
-                        InitJDA();
-                    } else {
-                        if (wasEnabled) {
-                            jda.shutdown();
-                            jda = null;
-                        }
-                    }
                     sender.sendMessage(Colorize("<prefix>Hardcourse config reloaded."));
+
+                    if (DiscordService.owner() != null) {
+                        boolean wasOnline = DiscordService.isEnabled();
+                        if (wasOnline) {
+                            sender.sendMessage(Colorize("<prefix>Restarting the Discord bot, this may take a moment..."));
+                        }
+                        DiscordService.restartAsync(success -> {
+                            if (success) {
+                                sender.sendMessage(Colorize(wasOnline ? "<prefix>Discord bot restarted." : "<prefix>Discord bot started."));
+                            } else if (DiscordService.config() != null && DiscordService.config().isEnabled()) {
+                                sender.sendMessage(Colorize("<prefix><error>Discord bot failed to restart, check the console."));
+                            } else if (wasOnline) {
+                                sender.sendMessage(Colorize("<prefix>Discord is disabled in discord-config.yml."));
+                            }
+                            // else: bot wasn't online before and still isn't - say nothing.
+                        });
+                    }
                     return Command.SINGLE_SUCCESS;
                 })
                 .build();

@@ -28,7 +28,7 @@ repositories {
 dependencies {
     compileOnly("io.papermc.paper:paper-api:26.2.build.+")
     implementation 'org.xerial:sqlite-jdbc:3.50.2.0'
-    implementation("net.dv8tion:JDA:6.3.1") {
+    compileOnly("net.dv8tion:JDA:6.4.1") {
         exclude module: 'opus-java'
         exclude module: 'tink'
     }
