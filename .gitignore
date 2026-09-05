@@ -2,6 +2,7 @@
 /target/
 /.gradle/
 /build/classes/java/main/
+/build/resources/
 /run/
 /libs/
 /.idea/
