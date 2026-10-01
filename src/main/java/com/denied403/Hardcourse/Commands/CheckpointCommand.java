@@ -3,7 +3,7 @@ package com.denied403.Hardcourse.Commands;
 import com.denied403.Hardcourse.Hardcourse;
 import com.denied403.Hardcourse.Utils.CheckpointDatabase;
 import com.denied403.Hardcourse.Utils.CheckpointLevelTimer;
-import com.denied403.Hardcourse.Utils.Luckperms;
+import com.denied403.core403.Util.LuckPermsUtil;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
@@ -199,7 +199,7 @@ public class CheckpointCommand {
                                         p.setRespawnLocation(p.getWorld().getSpawnLocation());
                                         p.sendMessage(Colorize("<prefix>You have been reset to the beginning."));
                                         CheckpointLevelTimer.resetForNewLevel(uuid);
-                                        Luckperms.removeRank(p.getUniqueId());
+                                        LuckPermsUtil.removeRank(p.getUniqueId());
                                         p.setStatistic(Statistic.DEATHS, 0);
 
                                         HardcourseDiscordExtras.logCheckpointChange(p.getName() + " reset back to level 0!");

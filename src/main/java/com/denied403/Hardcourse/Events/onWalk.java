@@ -1,6 +1,7 @@
 package com.denied403.Hardcourse.Events;
 
 import com.denied403.core403.Punishments.Utils.PunishmentReason;
+import com.denied403.core403.Util.LuckPermsUtil;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -18,7 +19,6 @@ import com.denied403.Hardcourse.Discord.HardcourseDiscordExtras;
 import static com.denied403.Hardcourse.Hardcourse.*;
 import static com.denied403.Hardcourse.Utils.CheckpointLevelTimer.getCurrentLevelTimeFormatted;
 import static com.denied403.Hardcourse.Utils.CheckpointLevelTimer.resetForNewLevel;
-import static com.denied403.Hardcourse.Utils.Luckperms.addRank;
 import static com.denied403.core403.Punishments.Events.PunishmentConfirmListener.handlePunishment;
 import static com.denied403.core403.Util.ColorUtil.Colorize;
 import static com.denied403.core403.Util.Playtime.getPlaytime;
@@ -162,7 +162,7 @@ public class onWalk implements Listener {
                     }
                     HardcourseDiscordExtras.announceWinning(p, "3", true);
                     p.sendMessage(Colorize("<prefix><accent>Congratulations! <main>You have completed Season 3! There is currently no Season 4, so you have reached the end of the Hardcourse for now. By completing the map, you have unlocked some perks! Try <accnet>/wtp <player><main> to teleport, and <accent>/checkpoint tp <level> [<season>]<main> to teleport to any level."));
-                    addRank(p.getUniqueId(), "winner");
+                    LuckPermsUtil.addRank(p.getUniqueId(), "winner");
                 }
             }
         }
@@ -175,7 +175,7 @@ public class onWalk implements Listener {
         p.setRespawnLocation(p.getLocation().add(0, 1, 0), true);
         checkpointDatabase.setLevel(p.getUniqueId(), 0);
         checkpointDatabase.setSeason(p.getUniqueId(), nextSeason);
-        addRank(p.getUniqueId(), String.valueOf(nextSeason));
+        LuckPermsUtil.addRank(p.getUniqueId(), String.valueOf(nextSeason));
         p.sendMessage(Colorize("<main>You have been teleported to the next season. You can now continue your journey!"));
     }
 }
