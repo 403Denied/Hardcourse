@@ -31,10 +31,11 @@ public class onWalk implements Listener {
         if (event.getFrom().getBlockX() == event.getTo().getBlockX() && event.getFrom().getBlockY() == event.getTo().getBlockY() && event.getFrom().getBlockZ() == event.getTo().getBlockZ()) return;
 
         Player p = event.getPlayer();
-        Block feet = p.getLocation().getBlock();
+        Location to = event.getTo();
+        Block feet = to.getBlock();
         Block checkpoint = findCheckpoint(feet);
         if (checkpoint != null) {
-            Location loc = checkpoint.equals(feet) ? p.getLocation() : checkpoint.getLocation().add(0.5, 0, 0.5).setDirection(p.getLocation().getDirection());
+            Location loc = checkpoint.equals(feet) ? to.clone() : checkpoint.getLocation().add(0.5, 0, 0.5).setDirection(to.getDirection());
 
             double checkpointNumber;
             String difficulty;
@@ -58,8 +59,12 @@ public class onWalk implements Listener {
             } catch (NumberFormatException e) {
                 return;
             }
-            int playerSeason = checkpointDatabase.getSeason(uuid) != null ? checkpointDatabase.getSeason(uuid) : 1;
+            int playerSeason = checkpointDatabase.getSeason(uuid);
+            if (playerSeason == 0) playerSeason = 1;
             if(playerSeason > season){
+                return;
+            }
+            if(season > playerSeason && !p.hasPermission("hardcourse.staff")){
                 return;
             }
             if(event.getPlayer().getGameMode() == GameMode.SPECTATOR){
@@ -67,14 +72,9 @@ public class onWalk implements Listener {
             }
             if(event.getPlayer().hasMetadata("vanished")) return;
 
-            double previousLevel = checkpointDatabase.getLevel(uuid) != null ? checkpointDatabase.getLevel(uuid) : 0;
+            double previousLevel = season == playerSeason ? checkpointDatabase.getLevel(uuid) : 0;
 
             if (checkpointNumber > previousLevel) {
-                if (season == 1) {
-                    HardcourseDiscordExtras.logCheckpointChange(p.getName() + ": " + String.valueOf(previousLevel).replace(".0", "") + " -> " + String.valueOf(checkpointNumber).replace(".0", "") + " [" + getCurrentLevelTimeFormatted(uuid) + "]");
-                } else {
-                    HardcourseDiscordExtras.logCheckpointChange(p.getName() + ": " + season + "-" + String.valueOf(previousLevel).replace(".0", "") + " -> " + season + "-" + String.valueOf(checkpointNumber).replace(".0", "") + " [" + getCurrentLevelTimeFormatted(uuid) + "]");
-                }
                 if (checkpointNumber > previousLevel + 10 && isSkipExempted((int) previousLevel, (int) checkpointNumber) && !p.hasPermission("hardcourse.staff")) {
                     if(checkpointNumber > previousLevel + 100 && ((p.getStatistic(Statistic.PLAY_ONE_MINUTE) <= 12000))) {
                         List<Player> onlineStaff = new ArrayList<>();
@@ -82,7 +82,8 @@ public class onWalk implements Listener {
                             if (staff.hasPermission("hardcourse.staff")) {onlineStaff.add(staff);}
                         }
                         if (onlineStaff.isEmpty()) {
-                            p.teleport(checkpointDatabase.getCheckpointLocation(season, previousLevel));
+                            Location previousCheckpoint = checkpointDatabase.getCheckpointLocation(season, previousLevel);
+                            p.teleport(previousCheckpoint != null ? previousCheckpoint : p.getWorld().getSpawnLocation());
                             String name = p.getName();
                             handlePunishment("00000000-0000-0000-0000-000000000000", PunishmentReason.getReasonByName("Unfair Advantage (Auto)"), p, "ban", "Skipped from level " + Double.toString(previousLevel).replace(".0", "") + " to level " + Double.toString(checkpointNumber).replace(".0", "") + " while no staff were online with a playtime of " + getPlaytime(p) + ".")
                                     .thenAccept(result -> {
@@ -129,6 +130,11 @@ public class onWalk implements Listener {
                     p.sendMessage(Colorize("<prefix>You can't set a checkpoint here! Please refrain from making any more progress, and contact an administrator to fix the issue!"));
                     return;
                 }
+                if (season == 1) {
+                    HardcourseDiscordExtras.logCheckpointChange(p.getName() + ": " + String.valueOf(previousLevel).replace(".0", "") + " -> " + String.valueOf(checkpointNumber).replace(".0", "") + " [" + getCurrentLevelTimeFormatted(uuid) + "]");
+                } else {
+                    HardcourseDiscordExtras.logCheckpointChange(p.getName() + ": " + season + "-" + String.valueOf(previousLevel).replace(".0", "") + " -> " + season + "-" + String.valueOf(checkpointNumber).replace(".0", "") + " [" + getCurrentLevelTimeFormatted(uuid) + "]");
+                }
                 p.playSound(loc, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
                 if(isDev) {
                     int pointsToAdd = 10 + random.nextInt(11);
@@ -159,12 +165,12 @@ public class onWalk implements Listener {
                     }
                 }
                 if (season == 3 && checkpointNumber == 240.0) {
-                    if (previousLevel >= 238.0 || p.hasPermission("hardcourse.staff")) {
+                    if (previousLevel < 238.0 && !p.hasPermission("hardcourse.staff")) {
                         p.sendMessage(Colorize("<prefix>You have reached the end. However, we have reason to believe you are &4cheating<main>. If you are not, please contact a staff member to verify your progress."));
                         return;
                     }
                     HardcourseDiscordExtras.announceWinning(p, "3", true);
-                    p.sendMessage(Colorize("<prefix><accent>Congratulations! <main>You have completed Season 3! There is currently no Season 4, so you have reached the end of the Hardcourse for now. By completing the map, you have unlocked some perks! Try <accnet>/wtp <player><main> to teleport, and <accent>/checkpoint tp <level> [<season>]<main> to teleport to any level."));
+                    p.sendMessage(Colorize("<prefix><accent>Congratulations! <main>You have completed Season 3! There is currently no Season 4, so you have reached the end of the Hardcourse for now. By completing the map, you have unlocked some perks! Try <accent>/wtp <player><main> to teleport, and <accent>/checkpoint tp <level> [<season>]<main> to teleport to any level."));
                     LuckPermsUtil.addRank(p.getUniqueId(), "winner");
                 }
             }
@@ -192,9 +198,15 @@ public class onWalk implements Listener {
     }
 
     private void handleSeasonComplete(Player p, int nextSeason, String discordSeasonId) {
+        World nextWorld = Bukkit.getWorld("Season" + nextSeason);
+        if (nextWorld == null) {
+            plugin.getLogger().severe("World Season" + nextSeason + " is not loaded, cannot move " + p.getName() + " to the next season.");
+            p.sendMessage(Colorize("<prefix>You have completed this season, but the next season isn't available right now. Please contact a staff member."));
+            return;
+        }
         HardcourseDiscordExtras.announceWinning(p, discordSeasonId, false);
         p.sendMessage(Colorize("<prefix><accent>Congratulations! <main>You have completed Season <accent>" + discordSeasonId + "<main>!"));
-        p.teleport(Bukkit.getWorld("Season" + nextSeason).getSpawnLocation());
+        p.teleport(nextWorld.getSpawnLocation());
         p.setGameMode(GameMode.ADVENTURE);
         p.setRespawnLocation(p.getLocation().add(0, 1, 0), true);
         checkpointDatabase.setLevel(p.getUniqueId(), 0);

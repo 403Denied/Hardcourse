@@ -16,32 +16,10 @@ public class onDeath implements Listener {
         Player player = e.getPlayer();
         HardcourseDiscordExtras.logDeath(player);
         if(!player.isOp() && !player.hasPermission("hardcourse.staff")){
-            if(player.getInventory().getItemInOffHand().equals(ItemStack.of(Material.ELYTRA))) {
-                player.getInventory().setItemInOffHand(new ItemStack(Material.AIR));
-            }
-            if(player.getInventory().getChestplate().equals(ItemStack.of(Material.ELYTRA))) {
-                player.getInventory().setChestplate(new ItemStack(Material.AIR));
-            }
-            if(player.getInventory().contains(Material.ELYTRA)) {
-                for(ItemStack item : player.getInventory().getContents()) {
-                    if (item != null && item.getType() == Material.ELYTRA) {
-                        player.getInventory().remove(item);
-                    }
-                }
-                for (ItemStack item : player.getInventory().getArmorContents()) {
-                    if (item != null && item.getType() == Material.ELYTRA) {
-                        player.getInventory().remove(item);
-                    }
-                }
-                for (ItemStack item : player.getInventory().getExtraContents()){
-                    if (item != null && item.getType() == Material.ELYTRA) {
-                        player.getInventory().remove(item);
-                    }
-                }
-                for (ItemStack item : player.getInventory().getStorageContents()){
-                    if (item != null && item.getType() == Material.ELYTRA) {
-                        player.getInventory().remove(item);
-                    }
+            ItemStack[] contents = player.getInventory().getContents();
+            for (int slot = 0; slot < contents.length; slot++) {
+                if (contents[slot] != null && contents[slot].getType() == Material.ELYTRA) {
+                    player.getInventory().setItem(slot, null);
                 }
             }
         }

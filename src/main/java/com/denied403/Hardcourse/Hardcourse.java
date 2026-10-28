@@ -117,6 +117,15 @@ public final class Hardcourse extends JavaPlugin implements Listener {
         exemptions = config.getStringList("skip-alert-exemptions");
     }
 
+    public static double getFinalLevel(int season) {
+        return switch (season) {
+            case 1 -> 543;
+            case 2 -> 365;
+            case 3 -> 240;
+            default -> Double.MAX_VALUE;
+        };
+    }
+
     public static boolean isSkipExempted(int from, int to) {
         for (String entry : exemptions) {
             String[] parts = entry.split("-");

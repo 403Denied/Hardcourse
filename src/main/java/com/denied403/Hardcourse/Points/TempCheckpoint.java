@@ -7,6 +7,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -27,7 +28,7 @@ public class TempCheckpoint implements Listener {
 
     @EventHandler
     public void onPlayerUseTempCheckpoint(PlayerInteractEvent event) {
-        if (event.getHand() != EquipmentSlot.HAND) return;
+        if (event.getHand() != EquipmentSlot.HAND || event.getAction() == Action.PHYSICAL) return;
 
         Player player = event.getPlayer();
         ItemStack itemInHand = player.getInventory().getItemInMainHand();
@@ -37,7 +38,7 @@ public class TempCheckpoint implements Listener {
         Location belowPlayer = player.getLocation().subtract(0, 1, 0);
         Block blockBelow = belowPlayer.getBlock();
 
-        if (blockBelow.getType() == Material.AIR) {
+        if (!blockBelow.getType().isSolid()) {
             player.sendMessage(Colorize("<prefix>You can't place a temporary checkpoint here!"));
             event.setCancelled(true);
             return;

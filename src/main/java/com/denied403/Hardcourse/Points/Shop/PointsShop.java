@@ -65,6 +65,7 @@ public class PointsShop implements Listener {
         event.setCancelled(true);
 
         if (!event.getClick().isLeftClick()) return;
+        if (event.getClickedInventory() != event.getView().getTopInventory()) return;
 
         ItemStack clicked = event.getCurrentItem();
         if (clicked == null || !clicked.hasItemMeta()) return;
@@ -74,7 +75,12 @@ public class PointsShop implements Listener {
 
         if (id == null) return;
 
-        ShopItem item = ShopItem.valueOf(id);
+        ShopItem item;
+        try {
+            item = ShopItem.valueOf(id);
+        } catch (IllegalArgumentException e) {
+            return;
+        }
 
         switch (item) {
             case JUMP_BOOTS -> buyJumpBoots(player);
@@ -90,6 +96,10 @@ public class PointsShop implements Listener {
     }
 
     private boolean tryPurchase(Player player, int cost) {
+        if (econ == null) {
+            player.sendMessage(Colorize("<prefix>The points shop is unavailable right now."));
+            return true;
+        }
         if (!econ.has(player, cost)) {
             player.sendMessage(Colorize("<prefix>You don't have enough points!"));
             return true;
@@ -247,7 +257,7 @@ public class PointsShop implements Listener {
 
 
     private void openCosmeticsShop(Player player) {
-        Inventory inv = Bukkit.createInventory(null, SIZE, Colorize("Cosmetics Shop"));
+        Inventory inv = Bukkit.createInventory(new PointsShopHolder(), SIZE, Colorize("Cosmetics Shop"));
         player.openInventory(inv);
     }
 }

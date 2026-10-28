@@ -162,15 +162,22 @@ public class CheckpointDatabase {
     }
 
     public void setSkips(UUID uuid, int skips) {
-        String sql = "UPDATE checkpoints SET skips = ? WHERE uuid = ?";
+        String sql = """
+            INSERT INTO checkpoints (uuid, season, level, skips)
+            VALUES (?, 1, 0, ?)
+            ON CONFLICT(uuid) DO UPDATE SET
+                skips = excluded.skips
+        """;
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, skips);
-            ps.setString(2, uuid.toString());
+            ps.setString(1, uuid.toString());
+            ps.setInt(2, skips);
             ps.executeUpdate();
 
             CheckpointData existing = cache.get(uuid);
             if(existing != null) {
                 cache.put(uuid, new CheckpointData(uuid, existing.season(), existing.level(), existing.level_time(), skips, existing.discord()));
+            } else {
+                cache.remove(uuid);
             }
         } catch (SQLException e) {
             plugin.getLogger().severe("[HARDCOURSE] Failed to save skips: " + e.getMessage());
@@ -348,6 +355,7 @@ public class CheckpointDatabase {
         double centerY = loc.getBlockY();
         double centerZ = loc.getBlockZ() + 0.5;
         int yaw = normalizeYawToCardinal(loc.getYaw());
+        Location stored = new Location(loc.getWorld(), centerX, centerY, centerZ, yaw, 0);
 
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, season);
@@ -360,7 +368,7 @@ public class CheckpointDatabase {
             ps.setString(8, difficulty);
             ps.executeUpdate();
 
-            locationCache.putIfAbsent(locationKey(season, level), loc);
+            locationCache.putIfAbsent(locationKey(season, level), stored);
         } catch (SQLException e) {
             plugin.getLogger().severe("[HARDCOURSE] Failed to store checkpoint location: " + e.getMessage());
         }
@@ -376,7 +384,8 @@ public class CheckpointDatabase {
 
     public Location getCheckpointLocation(int season, double level) {
         String key = locationKey(season, level);
-        if(locationCache.containsKey(key)) return locationCache.get(key);
+        Location cached = locationCache.get(key);
+        if(cached != null) return cached.clone();
 
         String sql = """
         SELECT world, x, y, z, yaw
@@ -401,7 +410,7 @@ public class CheckpointDatabase {
                     );
                     loc.setYaw(rs.getInt("yaw"));
                     locationCache.put(key, loc);
-                    return loc;
+                    return loc.clone();
                 }
             }
         } catch (SQLException e) {

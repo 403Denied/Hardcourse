@@ -22,14 +22,13 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
 import java.awt.Color;
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.UUID;
 
 import static com.denied403.Hardcourse.Hardcourse.checkpointDatabase;
@@ -48,13 +47,13 @@ public final class HardcourseDiscordExtras extends ListenerAdapter implements Li
     private static ThreadChannel hacksChannel() { return DiscordService.getThreadChannel(hacksChannelId); }
     private static ThreadChannel deathsChannel() { return DiscordService.getThreadChannel(deathsChannelId); }
     private static ThreadChannel checkpointsChannel() { return DiscordService.getThreadChannel(checkpointsChannelId); }
-    private static final Map<String, Message> lastHackAlert = new HashMap<>();
+    private static final Map<String, Message> lastHackAlert = new ConcurrentHashMap<>();
 
     private static final SimpleDateFormat FORMAT = new SimpleDateFormat("HH:mm:ss z");
     static {
         FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
-    private static String timestamp() {
+    private static synchronized String timestamp() {
         return FORMAT.format(new Date());
     }
 
@@ -191,6 +190,7 @@ public final class HardcourseDiscordExtras extends ListenerAdapter implements Li
         if (!event.getReason().equalsIgnoreCase("Unfair Advantage")) return;
 
         String playerName = Bukkit.getOfflinePlayer(event.getTargetUUID()).getName();
+        if (playerName == null) return;
         if (!event.getStaff().equals("CONSOLE")) {
             if (Bukkit.getOfflinePlayer(event.getTargetUUID()).getStatistic(Statistic.PLAY_ONE_MINUTE) >= 72000) {
                 Player staffPlayer = Bukkit.getPlayer(event.getStaff());
@@ -225,16 +225,17 @@ public final class HardcourseDiscordExtras extends ListenerAdapter implements Li
         }
 
         String playerName = id.substring("ban:".length());
+        event.deferReply(true).queue();
         Bukkit.getScheduler().runTask(plugin, () ->
                 handlePunishment(linkedUUID.toString(), PunishmentReason.getReasonByName("Unfair Advantage"), Bukkit.getOfflinePlayer(playerName), "ban", "Issued via discord")
                         .whenComplete((result, error) -> Bukkit.getScheduler().runTask(plugin, () -> {
                             if (error != null || result == null || result == PunishmentConfirmListener.FAILED) {
                                 String reason = error != null ? error.getMessage() : "Core403 didn't issue it (duplicate or misconfigured reason?)";
                                 EmbedBuilder embed = new EmbedBuilder().setColor(Color.RED).setDescription("❌ An error occurred. `" + reason + "`");
-                                event.replyEmbeds(embed.build()).setEphemeral(true).queue();
+                                event.getHook().sendMessageEmbeds(embed.build()).queue();
                                 return;
                             }
-                            event.reply("Issued ban for **`" + playerName + "`**.").setEphemeral(true).queue();
+                            event.getHook().sendMessage("Issued ban for **`" + playerName + "`**.").queue();
                             runBanCleanup(playerName);
                         })));
     }

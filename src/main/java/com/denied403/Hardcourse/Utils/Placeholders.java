@@ -2,12 +2,11 @@ package com.denied403.Hardcourse.Utils;
 
 import com.denied403.core403.Util.NumberUtil;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
-import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import static com.denied403.Hardcourse.Hardcourse.checkpointDatabase;
-import static com.denied403.Hardcourse.Hardcourse.isDev;
 import static com.denied403.Hardcourse.Utils.CheckpointLevelTimer.getCurrentLevelTimeFormatted;
 import static com.denied403.core403.Core403.*;
 import static com.denied403.core403.Util.ConfigManager.*;
@@ -24,20 +23,24 @@ public class Placeholders extends PlaceholderExpansion {
     public boolean persist(){return true;}
     @Override
     public String onRequest(OfflinePlayer player, String params){
-        if(params.equalsIgnoreCase("points")){return NumberUtil.formatNoUnits((long) econ.getBalance(player));}
+        if(params.equalsIgnoreCase("main")){return mainColor;}
+        if(params.equalsIgnoreCase("accent")){return accentColor;}
+        if(params.equalsIgnoreCase("prefix")){return prefix;}
+        if(player == null) return null;
+        if(params.equalsIgnoreCase("points")){return econ == null ? "0" : NumberUtil.formatNoUnits((long) econ.getBalance(player));}
         if (params.equalsIgnoreCase("level")) {return String.valueOf(checkpointDatabase.getLevel(player.getUniqueId())).replace(".0", "");}
         if (params.equalsIgnoreCase("season")) {return checkpointDatabase.getSeason(player.getUniqueId()).toString();}
         if(params.equalsIgnoreCase("formatted-level")){
             if(checkpointDatabase.getSeason(player.getUniqueId()) == 1){return String.valueOf(checkpointDatabase.getLevel(player.getUniqueId())).replace(".0", "");}
             else {return checkpointDatabase.getSeason(player.getUniqueId()) + "-" + String.valueOf(checkpointDatabase.getLevel(player.getUniqueId())).replace(".0", "");}
         }
-        if(params.equalsIgnoreCase("main")){return mainColor;}
-        if(params.equalsIgnoreCase("accent")){return accentColor;}
-        if(params.equalsIgnoreCase("prefix")){return prefix;}
         if(params.equalsIgnoreCase("level-time")){return getCurrentLevelTimeFormatted(player.getUniqueId());}
         if(params.equalsIgnoreCase("nickname")){return getNick(player.getUniqueId());}
         if(params.equalsIgnoreCase("skips")){return String.valueOf(checkpointDatabase.getSkips(player.getUniqueId()));}
-        if(params.equalsIgnoreCase("vanish")){return Bukkit.getPlayer(player.getUniqueId()).hasMetadata("vanished") ? "&l[V] " : "";}
+        if(params.equalsIgnoreCase("vanish")){
+            Player online = player.getPlayer();
+            return online != null && online.hasMetadata("vanished") ? "&l[V] " : "";
+        }
         return null;
     }
 }

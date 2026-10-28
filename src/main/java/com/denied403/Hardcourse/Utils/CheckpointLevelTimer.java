@@ -1,11 +1,13 @@
 package com.denied403.Hardcourse.Utils;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -33,7 +35,7 @@ public class CheckpointLevelTimer implements Listener {
     }
 
     public static void shutdown() {
-        for (UUID uuid : sessionStart.keySet()) {
+        for (UUID uuid : new ArrayList<>(sessionStart.keySet())) {
             saveAndClear(uuid);
         }
     }
@@ -52,8 +54,10 @@ public class CheckpointLevelTimer implements Listener {
     }
 
     public static void resetForNewLevel(UUID uuid) {
-        accumulatedTime.put(uuid, 0L);
-        sessionStart.put(uuid, System.currentTimeMillis());
+        if (Bukkit.getPlayer(uuid) != null) {
+            accumulatedTime.put(uuid, 0L);
+            sessionStart.put(uuid, System.currentTimeMillis());
+        }
         checkpointDatabase.setLevelTime(uuid, 0L);
     }
 

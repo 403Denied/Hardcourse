@@ -61,7 +61,7 @@ public class Deaths {
                                     String playerName = StringArgumentType.getString(ctx, "player");
                                     OfflinePlayer target = Bukkit.getOfflinePlayer(playerName);
 
-                                    if (!target.hasPlayedBefore()) {
+                                    if (!target.hasPlayedBefore() && !target.isOnline()) {
                                         sender.sendMessage(Colorize("<prefix>Player <accent>" + playerName + "<main> not found."));
                                         return 0;
                                     }
@@ -86,7 +86,7 @@ public class Deaths {
         int amount = IntegerArgumentType.getInteger(ctx, "amount");
 
         OfflinePlayer target = Bukkit.getOfflinePlayer(targetName);
-        if (!target.hasPlayedBefore()) {
+        if (!target.hasPlayedBefore() && !target.isOnline()) {
             sender.sendMessage(Colorize("<prefix>Player <accent>" + targetName + "<main> not found."));
             return 0;
         }
@@ -103,7 +103,7 @@ public class Deaths {
                 }
             }
             case "give" -> {
-                target.setStatistic(Statistic.DEATHS, currentDeaths + amount);
+                target.setStatistic(Statistic.DEATHS, (int) Math.min(Integer.MAX_VALUE, (long) currentDeaths + amount));
                 sender.sendMessage(Colorize("<prefix>Gave <accent>" + amount + "<main> deaths to <accent>" + targetName + "<main>."));
                 if(target.isOnline() && sender != target) {
                     Player onlineTarget = target.getPlayer();
@@ -111,7 +111,7 @@ public class Deaths {
                 }
             }
             case "remove" -> {
-                target.setStatistic(Statistic.DEATHS, currentDeaths - amount);
+                target.setStatistic(Statistic.DEATHS, Math.max(0, currentDeaths - amount));
                 sender.sendMessage(Colorize("<prefix>Removed <accent>" + amount + "<main> deaths from <accent>" + targetName + "<main>."));
                 if(target.isOnline() && sender != target) {
                     Player onlineTarget = target.getPlayer();

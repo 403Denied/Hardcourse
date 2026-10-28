@@ -5,6 +5,7 @@ import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -16,12 +17,12 @@ public class DoubleJump implements Listener {
 
     @EventHandler
     public void onPlayerRightClick(PlayerInteractEvent event) {
-        if (event.getHand() != EquipmentSlot.HAND) return;
+        if (event.getHand() != EquipmentSlot.HAND || event.getAction() == Action.PHYSICAL) return;
         if (!event.hasItem()) return;
 
         ItemStack item = event.getItem();
         if(item == null) return;
-        if (item.getType() != Material.FEATHER || !item.hasItemMeta()) return;
+        if (item.getType() != Material.FEATHER || !item.hasItemMeta() || !item.getItemMeta().hasDisplayName()) return;
 
         String name = stripAllColors(item.getItemMeta().displayName());
         if (!name.equalsIgnoreCase("Double Jump")) return;

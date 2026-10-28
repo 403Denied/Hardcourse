@@ -159,6 +159,11 @@ public class Skip {
             nextLoc = checkpointDatabase.getCheckpointLocation(season, nextLevel);
         }
 
+        if (nextLevel >= getFinalLevel(season)) {
+            player.sendMessage(Colorize("<prefix>You can't skip the final level of a season!"));
+            return 0;
+        }
+
         if (nextLoc == null) {
             player.sendMessage(Colorize("<prefix>No checkpoint location found for the next level (<accent>" + season + "-" + String.valueOf(nextLevel).replace(".0", "") + "<main>). Contact a staff member."));
             return 1;

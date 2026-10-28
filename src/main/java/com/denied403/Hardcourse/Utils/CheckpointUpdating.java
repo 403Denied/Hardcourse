@@ -179,6 +179,13 @@ public class CheckpointUpdating {
             return;
         }
 
+        if (updatesToApply.isEmpty()) return;
+
+        if (!player.hasPlayedBefore()) {
+            setLastProcessedUpdate(uuid, updatesToApply.getLast().id);
+            return;
+        }
+
         for (LevelUpdate update : updatesToApply) {
             Location targetLoc = checkpointDatabase.getCheckpointLocation(season, update.resetTo);
             if (targetLoc == null) {
@@ -186,27 +193,26 @@ public class CheckpointUpdating {
                 lastProcessed = update.id;
                 continue;
             }
-            if (!player.hasPlayedBefore()) {
-                setLastProcessedUpdate(uuid, update.id);
-                return;
-            }
-
             if (level >= update.start && level <= update.end) {
                 player.teleport(targetLoc);
-                player.setRespawnLocation(targetLoc.add(0, 1, 0));
-                checkpointDatabase.setCheckpointData(uuid, 1, update.resetTo);
+                player.setRespawnLocation(targetLoc.clone().add(0, 1, 0), true);
+                checkpointDatabase.setCheckpointData(uuid, season, update.resetTo);
                 level = update.resetTo;
                 giveItems(player);
                 resetForNewLevel(uuid);
                 player.sendMessage(Colorize("<prefix>Your checkpoint has been updated to level <accent>" + String.valueOf(update.resetTo).replace(".0", "") + "<main> for season <accent>" + season + "<main> due to a recent update. Contact a staff member for more information."));
-            } else {
-                Component message = Colorize("<prefix>A level update has been applied for Season <accent>" + season + " <main>Levels <accent>" + String.valueOf(update.start).replaceAll(".0", "") + "<main>-<accent>" + String.valueOf(update.end).replaceAll(".0", "") + "<main>.<accent> Click here to reset back to the updated section<main>! You could also run <accent>/checkpoint tp " + update.resetTo + "<main> to go see the updated portion without resetting yourself!")
+            } else if (level > update.end) {
+                Component message = Colorize("<prefix>A level update has been applied for Season <accent>" + season + " <main>Levels <accent>" + String.valueOf(update.start).replace(".0", "") + "<main>-<accent>" + String.valueOf(update.end).replace(".0", "") + "<main>.<accent> Click here to reset back to the updated section<main>! You could also run <accent>/checkpoint tp " + String.valueOf(update.resetTo).replace(".0", "") + " " + season + "<main> to go see the updated portion without resetting yourself!")
                         .hoverEvent(HoverEvent.showText(Colorize("Doing this will set your level back to <accent>" + String.valueOf(update.resetTo).replace(".0", ""))))
                         .clickEvent(ClickEvent.callback(audience -> {
                             if (!(audience instanceof Player p)) return;
+                            // The message can be clicked long after it was sent; only ever move a player back within the same season
+                            if (checkpointDatabase.getSeason(p.getUniqueId()) != season) return;
+                            if (checkpointDatabase.getLevel(p.getUniqueId()) <= update.resetTo) return;
 
                             p.teleport(targetLoc);
-                            checkpointDatabase.setCheckpointData(p.getUniqueId(), 1, update.resetTo);
+                            p.setRespawnLocation(targetLoc.clone().add(0, 1, 0), true);
+                            checkpointDatabase.setCheckpointData(p.getUniqueId(), season, update.resetTo);
                             giveItems(p);
                             resetForNewLevel(p.getUniqueId());
 

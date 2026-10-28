@@ -22,6 +22,7 @@ import org.bukkit.Statistic;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.Location;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -34,7 +35,7 @@ import static com.denied403.Hardcourse.Utils.CheckpointLevelTimer.resetForNewLev
 import static com.denied403.core403.Util.ColorUtil.Colorize;
 
 public class CheckpointCommand {
-    private static final Set<UUID> restartCancelled = new HashSet<>();
+    private static final Map<UUID, BukkitTask> pendingRestarts = new HashMap<>();
 
     public static LiteralCommandNode<CommandSourceStack> createCommand(String commandName) {
         return Commands.literal(commandName)
@@ -186,13 +187,20 @@ public class CheckpointCommand {
                             }
                             player.sendMessage(Colorize("<prefix>Click this message to confirm the reset.").clickEvent(ClickEvent.callback(audience -> {
                                 if(!(audience instanceof Player p)) return;
-                                p.sendMessage(Colorize("<prefix>Your checkpoint is about to be reset in <accent>10 seconds<main>. You may cancel this by clicking this message.").clickEvent(ClickEvent.callback(audience2 -> {
-                                    player.sendMessage(Colorize("<prefix>Restart cancelled."));
-                                    restartCancelled.add(player.getUniqueId());
-                                })));
                                 UUID uuid = p.getUniqueId();
-                                Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                                    if (!restartCancelled.contains(p.getUniqueId())) {
+                                if (pendingRestarts.containsKey(uuid)) {
+                                    p.sendMessage(Colorize("<prefix>Your restart is already pending."));
+                                    return;
+                                }
+                                p.sendMessage(Colorize("<prefix>Your checkpoint is about to be reset in <accent>10 seconds<main>. You may cancel this by clicking this message.").clickEvent(ClickEvent.callback(audience2 -> {
+                                    BukkitTask pending = pendingRestarts.remove(uuid);
+                                    if (pending == null) return;
+                                    pending.cancel();
+                                    p.sendMessage(Colorize("<prefix>Restart cancelled."));
+                                })));
+                                pendingRestarts.put(uuid, Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                                    pendingRestarts.remove(uuid);
+                                    if (p.isOnline()) {
                                         checkpointDatabase.setCheckpointData(uuid, 1, 0);
                                         p.performCommand("spawn");
                                         giveItems(p);
@@ -204,8 +212,7 @@ public class CheckpointCommand {
 
                                         HardcourseDiscordExtras.logCheckpointChange(p.getName() + " reset back to level 0!");
                                     }
-                                    restartCancelled.remove(player.getUniqueId());
-                                }, 200L);
+                                }, 200L));
                             })));
                             return Command.SINGLE_SUCCESS;
                         }))
@@ -271,7 +278,7 @@ public class CheckpointCommand {
                                             "<prefix>Checkpoint Info for level <accent>1-" +
                                                     String.valueOf(level).replace(".0", "") +
                                                     "<main>: " + locationString +
-                                                    "<main>\nDifficulty: <accent>" + difficulty.replaceAll("§", "&")
+                                                    "<main>\nDifficulty: <accent>" + (difficulty == null || difficulty.isEmpty() ? "Unknown" : difficulty.replaceAll("§", "&"))
                                     ));
                                     return Command.SINGLE_SUCCESS;
                                 })
@@ -300,7 +307,7 @@ public class CheckpointCommand {
                                                             season + "-" +
                                                             String.valueOf(level).replace(".0", "") +
                                                             "<main>: " + locationString +
-                                                            "<main>\nDifficulty: <accent>" + difficulty.replaceAll("§", "&")
+                                                            "<main>\nDifficulty: <accent>" + (difficulty == null || difficulty.isEmpty() ? "Unknown" : difficulty.replaceAll("§", "&"))
                                             ));
                                             return Command.SINGLE_SUCCESS;
                                         }))))

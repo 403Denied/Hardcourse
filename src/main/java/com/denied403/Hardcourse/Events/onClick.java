@@ -4,6 +4,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -14,7 +15,7 @@ import static com.denied403.core403.Util.ColorUtil.Colorize;
 public class onClick implements Listener {
     @EventHandler
     public void onClickEvent(PlayerInteractEvent event) {
-        if(event.getItem() == null) {
+        if(event.getItem() == null || event.getAction() == Action.PHYSICAL || !event.getItem().hasItemMeta() || !event.getItem().getItemMeta().hasItemName()) {
             return;
         } if(event.getItem().getItemMeta().itemName().equals(Colorize("&c&lStuck").decoration(TextDecoration.ITALIC, false)) && event.getItem().getType() == Material.CLOCK){
             event.getPlayer().setHealth(0);
