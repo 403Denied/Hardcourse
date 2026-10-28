@@ -4,6 +4,7 @@ import com.denied403.core403.Discord.Applications.TicketSetup;
 import com.denied403.core403.Discord.DiscordService;
 import com.denied403.core403.Discord.DiscordSetup;
 import com.denied403.core403.Punishments.Api.PunishmentEvent;
+import com.denied403.core403.Punishments.Events.PunishmentConfirmListener;
 import com.denied403.core403.Punishments.Utils.PunishmentReason;
 import com.denied403.core403.Util.LuckPermsUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -224,11 +225,20 @@ public final class HardcourseDiscordExtras extends ListenerAdapter implements Li
         }
 
         String playerName = id.substring("ban:".length());
-        Bukkit.getScheduler().runTask(plugin, () -> {
+        Bukkit.getScheduler().runTask(plugin, () ->
+        {
             try {
-                handlePunishment(linkedUUID.toString(), PunishmentReason.getReasonByName("Unfair Advantage"), Bukkit.getOfflinePlayer(playerName), "ban", "Issued via discord");
-                event.reply("Issued ban for **`" + playerName + "`**.").setEphemeral(true).queue();
-                runBanCleanup(playerName);
+                handlePunishment(linkedUUID.toString(), PunishmentReason.getReasonByName("Unfair Advantage"), Bukkit.getOfflinePlayer(playerName), "ban", "Issued via discord")
+                        .whenComplete((result, error) -> Bukkit.getScheduler().runTask(plugin, () -> {
+                            if (error != null || result == null || result == PunishmentConfirmListener.FAILED) {
+                                String reason = error != null ? error.getMessage() : "Core403 didn't issue it (duplicate or misconfigured reason?)";
+                                EmbedBuilder embed = new EmbedBuilder().setColor(Color.RED).setDescription("❌ An error occurred. `" + reason + "`");
+                                event.replyEmbeds(embed.build()).setEphemeral(true).queue();
+                                return;
+                            }
+                            event.reply("Issued ban for **`" + playerName + "`**.").setEphemeral(true).queue();
+                            runBanCleanup(playerName);
+                        }));
             } catch (SQLException e) {
                 EmbedBuilder embed = new EmbedBuilder().setColor(Color.RED).setDescription("❌ An error occurred. `" + e.getMessage() + "`");
                 event.replyEmbeds(embed.build()).setEphemeral(true).queue();

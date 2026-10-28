@@ -25,12 +25,14 @@ repositories {
     }
 }
 
+def core403Jar = file("../Core403/build/libs/Core403-1.0.jar")
+
 dependencies {
     compileOnly("io.papermc.paper:paper-api:26.3.build.+")
     implementation 'org.xerial:sqlite-jdbc:3.50.2.0'
     compileOnly("me.clip:placeholderapi:2.11.6")
     compileOnly("com.github.MilkBowl:VaultAPI:1.7"){exclude group: 'org.bukkit', module: 'bukkit'}
-    compileOnly("com.denied403:Core403-1.0:1.0")
+    compileOnly files(core403Jar)
     compileOnly 'net.luckperms:api:5.4'
 }
 

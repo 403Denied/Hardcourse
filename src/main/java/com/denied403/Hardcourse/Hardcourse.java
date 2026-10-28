@@ -5,7 +5,6 @@ import com.denied403.Hardcourse.Commands.Trails.EndTrail;
 import com.denied403.Hardcourse.Commands.Trails.OminousTrail;
 import com.denied403.Hardcourse.Discord.HardcourseDiscordExtras;
 import com.denied403.Hardcourse.Events.*;
-import com.denied403.Hardcourse.Chat.*;
 import com.denied403.Hardcourse.Points.*;
 import com.denied403.Hardcourse.Points.Shop.PointsShop;
 import com.denied403.Hardcourse.Utils.*;
@@ -64,7 +63,6 @@ public final class Hardcourse extends JavaPlugin implements Listener {
         }
 
         eventRegistrar.registerEvents(new MiscEvents(), this);
-        eventRegistrar.registerEvents(new ChatReactions(), this);
         eventRegistrar.registerEvents(new onJoin(), this);
         eventRegistrar.registerEvents(new onClick(), this);
         eventRegistrar.registerEvents(new onWalk(), this);
@@ -84,26 +82,15 @@ public final class Hardcourse extends JavaPlugin implements Listener {
             registrar.register(Clock.createCommand("clock"));
             registrar.register(CheckpointCommand.createCommand("checkpoint"));
             registrar.register(CheckpointCommand.createCommand("checkpoints"));
-            registrar.register(EndChatGame.createCommand("endChatGame"));
-            registrar.register(EndChatGame.createCommand("ecg"));
-            registrar.register(RunChatGame.createCommand("runChatGame"));
-            registrar.register(RunChatGame.createCommand("rcg"));
             registrar.register(ReloadHardcourse.createCommand("reloadHardcourse"));
             registrar.register(WinnerTP.createCommand("winnerTp"));
             registrar.register(WinnerTP.createCommand("wtp"));
-            registrar.register(ToggleDiabolicalUnscrambles.createCommand("toggleDiabolicalUnscrambles"));
             registrar.register(Deaths.createCommand("deaths"));
             registrar.register(EndTrail.createCommand("endTrail"));
             registrar.register(OminousTrail.createCommand("ominousTrail"));
             registrar.register(Skip.createCommand("skip"));
             registrar.register(Skip.createCommand("skips"));
         });
-
-        Bukkit.getScheduler().runTaskTimer(this, () -> {
-            if(UnscrambleEnabled) {
-                if(Bukkit.getOnlinePlayers().isEmpty()) return;
-                ChatReactions.runGame(ChatReactions.getRandomWord());
-            }}, 0L, 4800);
     }
 
     @Override
@@ -121,13 +108,11 @@ public final class Hardcourse extends JavaPlugin implements Listener {
         }
     }
 
-    public static boolean UnscrambleEnabled;
     public static boolean isDev;
     public static List<String> exemptions;
 
     public static void loadConfigValues() {
         FileConfiguration config = plugin.getConfig();
-        UnscrambleEnabled = config.getBoolean("unscramble-enabled");
         isDev = config.getBoolean("is-dev");
         exemptions = config.getStringList("skip-alert-exemptions");
     }

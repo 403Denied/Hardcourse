@@ -1,5 +1,6 @@
 package com.denied403.Hardcourse.Events;
 
+import com.denied403.core403.Punishments.Events.PunishmentConfirmListener;
 import com.denied403.core403.Punishments.Utils.PunishmentReason;
 import com.denied403.core403.Util.LuckPermsUtil;
 import org.bukkit.*;
@@ -11,7 +12,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
-import java.sql.SQLException;
 import java.util.*;
 
 import com.denied403.Hardcourse.Discord.HardcourseDiscordExtras;
@@ -31,8 +31,10 @@ public class onWalk implements Listener {
         if (event.getFrom().getBlockX() == event.getTo().getBlockX() && event.getFrom().getBlockY() == event.getTo().getBlockY() && event.getFrom().getBlockZ() == event.getTo().getBlockZ()) return;
 
         Player p = event.getPlayer();
-        Location loc = p.getLocation();
-        if (p.getLocation().subtract(0, 1, 0).getBlock().getType() == Material.JUKEBOX && p.getLocation().getBlock().getType() == Material.OAK_SIGN) {
+        Block feet = p.getLocation().getBlock();
+        Block checkpoint = findCheckpoint(feet);
+        if (checkpoint != null) {
+            Location loc = checkpoint.equals(feet) ? p.getLocation() : checkpoint.getLocation().add(0.5, 0, 0.5).setDirection(p.getLocation().getDirection());
 
             double checkpointNumber;
             String difficulty;
@@ -80,12 +82,13 @@ public class onWalk implements Listener {
                             if (staff.hasPermission("hardcourse.staff")) {onlineStaff.add(staff);}
                         }
                         if (onlineStaff.isEmpty()) {
-                            try {
-                                p.teleport(checkpointDatabase.getCheckpointLocation(season, previousLevel));
-                                handlePunishment("00000000-0000-0000-0000-000000000000", PunishmentReason.getReasonByName("Unfair Advantage (Auto)"), p, "ban", "Skipped from level " + Double.toString(previousLevel).replace(".0", "") + " to level " + Double.toString(checkpointNumber).replace(".0", "") + " while no staff were online with a playtime of " + getPlaytime(p) + ".");
-                                HardcourseDiscordExtras.runBanCleanup(p.getName());
-                                return;
-                            } catch (SQLException e) {return;}
+                            p.teleport(checkpointDatabase.getCheckpointLocation(season, previousLevel));
+                            String name = p.getName();
+                            handlePunishment("00000000-0000-0000-0000-000000000000", PunishmentReason.getReasonByName("Unfair Advantage (Auto)"), p, "ban", "Skipped from level " + Double.toString(previousLevel).replace(".0", "") + " to level " + Double.toString(checkpointNumber).replace(".0", "") + " while no staff were online with a playtime of " + getPlaytime(p) + ".")
+                                    .thenAccept(result -> {
+                                        if (result != PunishmentConfirmListener.FAILED) Bukkit.getScheduler().runTask(plugin, () -> HardcourseDiscordExtras.runBanCleanup(name));
+                                    });
+                            return;
                         }
                     }
                     if(playerSeason > 1) {
@@ -118,7 +121,7 @@ public class onWalk implements Listener {
                     }
                 }
 
-                Block blockAbove1 = p.getLocation().getBlock();
+                Block blockAbove1 = checkpoint;
                 Block blockAbove2 = blockAbove1.getRelative(BlockFace.UP);
                 Block blockAbove3 = blockAbove2.getRelative(BlockFace.UP);
 
@@ -167,6 +170,27 @@ public class onWalk implements Listener {
             }
         }
     }
+    private static boolean isCheckpoint(Block block) {
+        return block.getType() == Material.OAK_SIGN && block.getRelative(BlockFace.DOWN).getType() == Material.JUKEBOX;
+    }
+
+    private static boolean isUnobstructed(Block checkpoint) {
+        return checkpoint.isPassable() && checkpoint.getRelative(BlockFace.UP).isPassable() && checkpoint.getRelative(BlockFace.UP, 2).isPassable();
+    }
+
+    private static Block findCheckpoint(Block feet) {
+        if (isCheckpoint(feet)) return feet;
+        if (!feet.getRelative(BlockFace.DOWN).getType().isSolid()) return null;
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dz = -1; dz <= 1; dz++) {
+                if (dx == 0 && dz == 0) continue;
+                Block candidate = feet.getRelative(dx, 0, dz);
+                if (isCheckpoint(candidate) && isUnobstructed(candidate)) return candidate;
+            }
+        }
+        return null;
+    }
+
     private void handleSeasonComplete(Player p, int nextSeason, String discordSeasonId) {
         HardcourseDiscordExtras.announceWinning(p, discordSeasonId, false);
         p.sendMessage(Colorize("<prefix><accent>Congratulations! <main>You have completed Season <accent>" + discordSeasonId + "<main>!"));

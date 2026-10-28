@@ -3,7 +3,6 @@ Checkpoints-Channel-Id: CHANNEL_ID_HERE
 Deaths-Channel-Id: CHANNEL_ID_HERE
 Staff-Invite-Channel-Id: CHANNEL_ID_HERE
 
-unscramble-enabled: true/false
 is-dev: true/false
 
 skip-alert-exemptions:
