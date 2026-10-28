@@ -226,8 +226,6 @@ public final class HardcourseDiscordExtras extends ListenerAdapter implements Li
 
         String playerName = id.substring("ban:".length());
         Bukkit.getScheduler().runTask(plugin, () ->
-        {
-            try {
                 handlePunishment(linkedUUID.toString(), PunishmentReason.getReasonByName("Unfair Advantage"), Bukkit.getOfflinePlayer(playerName), "ban", "Issued via discord")
                         .whenComplete((result, error) -> Bukkit.getScheduler().runTask(plugin, () -> {
                             if (error != null || result == null || result == PunishmentConfirmListener.FAILED) {
@@ -238,11 +236,6 @@ public final class HardcourseDiscordExtras extends ListenerAdapter implements Li
                             }
                             event.reply("Issued ban for **`" + playerName + "`**.").setEphemeral(true).queue();
                             runBanCleanup(playerName);
-                        }));
-            } catch (SQLException e) {
-                EmbedBuilder embed = new EmbedBuilder().setColor(Color.RED).setDescription("❌ An error occurred. `" + e.getMessage() + "`");
-                event.replyEmbeds(embed.build()).setEphemeral(true).queue();
-            }
-        });
+                        })));
     }
 }
