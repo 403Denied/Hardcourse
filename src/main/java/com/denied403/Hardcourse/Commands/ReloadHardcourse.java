@@ -9,7 +9,7 @@ import org.bukkit.command.CommandSender;
 
 import static com.denied403.Hardcourse.Hardcourse.loadConfigValues;
 import static com.denied403.Hardcourse.Hardcourse.plugin;
-import static com.denied403.core403.Util.ColorUtil.Colorize;
+import static com.denied403.core403.Util.Chat.ColorUtil.Colorize;
 
 public class ReloadHardcourse {
 

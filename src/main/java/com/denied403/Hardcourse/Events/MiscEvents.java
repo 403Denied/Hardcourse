@@ -6,7 +6,7 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 
-import static com.denied403.core403.Util.ColorUtil.Colorize;
+import static com.denied403.core403.Util.Chat.ColorUtil.Colorize;
 
 public class MiscEvents implements Listener {
 

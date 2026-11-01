@@ -11,7 +11,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
-import static com.denied403.core403.Util.ColorUtil.stripAllColors;
+import static com.denied403.core403.Util.Chat.ColorUtil.stripAllColors;
 
 public class DoubleJump implements Listener {
 

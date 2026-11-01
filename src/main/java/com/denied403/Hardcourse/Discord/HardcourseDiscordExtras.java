@@ -6,7 +6,7 @@ import com.denied403.core403.Discord.DiscordSetup;
 import com.denied403.core403.Punishments.Api.PunishmentEvent;
 import com.denied403.core403.Punishments.Events.PunishmentConfirmListener;
 import com.denied403.core403.Punishments.Utils.PunishmentReason;
-import com.denied403.core403.Util.LuckPermsUtil;
+import com.denied403.core403.Util.Players.LuckPermsUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.components.MessageTopLevelComponentUnion;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
@@ -35,8 +35,8 @@ import static com.denied403.Hardcourse.Hardcourse.checkpointDatabase;
 import static com.denied403.Hardcourse.Hardcourse.plugin;
 import static com.denied403.core403.Core403.playerDatabase;
 import static com.denied403.core403.Punishments.Events.PunishmentConfirmListener.handlePunishment;
-import static com.denied403.core403.Util.ColorUtil.Colorize;
-import static com.denied403.core403.Util.ColorUtil.stripAllColors;
+import static com.denied403.core403.Util.Chat.ColorUtil.Colorize;
+import static com.denied403.core403.Util.Chat.ColorUtil.stripAllColors;
 
 public final class HardcourseDiscordExtras extends ListenerAdapter implements Listener {
     private static String hacksChannelId;
@@ -119,7 +119,7 @@ public final class HardcourseDiscordExtras extends ListenerAdapter implements Li
         String name = stripAllColors(player.displayName());
         String suffix = finalSeason ? ". This player has finished hardcourse!" : "";
         DiscordService.chatChannel().sendMessage(":trophy: **`" + name + "`** has completed **Season " + seasonId
-                + "**! Their playtime was " + com.denied403.core403.Util.Playtime.getPlaytime(player) + suffix).queue();
+                + "**! Their playtime was " + com.denied403.core403.Util.Format.Playtime.getPlaytime(player) + suffix).queue();
     }
 
     public static void logDeath(Player player) {

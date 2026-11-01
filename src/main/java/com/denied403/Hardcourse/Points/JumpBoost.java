@@ -12,8 +12,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import static com.denied403.core403.Util.ColorUtil.Colorize;
-import static com.denied403.core403.Util.ColorUtil.stripAllColors;
+import static com.denied403.core403.Util.Chat.ColorUtil.Colorize;
+import static com.denied403.core403.Util.Chat.ColorUtil.stripAllColors;
 
 public class JumpBoost implements Listener {
 

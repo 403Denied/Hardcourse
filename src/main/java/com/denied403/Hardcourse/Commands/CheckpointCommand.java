@@ -3,7 +3,7 @@ package com.denied403.Hardcourse.Commands;
 import com.denied403.Hardcourse.Hardcourse;
 import com.denied403.Hardcourse.Utils.CheckpointDatabase;
 import com.denied403.Hardcourse.Utils.CheckpointLevelTimer;
-import com.denied403.core403.Util.LuckPermsUtil;
+import com.denied403.core403.Util.Players.LuckPermsUtil;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
@@ -32,7 +32,7 @@ import com.denied403.Hardcourse.Discord.HardcourseDiscordExtras;
 import static com.denied403.Hardcourse.Commands.Clock.giveItems;
 import static com.denied403.Hardcourse.Hardcourse.*;
 import static com.denied403.Hardcourse.Utils.CheckpointLevelTimer.resetForNewLevel;
-import static com.denied403.core403.Util.ColorUtil.Colorize;
+import static com.denied403.core403.Util.Chat.ColorUtil.Colorize;
 
 public class CheckpointCommand {
     private static final Map<UUID, BukkitTask> pendingRestarts = new HashMap<>();

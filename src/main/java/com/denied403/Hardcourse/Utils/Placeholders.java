@@ -1,6 +1,6 @@
 package com.denied403.Hardcourse.Utils;
 
-import com.denied403.core403.Util.NumberUtil;
+import com.denied403.core403.Util.Format.NumberUtil;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -9,8 +9,8 @@ import org.jetbrains.annotations.NotNull;
 import static com.denied403.Hardcourse.Hardcourse.checkpointDatabase;
 import static com.denied403.Hardcourse.Utils.CheckpointLevelTimer.getCurrentLevelTimeFormatted;
 import static com.denied403.core403.Core403.*;
-import static com.denied403.core403.Util.ConfigManager.*;
-import static com.denied403.core403.Util.NickManager.getNick;
+import static com.denied403.core403.Util.Config.ConfigManager.*;
+import static com.denied403.core403.Util.Players.NickManager.getNick;
 
 public class Placeholders extends PlaceholderExpansion {
     @Override

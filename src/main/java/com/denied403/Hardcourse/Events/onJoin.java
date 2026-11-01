@@ -14,8 +14,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import static com.denied403.Hardcourse.Commands.Clock.giveItems;
 import static com.denied403.Hardcourse.Hardcourse.*;
 import static com.denied403.Hardcourse.Points.Shop.PointsShop.givePointsShopPaper;
-import static com.denied403.core403.Util.ColorUtil.Colorize;
-import static com.denied403.core403.Util.ColorUtil.stripAllColors;
+import static com.denied403.core403.Util.Chat.ColorUtil.Colorize;
+import static com.denied403.core403.Util.Chat.ColorUtil.stripAllColors;
 
 public class onJoin implements Listener {
     @EventHandler

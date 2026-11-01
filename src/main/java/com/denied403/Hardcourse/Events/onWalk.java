@@ -2,7 +2,7 @@ package com.denied403.Hardcourse.Events;
 
 import com.denied403.core403.Punishments.Events.PunishmentConfirmListener;
 import com.denied403.core403.Punishments.Utils.PunishmentReason;
-import com.denied403.core403.Util.LuckPermsUtil;
+import com.denied403.core403.Util.Players.LuckPermsUtil;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -20,8 +20,8 @@ import static com.denied403.Hardcourse.Hardcourse.*;
 import static com.denied403.Hardcourse.Utils.CheckpointLevelTimer.getCurrentLevelTimeFormatted;
 import static com.denied403.Hardcourse.Utils.CheckpointLevelTimer.resetForNewLevel;
 import static com.denied403.core403.Punishments.Events.PunishmentConfirmListener.handlePunishment;
-import static com.denied403.core403.Util.ColorUtil.Colorize;
-import static com.denied403.core403.Util.Playtime.getPlaytime;
+import static com.denied403.core403.Util.Chat.ColorUtil.Colorize;
+import static com.denied403.core403.Util.Format.Playtime.getPlaytime;
 
 public class onWalk implements Listener {
     private final Random random = new Random();

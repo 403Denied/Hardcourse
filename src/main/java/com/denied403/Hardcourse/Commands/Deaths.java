@@ -19,7 +19,7 @@ import java.util.concurrent.CompletableFuture;
 
 import com.denied403.Hardcourse.Discord.HardcourseDiscordExtras;
 
-import static com.denied403.core403.Util.ColorUtil.Colorize;
+import static com.denied403.core403.Util.Chat.ColorUtil.Colorize;
 
 public class Deaths {
     public static LiteralCommandNode<CommandSourceStack> createCommand(String commandName) {
