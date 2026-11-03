@@ -6,7 +6,7 @@ import com.denied403.core403.Discord.DiscordSetup;
 import com.denied403.core403.Punishments.Api.PunishmentEvent;
 import com.denied403.core403.Punishments.Events.PunishmentConfirmListener;
 import com.denied403.core403.Punishments.Utils.PunishmentReason;
-import com.denied403.core403.Util.Players.LuckPermsUtil;
+import com.denied403.core403.Util.Players.RankUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.components.MessageTopLevelComponentUnion;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
@@ -218,7 +218,7 @@ public final class HardcourseDiscordExtras extends ListenerAdapter implements Li
             return;
         }
 
-        if (!LuckPermsUtil.hasPermission(linkedUUID, "core403.punish.use")) {
+        if (!RankUtil.hasPermission(linkedUUID, "core403.punish.use")) {
             EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setDescription("❌ You don't have permission to do this!");
             event.replyEmbeds(denied.build()).setEphemeral(true).queue();
             return;

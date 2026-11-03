@@ -2,7 +2,7 @@ package com.denied403.Hardcourse.Events;
 
 import com.denied403.core403.Punishments.Events.PunishmentConfirmListener;
 import com.denied403.core403.Punishments.Utils.PunishmentReason;
-import com.denied403.core403.Util.Players.LuckPermsUtil;
+import com.denied403.core403.Util.Players.RankUtil;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -171,7 +171,7 @@ public class onWalk implements Listener {
                     }
                     HardcourseDiscordExtras.announceWinning(p, "3", true);
                     p.sendMessage(Colorize("<prefix><accent>Congratulations! <main>You have completed Season 3! There is currently no Season 4, so you have reached the end of the Hardcourse for now. By completing the map, you have unlocked some perks! Try <accent>/wtp <player><main> to teleport, and <accent>/checkpoint tp <level> [<season>]<main> to teleport to any level."));
-                    LuckPermsUtil.addRank(p.getUniqueId(), "winner");
+                    RankUtil.addRank(p.getUniqueId(), "winner");
                 }
             }
         }
@@ -211,7 +211,7 @@ public class onWalk implements Listener {
         p.setRespawnLocation(p.getLocation().add(0, 1, 0), true);
         checkpointDatabase.setLevel(p.getUniqueId(), 0);
         checkpointDatabase.setSeason(p.getUniqueId(), nextSeason);
-        LuckPermsUtil.addRank(p.getUniqueId(), String.valueOf(nextSeason));
+        RankUtil.addRank(p.getUniqueId(), String.valueOf(nextSeason));
         p.sendMessage(Colorize("<main>You have been teleported to the next season. You can now continue your journey!"));
     }
 }
