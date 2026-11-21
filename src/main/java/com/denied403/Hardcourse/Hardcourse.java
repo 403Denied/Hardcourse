@@ -76,6 +76,7 @@ public final class Hardcourse extends JavaPlugin implements Listener {
         eventRegistrar.registerEvents(new JumpBoost(), this);
         eventRegistrar.registerEvents(new DoubleJump(), this);
         eventRegistrar.registerEvents(new TempCheckpoint(), this);
+        eventRegistrar.registerEvents(new JumpBoostCommand(), this);
 
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
             Commands registrar = event.registrar();
@@ -90,6 +91,7 @@ public final class Hardcourse extends JavaPlugin implements Listener {
             registrar.register(OminousTrail.createCommand("ominousTrail"));
             registrar.register(Skip.createCommand("skip"));
             registrar.register(Skip.createCommand("skips"));
+            registrar.register(JumpBoostCommand.createCommand("jumpboost"));
         });
     }
 
